@@ -6,4 +6,8 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\SMAIAXBackend.Domain\SMAIAXBackend.Domain.csproj" />
+    </ItemGroup>
+
 </Project>
