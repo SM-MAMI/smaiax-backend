@@ -1,7 +1,10 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SMAIAXBackend.Application.Services.Implementations;
 using SMAIAXBackend.Application.Services.Interfaces;
+using SMAIAXBackend.Domain.Repositories;
 using SMAIAXBackend.Infrastructure.DbContexts;
+using SMAIAXBackend.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,8 +13,24 @@ builder.Services.AddDbContext<UserStoreDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("user-store"));
 });
 
+builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
+{
+    options.User.RequireUniqueEmail = true;
+    options.Password.RequireDigit = true;
+    options.Password.RequireLowercase = true;
+    options.Password.RequireNonAlphanumeric = true;
+    options.Password.RequireUppercase = true;
+    options.Password.RequiredLength = 8;
+    options.Password.RequiredUniqueChars = 1;
+})
+.AddEntityFrameworkStores<UserStoreDbContext>()
+.AddDefaultTokenProviders();
+
 // Application Services.
 builder.Services.AddScoped<IUserService, UserService>();
+
+// Repositories
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 builder.Services.AddControllers();
 

@@ -4,15 +4,18 @@ namespace SMAIAXBackend.Domain.Model.Entities;
 
 public class User : IEqualityComparer<User> 
 {
-    public UserId Id { get; }
-    public Name Name { get; }
-    public Address Address { get; }
-    public string Email { get; }
+    public UserId Id { get; } = null!;
+    public Name Name { get; } = null!;
+    public Address Address { get; } = null!;
+    public string Email { get; } = null!;
 
     public static User Create(UserId id, Name name, Address address, string email)
     {
         return new User(id, name, address, email);
     }
+    
+    // Needed by EF Core
+    private User() { }
     
     private User(UserId id, Name name, Address address, string email)
     {
