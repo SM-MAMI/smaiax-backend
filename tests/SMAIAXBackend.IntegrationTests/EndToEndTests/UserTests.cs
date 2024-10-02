@@ -30,14 +30,16 @@ public class UserTests : TestBase
         Assert.That(responseContent, Is.Not.Null);
 
         var identityUser = await UserStoreDbContext.Users
-            .SingleOrDefaultAsync(u => u.Email == registerDto.Email);
+            .SingleOrDefaultAsync(u => u.Id == id.ToString());
         var domainUser = await UserStoreDbContext.DomainUsers
             .SingleOrDefaultAsync(u => u.Id == new UserId(id));
+
         Assert.Multiple(() =>
         {
             Assert.That(identityUser, Is.Not.Null);
             Assert.That(domainUser, Is.Not.Null);
         });
+        Assert.That(identityUser.Email, Is.EqualTo(registerDto.Email));
         Assert.Multiple(() =>
         {
             Assert.That(domainUser.Email, Is.EqualTo(registerDto.Email));
