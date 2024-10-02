@@ -11,7 +11,7 @@ namespace SMAIAXBackend.Application.Services.Implementations;
 
 public class UserService(IUserRepository userRepository, UserManager<IdentityUser> userManager, ILogger<UserService> logger) : IUserService
 {
-    public async Task Register(RegisterDto registerDto)
+    public async Task<Guid> Register(RegisterDto registerDto)
     {
         var identityUser = new IdentityUser { UserName = registerDto.Email, Email = registerDto.Email };
         var result = await userManager.CreateAsync(identityUser, registerDto.Password);
@@ -28,5 +28,7 @@ public class UserService(IUserRepository userRepository, UserManager<IdentityUse
         var address = new Address(registerDto.Street, registerDto.City, registerDto.State, registerDto.ZipCode, registerDto.Country);
         var domainUser = User.Create(userId, name, address, registerDto.Email);
         await userRepository.Add(domainUser);
+
+        return userId.Id;
     }
 }

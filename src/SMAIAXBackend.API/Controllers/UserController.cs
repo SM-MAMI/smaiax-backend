@@ -13,9 +13,9 @@ public class UserController(IUserService userService) : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [Consumes("application/json")]
-    public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
+    public async Task<ActionResult<Guid>> Register([FromBody] RegisterDto registerDto)
     {
-        await userService.Register(registerDto);
-        return Ok();
+        var registeredUserId = await userService.Register(registerDto);
+        return Ok(registeredUserId);
     }
 }

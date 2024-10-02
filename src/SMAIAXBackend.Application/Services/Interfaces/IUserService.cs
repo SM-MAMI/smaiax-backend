@@ -4,5 +4,5 @@ namespace SMAIAXBackend.Application.Services.Interfaces;
 
 public interface IUserService
 {
-    Task Register(RegisterDto registerDto);
+    Task<Guid> Register(RegisterDto registerDto);
 }
