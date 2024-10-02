@@ -1,36 +1,11 @@
 namespace SMAIAXBackend.Domain.Model.ValueObjects;
 
-public class UserId(Guid id) : IEqualityComparer<UserId>
+public class UserId(Guid id) : ValueObject
 {
     public Guid Id { get; } = id;
 
-    public bool Equals(UserId? x, UserId? y)
+    protected override IEnumerable<object> GetEqualityComponents()
     {
-        if (ReferenceEquals(x, y))
-        {
-            return true;
-        }
-
-        if (x is null)
-        {
-            return false;
-        }
-
-        if (y is null)
-        {
-            return false;
-        }
-
-        if (x.GetType() != y.GetType())
-        {
-            return false;
-        }
-
-        return x.Id.Equals(y.Id);
-    }
-
-    public int GetHashCode(UserId obj)
-    {
-        return obj.Id.GetHashCode();
+        yield return Id;
     }
 }
