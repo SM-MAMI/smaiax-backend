@@ -1,0 +1,20 @@
+﻿services:
+  smaiax-backend:
+    image: smaiax-backend
+    container_name: "smaiax-backend"
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - postgres
+  postgres:
+    image: postgres:16-bullseye
+    container_name: "smaiax-backend-db"
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: user-store
