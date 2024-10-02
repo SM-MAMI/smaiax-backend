@@ -15,7 +15,7 @@ public class UserController(IUserService userService) : ControllerBase
     [Consumes("application/json")]
     public async Task<ActionResult<Guid>> Register([FromBody] RegisterDto registerDto)
     {
-        var registeredUserId = await userService.Register(registerDto);
+        var registeredUserId = await userService.RegisterAsync(registerDto);
         return Ok(registeredUserId);
     }
 }

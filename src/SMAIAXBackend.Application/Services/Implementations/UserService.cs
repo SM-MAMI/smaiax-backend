@@ -14,7 +14,7 @@ public class UserService(
     UserManager<IdentityUser> userManager,
     ILogger<UserService> logger) : IUserService
 {
-    public async Task<Guid> Register(RegisterDto registerDto)
+    public async Task<Guid> RegisterAsync(RegisterDto registerDto)
     {
         var userId = userRepository.NextIdentity();
         var identityUser = new IdentityUser
@@ -23,25 +23,16 @@ public class UserService(
         };
 
         var result = await userManager.CreateAsync(identityUser, registerDto.Password);
-
+    
         if (!result.Succeeded)
         {
             var errorMessages = string.Join(", ", result.Errors.Select(e => e.Description));
             logger.LogError("Registration failed with the following errors: {ErrorMessages}", errorMessages);
             throw new RegistrationException(errorMessages);
         }
-
-        var name = new Name(registerDto.FirstName, registerDto.LastName);
-        var address = new Address(
-            registerDto.Street,
-            registerDto.City,
-            registerDto.State,
-            registerDto.ZipCode,
-            registerDto.Country
-        );
-
-        var domainUser = User.Create(userId, name, address, registerDto.Email);
-        await userRepository.Add(domainUser);
+        
+        var domainUser = User.Create(userId, registerDto.Name, registerDto.Address, registerDto.Email);
+        await userRepository.AddAsync(domainUser);
 
         return userId.Id;
     }

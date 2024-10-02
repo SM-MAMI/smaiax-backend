@@ -12,7 +12,7 @@ public class UserRepository(UserStoreDbContext userStoreDbContext) : IUserReposi
         return new UserId(Guid.NewGuid());
     }
 
-    public async Task Add(User user)
+    public async Task AddAsync(User user)
     {
         await userStoreDbContext.DomainUsers.AddAsync(user);
         await userStoreDbContext.SaveChangesAsync();

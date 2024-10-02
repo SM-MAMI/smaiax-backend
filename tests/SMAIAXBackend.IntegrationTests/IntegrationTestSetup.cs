@@ -6,7 +6,7 @@ namespace SMAIAXBackend.IntegrationTests;
 
 
 [SetUpFixture]
-public class IntegrationTestSetup
+internal static class IntegrationTestSetup
 {
     private static PostgreSqlContainer _postgresContainer = null!;
     private static WebAppFactory _webAppFactory = null!;

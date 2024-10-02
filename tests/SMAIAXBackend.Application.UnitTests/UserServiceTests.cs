@@ -34,8 +34,8 @@ public class UserServiceTests
     public async Task GivenValidRegisterDto_WhenRegistrationSucceeds_ThenUserIsAddedToRepository()
     {
         // Given
-        var registerDto = new RegisterDto("test@example.com", "Password123!", "John", "Doe",
-            "123 Main St", "Anytown", "NY", "12345", "USA");
+        var registerDto = new RegisterDto("test@example.com", "Password123!", new Name("John", "Doe"),
+            new Address("123 Main St", "Anytown", "NY", "12345", "USA"));
 
         _userManagerMock
             .Setup(um => um.CreateAsync(It.IsAny<IdentityUser>(), It.IsAny<string>()))
@@ -46,21 +46,21 @@ public class UserServiceTests
             .Returns(new UserId(Guid.NewGuid()));
 
         // When
-        await _userService.Register(registerDto);
+        await _userService.RegisterAsync(registerDto);
 
         // Then
         _userManagerMock.Verify(
             um => um.CreateAsync(It.Is<IdentityUser>(iu => iu.Email == registerDto.Email), registerDto.Password),
             Times.Once);
-        _userRepositoryMock.Verify(repo => repo.Add(It.IsAny<User>()), Times.Once);
+        _userRepositoryMock.Verify(repo => repo.AddAsync(It.IsAny<User>()), Times.Once);
     }
     
     [Test]
     public void GivenInvalidRegisterDto_WhenUserCreationFails_ThenRegistrationExceptionIsThrown()
     {
         // Given
-        var registerDto = new RegisterDto("test@example.com", "WeakPassword123!", "John", "Doe",
-            "123 Main St", "Anytown", "NY", "12345", "USA");
+        var registerDto = new RegisterDto("test@example.com", "WeakPassword123!", new Name("John", "Doe"),
+            new Address("123 Main St", "Anytown", "NY", "12345", "USA"));
 
         var identityErrors = new List<IdentityError> { new() { Description = "Password is too weak" } };
         var identityResult = IdentityResult.Failed(identityErrors.ToArray());
@@ -74,13 +74,13 @@ public class UserServiceTests
             .Returns(new UserId(Guid.NewGuid()));
 
         // When
-        var exception = Assert.ThrowsAsync<RegistrationException>(() => _userService.Register(registerDto));
+        var exception = Assert.ThrowsAsync<RegistrationException>(() => _userService.RegisterAsync(registerDto));
 
         // Then
         Assert.That(exception.Message, Does.Contain("Password is too weak"));
         _userManagerMock.Verify(
             um => um.CreateAsync(It.Is<IdentityUser>(iu => iu.Email == registerDto.Email), registerDto.Password),
             Times.Once);
-        _userRepositoryMock.Verify(repo => repo.Add(It.IsAny<User>()), Times.Never);
+        _userRepositoryMock.Verify(repo => repo.AddAsync(It.IsAny<User>()), Times.Never);
     }
 }

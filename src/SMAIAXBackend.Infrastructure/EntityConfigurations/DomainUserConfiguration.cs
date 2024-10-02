@@ -20,17 +20,17 @@ public class DomainUserConfiguration : IEntityTypeConfiguration<User>
         
         builder.OwnsOne(u => u.Name, name =>
         {
-            name.Property(fn => fn.FirstName).HasColumnName("FirstName").IsRequired();
-            name.Property(fn => fn.LastName).HasColumnName("LastName").IsRequired();
+            name.Property(fn => fn.FirstName).HasColumnName("firstName").IsRequired();
+            name.Property(fn => fn.LastName).HasColumnName("lastName").IsRequired();
         });
         
         builder.OwnsOne(u => u.Address, address =>
         {
-            address.Property(a => a.Street).HasColumnName("Street").IsRequired();
-            address.Property(a => a.City).HasColumnName("City").IsRequired();
-            address.Property(a => a.State).HasColumnName("State").IsRequired();
-            address.Property(a => a.ZipCode).HasColumnName("ZipCode").IsRequired();
-            address.Property(a => a.Country).HasColumnName("Country").IsRequired();
+            address.Property(a => a.Street).HasColumnName("street").IsRequired();
+            address.Property(a => a.City).HasColumnName("city").IsRequired();
+            address.Property(a => a.State).HasColumnName("state").IsRequired();
+            address.Property(a => a.ZipCode).HasColumnName("zipCode").IsRequired();
+            address.Property(a => a.Country).HasColumnName("country").IsRequired();
         });
         
         builder.Property(u => u.Email)

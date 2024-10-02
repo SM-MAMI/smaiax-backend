@@ -6,5 +6,5 @@ namespace SMAIAXBackend.Domain.Repositories;
 public interface IUserRepository
 {
     UserId NextIdentity();
-    Task Add(User user);
+    Task AddAsync(User user);
 }

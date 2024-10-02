@@ -16,8 +16,8 @@ public class UserTests : TestBase
     public async Task GivenUserInformation_WhenRegister_ThenDomainUserAndIdentityUserAreCreated()
     {
         // Given
-        var registerDto = new RegisterDto("user@example.com", "P@ssw0rd", "John", "Doe",
-            "123 Main St", "Anytown", "CA", "12345", "USA");
+        var registerDto = new RegisterDto("user@example.com", "P@ssw0rd", new Name("John", "Doe"),
+            new Address("123 Main St", "Anytown", "CA", "12345", "USA"));
 
         var httpContent = new StringContent(JsonConvert.SerializeObject(registerDto), Encoding.UTF8,
             "application/json");
@@ -45,13 +45,8 @@ public class UserTests : TestBase
         Assert.Multiple(() =>
         {
             Assert.That(domainUser.Email, Is.EqualTo(registerDto.Email));
-            Assert.That(domainUser.Name.FirstName, Is.EqualTo(registerDto.FirstName));
-            Assert.That(domainUser.Name.LastName, Is.EqualTo(registerDto.LastName));
-            Assert.That(domainUser.Address.Street, Is.EqualTo(registerDto.Street));
-            Assert.That(domainUser.Address.City, Is.EqualTo(registerDto.City));
-            Assert.That(domainUser.Address.State, Is.EqualTo(registerDto.State));
-            Assert.That(domainUser.Address.ZipCode, Is.EqualTo(registerDto.ZipCode));
-            Assert.That(domainUser.Address.Country, Is.EqualTo(registerDto.Country));
+            Assert.That(domainUser.Name, Is.EqualTo(registerDto.Name));
+            Assert.That(domainUser.Address, Is.EqualTo(registerDto.Address));
         });
     }
 
@@ -59,8 +54,8 @@ public class UserTests : TestBase
     public async Task GivenInvalidUserInformation_WhenRegister_ThenErrorResponseIsReturned()
     {
         // Given
-        var registerDto = new RegisterDto("user@example.com", "Passw0rd", "John", "Doe",
-            "123 Main St", "Anytown", "CA", "12345", "USA");
+        var registerDto = new RegisterDto("user@example.com", "Passw0rd", new Name("John", "Doe"),
+            new Address("123 Main St", "Anytown", "CA", "12345", "USA"));
 
         var httpContent = new StringContent(JsonConvert.SerializeObject(registerDto), Encoding.UTF8,
             "application/json");
