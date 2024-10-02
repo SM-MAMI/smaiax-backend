@@ -60,3 +60,8 @@ app.UseAuthorization();
 app.MapControllers();
 
 await app.RunAsync();
+
+// For integration tests
+public abstract partial class Program
+{
+}

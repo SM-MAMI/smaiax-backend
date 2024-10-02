@@ -1,5 +1,3 @@
-using System.Collections;
-
 namespace SMAIAXBackend.Domain.Model.ValueObjects;
 
 public class Name(string firstName, string lastName) : IEqualityComparer<Name>
