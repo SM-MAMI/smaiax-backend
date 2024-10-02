@@ -32,6 +32,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 
 // Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<ITokenService, JwtService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

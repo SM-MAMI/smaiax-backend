@@ -18,4 +18,16 @@ public class UserController(IUserService userService) : ControllerBase
         var registeredUserId = await userService.RegisterAsync(registerDto);
         return Ok(registeredUserId);
     }
+
+    [HttpPost("login")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [Consumes("application/json")]
+    public async Task<ActionResult<string>> Login([FromBody] LoginDto loginDto)
+    {
+        var jwt = await userService.LoginAsync(loginDto);
+        return Ok(jwt);
+    }
 }
