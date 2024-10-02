@@ -68,6 +68,10 @@ public class UserServiceTests
         _userManagerMock
             .Setup(um => um.CreateAsync(It.IsAny<IdentityUser>(), It.IsAny<string>()))
             .ReturnsAsync(identityResult);
+        
+        _userRepositoryMock
+            .Setup(repo => repo.NextIdentity())
+            .Returns(new UserId(Guid.NewGuid()));
 
         // When
         var exception = Assert.ThrowsAsync<RegistrationException>(() => _userService.Register(registerDto));
