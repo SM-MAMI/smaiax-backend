@@ -1,3 +1,4 @@
+using System.Net;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
@@ -20,6 +21,7 @@ public class UserTests : TestBase
 
         var httpContent = new StringContent(JsonConvert.SerializeObject(registerDto), Encoding.UTF8,
             "application/json");
+
         // When
         var response = await HttpClient.PostAsync($"{BaseUrl}/register", httpContent);
         var responseContent = await response.Content.ReadAsStringAsync();
@@ -51,5 +53,26 @@ public class UserTests : TestBase
             Assert.That(domainUser.Address.ZipCode, Is.EqualTo(registerDto.ZipCode));
             Assert.That(domainUser.Address.Country, Is.EqualTo(registerDto.Country));
         });
+    }
+
+    [Test]
+    public async Task GivenInvalidUserInformation_WhenRegister_ThenErrorResponseIsReturned()
+    {
+        // Given
+        var registerDto = new RegisterDto("user@example.com", "Passw0rd", "John", "Doe",
+            "123 Main St", "Anytown", "CA", "12345", "USA");
+
+        var httpContent = new StringContent(JsonConvert.SerializeObject(registerDto), Encoding.UTF8,
+            "application/json");
+
+        // When
+        var response = await HttpClient.PostAsync($"{BaseUrl}/register", httpContent);
+
+        // Then
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
+        var responseContent = await response.Content.ReadAsStringAsync();
+        Assert.That(responseContent, Is.Not.Null);
+        Assert.That(responseContent, Does.Contain("Registration Error"));
+        Assert.That(responseContent, Does.Contain("Registration failed with the following errors: Passwords must have at least one non alphanumeric character."));
     }
 }
