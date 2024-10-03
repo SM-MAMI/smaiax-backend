@@ -4,6 +4,7 @@ using SMAIAXBackend.API;
 using SMAIAXBackend.Application.Services.Implementations;
 using SMAIAXBackend.Application.Services.Interfaces;
 using SMAIAXBackend.Domain.Repositories;
+using SMAIAXBackend.Infrastructure.Configurations;
 using SMAIAXBackend.Infrastructure.DbContexts;
 using SMAIAXBackend.Infrastructure.Repositories;
 
@@ -32,6 +33,9 @@ builder.Services.AddScoped<IUserService, UserService>();
 
 // Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<ITokenService, JwtService>();
+
+builder.Services.Configure<JwtConfiguration>(builder.Configuration.GetSection("JwtConfiguration"));
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -43,13 +47,12 @@ var app = builder.Build();
 using var scope = app.Services.CreateScope();
 var services = scope.ServiceProvider;
 
-var userStoreDbContext = services.GetRequiredService<UserStoreDbContext>();
-
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
     
+    var userStoreDbContext = services.GetRequiredService<UserStoreDbContext>();
     await userStoreDbContext.Database.EnsureDeletedAsync();
     await userStoreDbContext.Database.EnsureCreatedAsync();
 }
