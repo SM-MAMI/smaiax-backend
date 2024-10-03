@@ -45,7 +45,7 @@ var services = scope.ServiceProvider;
 
 var userStoreDbContext = services.GetRequiredService<UserStoreDbContext>();
 
-if (app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("DockerDevelopment"))
 {
     app.UseSwagger();
     app.UseSwaggerUI();
