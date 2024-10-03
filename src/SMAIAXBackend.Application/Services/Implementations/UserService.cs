@@ -56,8 +56,7 @@ public class UserService(
             throw new InvalidLoginException();
         }
         
-        // To avoid the null reference warning we access the username like this
-        // although there will definitely be a username
+        // To avoid the null reference warning
         var userName = user.UserName ?? string.Empty;
         var accessToken = await tokenService.GenerateAccessTokenAsync(user.Id, userName);
 
