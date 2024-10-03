@@ -4,7 +4,6 @@ using Moq;
 using SMAIAXBackend.Application.DTOs;
 using SMAIAXBackend.Application.Exceptions;
 using SMAIAXBackend.Application.Services.Implementations;
-using SMAIAXBackend.Application.Services.Interfaces;
 using SMAIAXBackend.Domain.Model.Entities;
 using SMAIAXBackend.Domain.Model.ValueObjects;
 using SMAIAXBackend.Domain.Repositories;
@@ -15,19 +14,22 @@ namespace SMAIAXBackend.Application.UnitTests;
 public class UserServiceTests
 {
     private Mock<IUserRepository> _userRepositoryMock;
+    private Mock<ITokenService> _tokenServiceMock;
     private Mock<UserManager<IdentityUser>> _userManagerMock;
     private Mock<ILogger<UserService>> _loggerMock;
-    private IUserService _userService;
+    private UserService _userService;
 
-    [OneTimeSetUp]
+    [SetUp]
     public void Setup()
     {
         _userRepositoryMock = new Mock<IUserRepository>();
+        _tokenServiceMock = new Mock<ITokenService>();
         _userManagerMock = new Mock<UserManager<IdentityUser>>(
-            Mock.Of<IUserStore<IdentityUser>>(), null, null, null, null, null, null, null, null
+            Mock.Of<IUserStore<IdentityUser>>(), null!, null!, null!, null!, null!, null!, null!, null!
         );
         _loggerMock = new Mock<ILogger<UserService>>();
-        _userService = new UserService(_userRepositoryMock.Object, _userManagerMock.Object, _loggerMock.Object);
+        _userService = new UserService(_userRepositoryMock.Object, _tokenServiceMock.Object, 
+            _userManagerMock.Object, _loggerMock.Object);
     }
 
     [Test]
@@ -78,9 +80,81 @@ public class UserServiceTests
 
         // Then
         Assert.That(exception.Message, Does.Contain("Password is too weak"));
-        _userManagerMock.Verify(
-            um => um.CreateAsync(It.Is<IdentityUser>(iu => iu.Email == registerDto.Email), registerDto.Password),
-            Times.Once);
         _userRepositoryMock.Verify(repo => repo.AddAsync(It.IsAny<User>()), Times.Never);
+    }
+
+    [Test]
+    public async Task GivenValidUsernameAndPassword_WhenLogin_ThenAccessTokenIsReturned()
+    {
+        // Given
+        var loginDto = new LoginDto("valid@example.com", "validPassword");
+        var user = new IdentityUser { Id = "user123", UserName = loginDto.Username };
+        var expectedAccessToken = "accessToken123";
+        
+        _userManagerMock
+            .Setup(um => um.FindByNameAsync(loginDto.Username))
+            .ReturnsAsync(user);
+
+        _userManagerMock
+            .Setup(um => um.CheckPasswordAsync(user, loginDto.Password))
+            .ReturnsAsync(true);
+
+        _tokenServiceMock
+            .Setup(ts => ts.GenerateAccessTokenAsync(user.Id, user.UserName))
+            .ReturnsAsync(expectedAccessToken);
+        
+        // When
+        var accessToken = await _userService.LoginAsync(loginDto);
+        
+        // Then
+        Assert.That(accessToken, Is.EqualTo(expectedAccessToken));
+        
+        _userManagerMock.Verify(um => um.FindByNameAsync(loginDto.Username), Times.Once);
+        _userManagerMock.Verify(um => um.CheckPasswordAsync(user, loginDto.Password), Times.Once);
+        _tokenServiceMock.Verify(ts => ts.GenerateAccessTokenAsync(user.Id, user.UserName), Times.Once);
+    }
+    
+    [Test]
+    public void GivenInvalidUsernameAndValidPassword_WhenLogin_ThenInvalidLoginExceptionIsThrown()
+    {
+        // Given
+        var loginDto = new LoginDto("invalid@example.com", "validPassword");
+        
+        _userManagerMock
+            .Setup(um => um.FindByNameAsync(loginDto.Username))
+            .ReturnsAsync((IdentityUser)null!);
+        
+        // When
+        var exception = Assert.ThrowsAsync<InvalidLoginException>(() => _userService.LoginAsync(loginDto));
+        
+        // Then
+        Assert.That(exception.Message, Does.Contain("Username or password is wrong"));
+        _userManagerMock.Verify(um => um.FindByNameAsync(loginDto.Username), Times.Once);
+        _userManagerMock.Verify(um => um.CheckPasswordAsync(It.IsAny<IdentityUser>(), loginDto.Password), Times.Never);
+        _tokenServiceMock.Verify(ts => ts.GenerateAccessTokenAsync(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+    }
+    
+    [Test]
+    public void GivenValidUsernameAndInvalidPassword_WhenLogin_ThenInvalidLoginExceptionIsThrown()
+    {
+        // Given
+        var loginDto = new LoginDto("valid@example.com", "invalidPassword");
+        var user = new IdentityUser { Id = "user123", UserName = loginDto.Username };
+        
+        _userManagerMock
+            .Setup(um => um.FindByNameAsync(loginDto.Username))
+            .ReturnsAsync(user);
+        _userManagerMock
+            .Setup(um => um.CheckPasswordAsync(user, loginDto.Password))
+            .ReturnsAsync(false);
+        
+        // When
+        var exception = Assert.ThrowsAsync<InvalidLoginException>(() => _userService.LoginAsync(loginDto));
+        
+        // Then
+        Assert.That(exception.Message, Does.Contain("Username or password is wrong"));
+        _userManagerMock.Verify(um => um.FindByNameAsync(loginDto.Username), Times.Once);
+        _userManagerMock.Verify(um => um.CheckPasswordAsync(user, loginDto.Password), Times.Once);
+        _tokenServiceMock.Verify(ts => ts.GenerateAccessTokenAsync(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
     }
 }

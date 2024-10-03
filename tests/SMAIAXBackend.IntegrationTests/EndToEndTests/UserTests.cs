@@ -70,4 +70,59 @@ public class UserTests : TestBase
         Assert.That(responseContent, Does.Contain("Registration Error"));
         Assert.That(responseContent, Does.Contain("Registration failed with the following errors: Passwords must have at least one non alphanumeric character."));
     }
+
+    [Test]
+    public async Task GivenValidUsernameAndPassword_WhenLogin_ThenAccessTokenIsReturned()
+    {
+        // Given
+        var loginDto = new LoginDto("john.doe@example.com", "P@ssw0rd");
+        var httpContent = new StringContent(JsonConvert.SerializeObject(loginDto), Encoding.UTF8,
+            "application/json");
+        
+        // When
+        var response = await HttpClient.PostAsync($"{BaseUrl}/login", httpContent);
+        var responseContent = await response.Content.ReadAsStringAsync();
+
+        // Then
+        response.EnsureSuccessStatusCode();
+        Assert.That(responseContent, Is.Not.Null);
+    }
+    
+    [Test]
+    public async Task GivenInvalidUsernameAndValidPassword_WhenLogin_ThenErrorResponseIsReturned()
+    {
+        // Given
+        var loginDto = new LoginDto("john.invalid@example.com", "P@ssw0rd");
+        var httpContent = new StringContent(JsonConvert.SerializeObject(loginDto), Encoding.UTF8,
+            "application/json");
+        
+        // When
+        var response = await HttpClient.PostAsync($"{BaseUrl}/login", httpContent);
+        var responseContent = await response.Content.ReadAsStringAsync();
+
+        // Then
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
+        Assert.That(responseContent, Is.Not.Null);
+        Assert.That(responseContent, Does.Contain("Unauthorized"));
+        Assert.That(responseContent, Does.Contain("Username or password is wrong"));
+    }
+    
+    [Test]
+    public async Task GivenValidUsernameAndInvalidPassword_WhenLogin_ThenErrorResponseIsReturned()
+    {
+        // Given
+        var loginDto = new LoginDto("john.doe@example.com", "InvalidPassword");
+        var httpContent = new StringContent(JsonConvert.SerializeObject(loginDto), Encoding.UTF8,
+            "application/json");
+        
+        // When
+        var response = await HttpClient.PostAsync($"{BaseUrl}/login", httpContent);
+        var responseContent = await response.Content.ReadAsStringAsync();
+
+        // Then
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
+        Assert.That(responseContent, Is.Not.Null);
+        Assert.That(responseContent, Does.Contain("Unauthorized"));
+        Assert.That(responseContent, Does.Contain("Username or password is wrong"));
+    }
 }
