@@ -25,9 +25,9 @@ public class UserController(IUserService userService) : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [Consumes("application/json")]
-    public async Task<ActionResult<string>> Login([FromBody] LoginDto loginDto)
+    public async Task<ActionResult<TokenDto>> Login([FromBody] LoginDto loginDto)
     {
-        var jwt = await userService.LoginAsync(loginDto);
-        return Ok(jwt);
+        var tokenDto = await userService.LoginAsync(loginDto);
+        return Ok(tokenDto);
     }
 }

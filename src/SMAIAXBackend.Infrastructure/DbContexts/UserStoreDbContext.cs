@@ -9,6 +9,7 @@ namespace SMAIAXBackend.Infrastructure.DbContexts;
 public class UserStoreDbContext(DbContextOptions<UserStoreDbContext> options) : IdentityDbContext<IdentityUser>(options)
 {
     public DbSet<User> DomainUsers { get; init; }
+    public DbSet<RefreshToken> RefreshTokens { get; init; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -20,6 +21,7 @@ public class UserStoreDbContext(DbContextOptions<UserStoreDbContext> options) : 
     {
         base.OnModelCreating(builder);
         builder.ApplyConfiguration(new DomainUserConfiguration());
+        builder.ApplyConfiguration(new RefreshTokenConfiguration());
         
         SeedTestData(builder);
     }

@@ -28,7 +28,7 @@ public class UserServiceTests
             Mock.Of<IUserStore<IdentityUser>>(), null!, null!, null!, null!, null!, null!, null!, null!
         );
         _loggerMock = new Mock<ILogger<UserService>>();
-        _userService = new UserService(_userRepositoryMock.Object, _tokenServiceMock.Object, 
+        _userService = new UserService(_userRepositoryMock.Object, _tokenServiceMock.Object,
             _userManagerMock.Object, _loggerMock.Object);
     }
 
@@ -56,7 +56,7 @@ public class UserServiceTests
             Times.Once);
         _userRepositoryMock.Verify(repo => repo.AddAsync(It.IsAny<User>()), Times.Once);
     }
-    
+
     [Test]
     public void GivenInvalidRegisterDto_WhenUserCreationFails_ThenRegistrationExceptionIsThrown()
     {
@@ -70,7 +70,7 @@ public class UserServiceTests
         _userManagerMock
             .Setup(um => um.CreateAsync(It.IsAny<IdentityUser>(), It.IsAny<string>()))
             .ReturnsAsync(identityResult);
-        
+
         _userRepositoryMock
             .Setup(repo => repo.NextIdentity())
             .Returns(new UserId(Guid.NewGuid()));
@@ -84,13 +84,17 @@ public class UserServiceTests
     }
 
     [Test]
-    public async Task GivenValidUsernameAndPassword_WhenLogin_ThenAccessTokenIsReturned()
+    public async Task GivenValidUsernameAndPassword_WhenLogin_ThenTokenDtoIsReturned()
     {
         // Given
         var loginDto = new LoginDto("valid@example.com", "validPassword");
-        var user = new IdentityUser { Id = "user123", UserName = loginDto.Username };
+        var user = new IdentityUser { Id = Guid.NewGuid().ToString(), UserName = loginDto.Username };
+        var expectedTokenId = Guid.NewGuid();
         var expectedAccessToken = "accessToken123";
-        
+        var expectedRefreshToken = RefreshToken.Create(new RefreshTokenId(Guid.NewGuid()),
+            new UserId(Guid.Parse(user.Id)), expectedTokenId.ToString(), "refreshToken123", true,
+            DateTime.UtcNow.AddMinutes(1));
+
         _userManagerMock
             .Setup(um => um.FindByNameAsync(loginDto.Username))
             .ReturnsAsync(user);
@@ -99,62 +103,73 @@ public class UserServiceTests
             .Setup(um => um.CheckPasswordAsync(user, loginDto.Password))
             .ReturnsAsync(true);
 
+        _tokenServiceMock.Setup(ts => ts.NextIdentity()).Returns(expectedTokenId);
         _tokenServiceMock
-            .Setup(ts => ts.GenerateAccessTokenAsync(user.Id, user.UserName))
+            .Setup(ts => ts.GenerateAccessTokenAsync(expectedTokenId.ToString(), user.Id, user.UserName))
             .ReturnsAsync(expectedAccessToken);
-        
+        _tokenServiceMock
+            .Setup(ts => ts.GenerateRefreshToken(expectedTokenId.ToString(), user.Id))
+            .ReturnsAsync(expectedRefreshToken);
+
         // When
-        var accessToken = await _userService.LoginAsync(loginDto);
-        
+        var tokenDto = await _userService.LoginAsync(loginDto);
+
         // Then
-        Assert.That(accessToken, Is.EqualTo(expectedAccessToken));
-        
+        Assert.Multiple(() =>
+        {
+            Assert.That(tokenDto.AccessToken, Is.EqualTo(expectedAccessToken));
+            Assert.That(tokenDto.RefreshToken, Is.EqualTo(expectedRefreshToken.Token));
+        });
         _userManagerMock.Verify(um => um.FindByNameAsync(loginDto.Username), Times.Once);
         _userManagerMock.Verify(um => um.CheckPasswordAsync(user, loginDto.Password), Times.Once);
-        _tokenServiceMock.Verify(ts => ts.GenerateAccessTokenAsync(user.Id, user.UserName), Times.Once);
+        _tokenServiceMock.Verify(ts => ts.GenerateAccessTokenAsync(expectedTokenId.ToString(), user.Id, user.UserName),
+            Times.Once);
     }
-    
+
     [Test]
     public void GivenInvalidUsernameAndValidPassword_WhenLogin_ThenInvalidLoginExceptionIsThrown()
     {
         // Given
         var loginDto = new LoginDto("invalid@example.com", "validPassword");
-        
+
         _userManagerMock
             .Setup(um => um.FindByNameAsync(loginDto.Username))
             .ReturnsAsync((IdentityUser)null!);
-        
+
         // When
         var exception = Assert.ThrowsAsync<InvalidLoginException>(() => _userService.LoginAsync(loginDto));
-        
+
         // Then
         Assert.That(exception.Message, Does.Contain("Username or password is wrong"));
         _userManagerMock.Verify(um => um.FindByNameAsync(loginDto.Username), Times.Once);
         _userManagerMock.Verify(um => um.CheckPasswordAsync(It.IsAny<IdentityUser>(), loginDto.Password), Times.Never);
-        _tokenServiceMock.Verify(ts => ts.GenerateAccessTokenAsync(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+        _tokenServiceMock.Verify(
+            ts => ts.GenerateAccessTokenAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
     }
-    
+
     [Test]
     public void GivenValidUsernameAndInvalidPassword_WhenLogin_ThenInvalidLoginExceptionIsThrown()
     {
         // Given
         var loginDto = new LoginDto("valid@example.com", "invalidPassword");
         var user = new IdentityUser { Id = "user123", UserName = loginDto.Username };
-        
+
         _userManagerMock
             .Setup(um => um.FindByNameAsync(loginDto.Username))
             .ReturnsAsync(user);
         _userManagerMock
             .Setup(um => um.CheckPasswordAsync(user, loginDto.Password))
             .ReturnsAsync(false);
-        
+
         // When
         var exception = Assert.ThrowsAsync<InvalidLoginException>(() => _userService.LoginAsync(loginDto));
-        
+
         // Then
         Assert.That(exception.Message, Does.Contain("Username or password is wrong"));
         _userManagerMock.Verify(um => um.FindByNameAsync(loginDto.Username), Times.Once);
         _userManagerMock.Verify(um => um.CheckPasswordAsync(user, loginDto.Password), Times.Once);
-        _tokenServiceMock.Verify(ts => ts.GenerateAccessTokenAsync(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+        _tokenServiceMock.Verify(
+            ts => ts.GenerateAccessTokenAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()),
+            Times.Never);
     }
 }

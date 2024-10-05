@@ -72,7 +72,7 @@ public class UserTests : TestBase
     }
 
     [Test]
-    public async Task GivenValidUsernameAndPassword_WhenLogin_ThenAccessTokenIsReturned()
+    public async Task GivenValidUsernameAndPassword_WhenLogin_ThenAccessTokenAndRefreshTokenAreReturned()
     {
         // Given
         var loginDto = new LoginDto("john.doe@example.com", "P@ssw0rd");
@@ -86,6 +86,10 @@ public class UserTests : TestBase
         // Then
         response.EnsureSuccessStatusCode();
         Assert.That(responseContent, Is.Not.Null);
+        var tokenDto = JsonConvert.DeserializeObject<TokenDto>(responseContent);
+        Assert.That(tokenDto, Is.Not.Null);
+        Assert.That(tokenDto.AccessToken, Is.Not.Null);
+        Assert.That(tokenDto.RefreshToken, Is.Not.Null);
     }
     
     [Test]

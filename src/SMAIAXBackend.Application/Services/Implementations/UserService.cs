@@ -37,7 +37,7 @@ public class UserService(
         return userId.Id;
     }
 
-    public async Task<string> LoginAsync(LoginDto loginDto)
+    public async Task<TokenDto> LoginAsync(LoginDto loginDto)
     {
         var user = await userManager.FindByNameAsync(loginDto.Username);
 
@@ -51,15 +51,17 @@ public class UserService(
 
         if (!isPasswordCorrect)
         {
-            // TODO: Increment AccessFailedCount and lock user for a configured amount of time?
             logger.LogError("Invalid password for user `{Username}`.", loginDto.Username);
             throw new InvalidLoginException();
         }
         
         // To avoid the null reference warning
         var userName = user.UserName ?? string.Empty;
-        var accessToken = await tokenService.GenerateAccessTokenAsync(user.Id, userName);
-
-        return accessToken;
+        var tokenId = tokenService.NextIdentity();
+        var accessToken = await tokenService.GenerateAccessTokenAsync(tokenId.ToString(), user.Id, userName);
+        var refreshToken = await tokenService.GenerateRefreshToken(tokenId.ToString(), user.Id);
+        var tokenDto = new TokenDto(accessToken, refreshToken.Token);
+        
+        return tokenDto;
     }
 }
