@@ -108,7 +108,7 @@ public class UserServiceTests
             .Setup(ts => ts.GenerateAccessTokenAsync(expectedTokenId.ToString(), user.Id, user.UserName))
             .ReturnsAsync(expectedAccessToken);
         _tokenServiceMock
-            .Setup(ts => ts.GenerateRefreshToken(expectedTokenId.ToString(), user.Id))
+            .Setup(ts => ts.GenerateRefreshTokenAsync(expectedTokenId.ToString(), user.Id))
             .ReturnsAsync(expectedRefreshToken);
 
         // When
@@ -171,5 +171,204 @@ public class UserServiceTests
         _tokenServiceMock.Verify(
             ts => ts.GenerateAccessTokenAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()),
             Times.Never);
+    }
+
+    [Test]
+    public async Task GivenValidTokens_WhenRefreshingTokens_ThenNewTokensAreReturned()
+    {
+        // Given
+        var userId = new UserId(Guid.NewGuid());
+        var identityUser = new IdentityUser { Id = userId.ToString(), UserName = "john.doe@example.com" };
+        var validAccessToken = "validAccessToken";
+        var validRefreshToken = "validRefreshToken";
+        var refreshTokenId = new RefreshTokenId(Guid.NewGuid());
+        var tokenDto = new TokenDto(validAccessToken, validRefreshToken);
+
+        var existingRefreshToken = RefreshToken.Create(
+            refreshTokenId,
+            userId,
+            Guid.NewGuid().ToString(),
+            validRefreshToken,
+            isValid: true,
+            expiresAt: DateTime.UtcNow.AddMinutes(10)
+        );
+
+        var newRefreshTokenId = new RefreshTokenId(Guid.NewGuid());
+        var newRefreshTokenString = "newRefreshToken";
+        var newAccessToken = "newAccessToken";
+
+        var newRefreshToken = RefreshToken.Create(
+            newRefreshTokenId,
+            userId,
+            Guid.NewGuid().ToString(),
+            newRefreshTokenString,
+            isValid: true,
+            expiresAt: DateTime.UtcNow.AddMinutes(10)
+        );
+
+        _tokenServiceMock.Setup(ts => ts.GetRefreshTokenByTokenAsync(validRefreshToken))
+            .ReturnsAsync(existingRefreshToken);
+        _tokenServiceMock.Setup(ts => ts.ValidateAccessToken(validAccessToken, userId, existingRefreshToken.JwtTokenId))
+            .Returns(true);
+        _userManagerMock.Setup(um => um.FindByIdAsync(userId.ToString()))
+            .ReturnsAsync(identityUser);
+        _tokenServiceMock.Setup(ts => ts.NextIdentity()).Returns(newRefreshTokenId.Id);
+        _tokenServiceMock.Setup(ts => ts.GenerateRefreshTokenAsync(newRefreshTokenId.ToString(), userId.ToString()))
+            .ReturnsAsync(newRefreshToken);
+        _tokenServiceMock.Setup(ts =>
+                ts.GenerateAccessTokenAsync(It.IsAny<string>(), userId.ToString(), identityUser.UserName))
+            .ReturnsAsync(newAccessToken);
+
+        // When
+        var result = await _userService.RefreshTokensAsync(tokenDto);
+
+        // Then
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.AccessToken, Is.EqualTo(newAccessToken));
+            Assert.That(result.RefreshToken, Is.EqualTo(newRefreshToken.Token));
+        });
+
+        _tokenServiceMock.Verify(ts => ts.GetRefreshTokenByTokenAsync(validRefreshToken), Times.Once);
+        _tokenServiceMock.Verify(
+            ts => ts.ValidateAccessToken(validAccessToken, userId, existingRefreshToken.JwtTokenId), Times.Once);
+        _tokenServiceMock.Verify(ts => ts.NextIdentity(), Times.Once);
+        _tokenServiceMock.Verify(ts => ts.GenerateRefreshTokenAsync(newRefreshTokenId.ToString(), userId.ToString()),
+            Times.Once);
+        _tokenServiceMock.Verify(
+            ts => ts.GenerateAccessTokenAsync(It.IsAny<string>(), userId.ToString(), identityUser.UserName),
+            Times.Once);
+        _userManagerMock.Verify(um => um.FindByIdAsync(userId.ToString()), Times.Once);
+    }
+
+    [Test]
+    public void GivenNonExistentRefreshToken_WhenRefreshingTokens_ThenInvalidTokenExceptionIsThrown()
+    {
+        // Given
+        var validAccessToken = "validAccessToken";
+        var invalidRefreshToken = "invalidRefreshToken";
+        var tokenDto = new TokenDto(validAccessToken, invalidRefreshToken);
+
+        _tokenServiceMock.Setup(ts => ts.GetRefreshTokenByTokenAsync(invalidRefreshToken))
+            .ReturnsAsync((RefreshToken)null!);
+
+        // When ... Then
+        Assert.ThrowsAsync<InvalidTokenException>(async () => await _userService.RefreshTokensAsync(tokenDto));
+        _tokenServiceMock.Verify(ts => ts.GetRefreshTokenByTokenAsync(invalidRefreshToken), Times.Once);
+    }
+
+    [Test]
+    public void Given_InvalidRefreshToken_When_RefreshingTokens_Then_InvalidTokenExceptionIsThrown()
+    {
+        // Given
+        var validAccessToken = "validAccessToken";
+        var invalidRefreshToken = "invalidRefreshToken";
+        var tokenDto = new TokenDto(validAccessToken, invalidRefreshToken);
+
+        var existingRefreshToken = RefreshToken.Create(
+            new RefreshTokenId(Guid.NewGuid()),
+            new UserId(Guid.NewGuid()),
+            Guid.NewGuid().ToString(),
+            invalidRefreshToken,
+            isValid: false,
+            expiresAt: DateTime.UtcNow.AddMinutes(10)
+        );
+
+        _tokenServiceMock.Setup(ts => ts.GetRefreshTokenByTokenAsync(invalidRefreshToken))
+            .ReturnsAsync(existingRefreshToken);
+
+        // When ... Then
+        Assert.ThrowsAsync<InvalidTokenException>(async () => await _userService.RefreshTokensAsync(tokenDto));
+        _tokenServiceMock.Verify(ts => ts.GetRefreshTokenByTokenAsync(invalidRefreshToken), Times.Once);
+    }
+
+    [Test]
+    public void GivenExpiredRefreshToken_WhenRefreshingTokens_ThenInvalidTokenExceptionIsThrown()
+    {
+        // Given
+        var validAccessToken = "validAccessToken";
+        var expiredRefreshToken = "expiredRefreshToken";
+        var tokenDto = new TokenDto(validAccessToken, expiredRefreshToken);
+
+        var existingRefreshToken = RefreshToken.Create(
+            new RefreshTokenId(Guid.NewGuid()),
+            new UserId(Guid.NewGuid()),
+            Guid.NewGuid().ToString(),
+            expiredRefreshToken,
+            isValid: true,
+            expiresAt: DateTime.UtcNow.AddMinutes(-10) // Expired token
+        );
+
+        _tokenServiceMock.Setup(ts => ts.GetRefreshTokenByTokenAsync(expiredRefreshToken))
+            .ReturnsAsync(existingRefreshToken);
+
+        // When ... Then
+        Assert.ThrowsAsync<InvalidTokenException>(async () => await _userService.RefreshTokensAsync(tokenDto));
+        _tokenServiceMock.Verify(ts => ts.GetRefreshTokenByTokenAsync(expiredRefreshToken), Times.Once);
+    }
+
+    [Test]
+    public void GivenInvalidAccessToken_WhenRefreshingTokens_ThenInvalidTokenExceptionIsThrown()
+    {
+        // Given
+        var invalidAccessToken = "invalidAccessToken";
+        var validRefreshToken = "validRefreshToken";
+        var tokenDto = new TokenDto(invalidAccessToken, validRefreshToken);
+        var userId = new UserId(Guid.NewGuid());
+        var refreshTokenId = new RefreshTokenId(Guid.NewGuid());
+
+        var existingRefreshToken = RefreshToken.Create(
+            refreshTokenId,
+            userId,
+            Guid.NewGuid().ToString(),
+            validRefreshToken,
+            isValid: true,
+            expiresAt: DateTime.UtcNow.AddMinutes(10)
+        );
+
+        _tokenServiceMock.Setup(ts => ts.GetRefreshTokenByTokenAsync(validRefreshToken))
+            .ReturnsAsync(existingRefreshToken);
+        _tokenServiceMock
+            .Setup(ts => ts.ValidateAccessToken(invalidAccessToken, userId, existingRefreshToken.JwtTokenId))
+            .Returns(false);
+
+        // When ... Then
+        Assert.ThrowsAsync<InvalidTokenException>(async () => await _userService.RefreshTokensAsync(tokenDto));
+        _tokenServiceMock.Verify(ts => ts.GetRefreshTokenByTokenAsync(validRefreshToken), Times.Once);
+        _tokenServiceMock.Verify(
+            ts => ts.ValidateAccessToken(invalidAccessToken, userId, existingRefreshToken.JwtTokenId), Times.Once);
+    }
+
+    [Test]
+    public void GivenNonExistentUserId_WhenRefreshingTokens_ThenInvalidTokenExceptionIsThrown()
+    {
+        // Given
+        var validAccessToken = "validAccessToken";
+        var validRefreshToken = "validRefreshToken";
+        var tokenDto = new TokenDto(validAccessToken, validRefreshToken);
+        var userId = new UserId(Guid.NewGuid());
+        var refreshTokenId = new RefreshTokenId(Guid.NewGuid());
+
+        var existingRefreshToken = RefreshToken.Create(
+            refreshTokenId,
+            userId,
+            Guid.NewGuid().ToString(),
+            validRefreshToken,
+            isValid: true,
+            expiresAt: DateTime.UtcNow.AddMinutes(10)
+        );
+
+        _tokenServiceMock.Setup(ts => ts.GetRefreshTokenByTokenAsync(validRefreshToken))
+            .ReturnsAsync(existingRefreshToken);
+        _tokenServiceMock.Setup(ts => ts.ValidateAccessToken(validAccessToken, userId, existingRefreshToken.JwtTokenId))
+            .Returns(true);
+        _userManagerMock.Setup(um => um.FindByIdAsync(userId.ToString())).ReturnsAsync((IdentityUser)null!);
+
+        // When ... Then
+        Assert.ThrowsAsync<InvalidTokenException>(async () => await _userService.RefreshTokensAsync(tokenDto));
+        _tokenServiceMock.Verify(ts => ts.GetRefreshTokenByTokenAsync(validRefreshToken), Times.Once);
+        _tokenServiceMock.Verify(
+            ts => ts.ValidateAccessToken(validAccessToken, userId, existingRefreshToken.JwtTokenId), Times.Once);
+        _userManagerMock.Verify(um => um.FindByIdAsync(userId.ToString()), Times.Once);
     }
 }

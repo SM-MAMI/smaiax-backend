@@ -12,7 +12,7 @@ public class RefreshToken : IEqualityComparer<RefreshTokenId>
 
     public string Token { get; }
 
-    public bool IsValid { get; }
+    public bool IsValid { get; private set; }
 
     public DateTime ExpiresAt { get; }
 
@@ -28,7 +28,9 @@ public class RefreshToken : IEqualityComparer<RefreshTokenId>
     }
 
     // Needed by EF Core
-    private RefreshToken() {}
+    private RefreshToken()
+    {
+    }
 
     private RefreshToken(
         RefreshTokenId id,
@@ -44,6 +46,11 @@ public class RefreshToken : IEqualityComparer<RefreshTokenId>
         Token = token;
         IsValid = isValid;
         ExpiresAt = expiresAt;
+    }
+
+    public void Invalidate()
+    {
+        IsValid = false;
     }
 
     public bool Equals(RefreshTokenId? x, RefreshTokenId? y)

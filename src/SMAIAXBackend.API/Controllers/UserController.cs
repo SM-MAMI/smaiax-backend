@@ -30,4 +30,16 @@ public class UserController(IUserService userService) : ControllerBase
         var tokenDto = await userService.LoginAsync(loginDto);
         return Ok(tokenDto);
     }
+
+    [HttpPost("refresh")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [Consumes("application/json")]
+    public async Task<ActionResult<TokenDto>> RefreshTokens([FromBody] TokenDto tokenDto)
+    {
+        var refreshedTokens = await userService.RefreshTokensAsync(tokenDto);
+        return Ok(refreshedTokens);
+    }
 }

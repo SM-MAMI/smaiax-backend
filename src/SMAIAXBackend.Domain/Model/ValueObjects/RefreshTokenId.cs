@@ -8,4 +8,9 @@ public class RefreshTokenId(Guid id) : ValueObject
     {
         yield return Id;
     }
+
+    public override string ToString()
+    {
+        return Id.ToString();
+    }
 }
