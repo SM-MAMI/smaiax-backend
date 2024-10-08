@@ -25,6 +25,15 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         builder.ApplyConfiguration(new DomainUserConfiguration());
         builder.ApplyConfiguration(new RefreshTokenConfiguration());
 
+        // Place Identity tables in the "auth" schema
+        builder.Entity<IdentityUser>(entity => entity.ToTable(name: "AspNetUsers", schema: "auth"));
+        builder.Entity<IdentityRole>(entity => entity.ToTable(name: "AspNetRoles", schema: "auth"));
+        builder.Entity<IdentityUserRole<string>>(entity => entity.ToTable("AspNetUserRoles", schema: "auth"));
+        builder.Entity<IdentityUserClaim<string>>(entity => entity.ToTable("AspNetUserClaims", schema: "auth"));
+        builder.Entity<IdentityUserLogin<string>>(entity => entity.ToTable("AspNetUserLogins", schema: "auth"));
+        builder.Entity<IdentityRoleClaim<string>>(entity => entity.ToTable("AspNetRoleClaims", schema: "auth"));
+        builder.Entity<IdentityUserToken<string>>(entity => entity.ToTable("AspNetUserTokens", schema: "auth"));
+
         SeedTestData(builder);
     }
 
