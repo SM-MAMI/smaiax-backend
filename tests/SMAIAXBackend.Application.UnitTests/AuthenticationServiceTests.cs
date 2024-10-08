@@ -11,24 +11,24 @@ using SMAIAXBackend.Domain.Repositories;
 namespace SMAIAXBackend.Application.UnitTests;
 
 [TestFixture]
-public class UserServiceTests
+public class AuthenticationServiceTests
 {
     private Mock<IUserRepository> _userRepositoryMock;
-    private Mock<ITokenService> _tokenServiceMock;
+    private Mock<ITokenRepository> _tokenServiceMock;
     private Mock<UserManager<IdentityUser>> _userManagerMock;
-    private Mock<ILogger<UserService>> _loggerMock;
-    private UserService _userService;
+    private Mock<ILogger<AuthenticationService>> _loggerMock;
+    private AuthenticationService _authenticationService;
 
     [SetUp]
     public void Setup()
     {
         _userRepositoryMock = new Mock<IUserRepository>();
-        _tokenServiceMock = new Mock<ITokenService>();
+        _tokenServiceMock = new Mock<ITokenRepository>();
         _userManagerMock = new Mock<UserManager<IdentityUser>>(
             Mock.Of<IUserStore<IdentityUser>>(), null!, null!, null!, null!, null!, null!, null!, null!
         );
-        _loggerMock = new Mock<ILogger<UserService>>();
-        _userService = new UserService(_userRepositoryMock.Object, _tokenServiceMock.Object,
+        _loggerMock = new Mock<ILogger<AuthenticationService>>();
+        _authenticationService = new AuthenticationService(_userRepositoryMock.Object, _tokenServiceMock.Object,
             _userManagerMock.Object, _loggerMock.Object);
     }
 
@@ -48,7 +48,7 @@ public class UserServiceTests
             .Returns(new UserId(Guid.NewGuid()));
 
         // When
-        await _userService.RegisterAsync(registerDto);
+        await _authenticationService.RegisterAsync(registerDto);
 
         // Then
         _userManagerMock.Verify(
@@ -76,7 +76,8 @@ public class UserServiceTests
             .Returns(new UserId(Guid.NewGuid()));
 
         // When
-        var exception = Assert.ThrowsAsync<RegistrationException>(() => _userService.RegisterAsync(registerDto));
+        var exception =
+            Assert.ThrowsAsync<RegistrationException>(() => _authenticationService.RegisterAsync(registerDto));
 
         // Then
         Assert.That(exception.Message, Does.Contain("Password is too weak"));
@@ -89,10 +90,11 @@ public class UserServiceTests
         // Given
         var loginDto = new LoginDto("valid@example.com", "validPassword");
         var user = new IdentityUser { Id = Guid.NewGuid().ToString(), UserName = loginDto.Username };
-        var expectedTokenId = Guid.NewGuid();
+        var expectedJwtId = Guid.NewGuid();
+        var expectedRefreshTokenId = new RefreshTokenId(Guid.NewGuid());
         var expectedAccessToken = "accessToken123";
-        var expectedRefreshToken = RefreshToken.Create(new RefreshTokenId(Guid.NewGuid()),
-            new UserId(Guid.Parse(user.Id)), expectedTokenId.ToString(), "refreshToken123", true,
+        var expectedRefreshToken = RefreshToken.Create(expectedRefreshTokenId,
+            new UserId(Guid.Parse(user.Id)), expectedJwtId.ToString(), "refreshToken123", true,
             DateTime.UtcNow.AddMinutes(1));
 
         _userManagerMock
@@ -103,16 +105,20 @@ public class UserServiceTests
             .Setup(um => um.CheckPasswordAsync(user, loginDto.Password))
             .ReturnsAsync(true);
 
-        _tokenServiceMock.Setup(ts => ts.NextIdentity()).Returns(expectedTokenId);
+        _tokenServiceMock.SetupSequence(ts => ts.NextIdentity())
+            .Returns(expectedJwtId)
+            .Returns(expectedRefreshTokenId.Id);
+
         _tokenServiceMock
-            .Setup(ts => ts.GenerateAccessTokenAsync(expectedTokenId.ToString(), user.Id, user.UserName))
+            .Setup(ts => ts.GenerateAccessTokenAsync(expectedJwtId.ToString(), user.Id, user.UserName))
             .ReturnsAsync(expectedAccessToken);
+
         _tokenServiceMock
-            .Setup(ts => ts.GenerateRefreshTokenAsync(expectedTokenId.ToString(), user.Id))
+            .Setup(ts => ts.GenerateRefreshTokenAsync(expectedRefreshTokenId, expectedJwtId.ToString(), user.Id))
             .ReturnsAsync(expectedRefreshToken);
 
         // When
-        var tokenDto = await _userService.LoginAsync(loginDto);
+        var tokenDto = await _authenticationService.LoginAsync(loginDto);
 
         // Then
         Assert.Multiple(() =>
@@ -122,7 +128,7 @@ public class UserServiceTests
         });
         _userManagerMock.Verify(um => um.FindByNameAsync(loginDto.Username), Times.Once);
         _userManagerMock.Verify(um => um.CheckPasswordAsync(user, loginDto.Password), Times.Once);
-        _tokenServiceMock.Verify(ts => ts.GenerateAccessTokenAsync(expectedTokenId.ToString(), user.Id, user.UserName),
+        _tokenServiceMock.Verify(ts => ts.GenerateAccessTokenAsync(expectedJwtId.ToString(), user.Id, user.UserName),
             Times.Once);
     }
 
@@ -137,7 +143,7 @@ public class UserServiceTests
             .ReturnsAsync((IdentityUser)null!);
 
         // When
-        var exception = Assert.ThrowsAsync<InvalidLoginException>(() => _userService.LoginAsync(loginDto));
+        var exception = Assert.ThrowsAsync<InvalidLoginException>(() => _authenticationService.LoginAsync(loginDto));
 
         // Then
         Assert.That(exception.Message, Does.Contain("Username or password is wrong"));
@@ -162,7 +168,7 @@ public class UserServiceTests
             .ReturnsAsync(false);
 
         // When
-        var exception = Assert.ThrowsAsync<InvalidLoginException>(() => _userService.LoginAsync(loginDto));
+        var exception = Assert.ThrowsAsync<InvalidLoginException>(() => _authenticationService.LoginAsync(loginDto));
 
         // Then
         Assert.That(exception.Message, Does.Contain("Username or password is wrong"));
@@ -195,6 +201,7 @@ public class UserServiceTests
 
         var newRefreshTokenId = new RefreshTokenId(Guid.NewGuid());
         var newRefreshTokenString = "newRefreshToken";
+        var newJwtId = Guid.NewGuid();
         var newAccessToken = "newAccessToken";
 
         var newRefreshToken = RefreshToken.Create(
@@ -212,15 +219,19 @@ public class UserServiceTests
             .Returns(true);
         _userManagerMock.Setup(um => um.FindByIdAsync(userId.ToString()))
             .ReturnsAsync(identityUser);
-        _tokenServiceMock.Setup(ts => ts.NextIdentity()).Returns(newRefreshTokenId.Id);
-        _tokenServiceMock.Setup(ts => ts.GenerateRefreshTokenAsync(newRefreshTokenId.ToString(), userId.ToString()))
+        _tokenServiceMock.SetupSequence(ts => ts.NextIdentity())
+            .Returns(newJwtId)
+            .Returns(newRefreshTokenId.Id);
+
+        _tokenServiceMock.Setup(ts =>
+                ts.GenerateRefreshTokenAsync(newRefreshTokenId, newJwtId.ToString(), userId.ToString()))
             .ReturnsAsync(newRefreshToken);
         _tokenServiceMock.Setup(ts =>
                 ts.GenerateAccessTokenAsync(It.IsAny<string>(), userId.ToString(), identityUser.UserName))
             .ReturnsAsync(newAccessToken);
 
         // When
-        var result = await _userService.RefreshTokensAsync(tokenDto);
+        var result = await _authenticationService.RefreshTokensAsync(tokenDto);
 
         // Then
         Assert.Multiple(() =>
@@ -232,8 +243,9 @@ public class UserServiceTests
         _tokenServiceMock.Verify(ts => ts.GetRefreshTokenByTokenAsync(validRefreshToken), Times.Once);
         _tokenServiceMock.Verify(
             ts => ts.ValidateAccessToken(validAccessToken, userId, existingRefreshToken.JwtTokenId), Times.Once);
-        _tokenServiceMock.Verify(ts => ts.NextIdentity(), Times.Once);
-        _tokenServiceMock.Verify(ts => ts.GenerateRefreshTokenAsync(newRefreshTokenId.ToString(), userId.ToString()),
+        _tokenServiceMock.Verify(ts => ts.NextIdentity(), Times.Exactly(2));
+        _tokenServiceMock.Verify(
+            ts => ts.GenerateRefreshTokenAsync(newRefreshTokenId, newJwtId.ToString(), userId.ToString()),
             Times.Once);
         _tokenServiceMock.Verify(
             ts => ts.GenerateAccessTokenAsync(It.IsAny<string>(), userId.ToString(), identityUser.UserName),
@@ -253,7 +265,8 @@ public class UserServiceTests
             .ReturnsAsync((RefreshToken)null!);
 
         // When ... Then
-        Assert.ThrowsAsync<InvalidTokenException>(async () => await _userService.RefreshTokensAsync(tokenDto));
+        Assert.ThrowsAsync<InvalidTokenException>(async () =>
+            await _authenticationService.RefreshTokensAsync(tokenDto));
         _tokenServiceMock.Verify(ts => ts.GetRefreshTokenByTokenAsync(invalidRefreshToken), Times.Once);
     }
 
@@ -278,7 +291,8 @@ public class UserServiceTests
             .ReturnsAsync(existingRefreshToken);
 
         // When ... Then
-        Assert.ThrowsAsync<InvalidTokenException>(async () => await _userService.RefreshTokensAsync(tokenDto));
+        Assert.ThrowsAsync<InvalidTokenException>(async () =>
+            await _authenticationService.RefreshTokensAsync(tokenDto));
         _tokenServiceMock.Verify(ts => ts.GetRefreshTokenByTokenAsync(invalidRefreshToken), Times.Once);
     }
 
@@ -303,7 +317,8 @@ public class UserServiceTests
             .ReturnsAsync(existingRefreshToken);
 
         // When ... Then
-        Assert.ThrowsAsync<InvalidTokenException>(async () => await _userService.RefreshTokensAsync(tokenDto));
+        Assert.ThrowsAsync<InvalidTokenException>(async () =>
+            await _authenticationService.RefreshTokensAsync(tokenDto));
         _tokenServiceMock.Verify(ts => ts.GetRefreshTokenByTokenAsync(expiredRefreshToken), Times.Once);
     }
 
@@ -333,7 +348,8 @@ public class UserServiceTests
             .Returns(false);
 
         // When ... Then
-        Assert.ThrowsAsync<InvalidTokenException>(async () => await _userService.RefreshTokensAsync(tokenDto));
+        Assert.ThrowsAsync<InvalidTokenException>(async () =>
+            await _authenticationService.RefreshTokensAsync(tokenDto));
         _tokenServiceMock.Verify(ts => ts.GetRefreshTokenByTokenAsync(validRefreshToken), Times.Once);
         _tokenServiceMock.Verify(
             ts => ts.ValidateAccessToken(invalidAccessToken, userId, existingRefreshToken.JwtTokenId), Times.Once);
@@ -365,7 +381,8 @@ public class UserServiceTests
         _userManagerMock.Setup(um => um.FindByIdAsync(userId.ToString())).ReturnsAsync((IdentityUser)null!);
 
         // When ... Then
-        Assert.ThrowsAsync<InvalidTokenException>(async () => await _userService.RefreshTokensAsync(tokenDto));
+        Assert.ThrowsAsync<InvalidTokenException>(async () =>
+            await _authenticationService.RefreshTokensAsync(tokenDto));
         _tokenServiceMock.Verify(ts => ts.GetRefreshTokenByTokenAsync(validRefreshToken), Times.Once);
         _tokenServiceMock.Verify(
             ts => ts.ValidateAccessToken(validAccessToken, userId, existingRefreshToken.JwtTokenId), Times.Once);

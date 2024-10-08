@@ -16,24 +16,24 @@ builder.Services.AddDbContext<UserStoreDbContext>(options =>
 });
 
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
-{
-    options.User.RequireUniqueEmail = true;
-    options.Password.RequireDigit = true;
-    options.Password.RequireLowercase = true;
-    options.Password.RequireNonAlphanumeric = true;
-    options.Password.RequireUppercase = true;
-    options.Password.RequiredLength = 8;
-    options.Password.RequiredUniqueChars = 1;
-})
-.AddEntityFrameworkStores<UserStoreDbContext>()
-.AddDefaultTokenProviders();
+    {
+        options.User.RequireUniqueEmail = true;
+        options.Password.RequireDigit = true;
+        options.Password.RequireLowercase = true;
+        options.Password.RequireNonAlphanumeric = true;
+        options.Password.RequireUppercase = true;
+        options.Password.RequiredLength = 8;
+        options.Password.RequiredUniqueChars = 1;
+    })
+    .AddEntityFrameworkStores<UserStoreDbContext>()
+    .AddDefaultTokenProviders();
 
 // Application Services.
-builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 
 // Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<ITokenService, JwtService>();
+builder.Services.AddScoped<ITokenRepository, TokenRepository>();
 
 builder.Services.Configure<JwtConfiguration>(builder.Configuration.GetSection("JwtConfiguration"));
 
@@ -51,7 +51,7 @@ if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("DockerDeve
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-    
+
     var userStoreDbContext = services.GetRequiredService<UserStoreDbContext>();
     await userStoreDbContext.Database.EnsureDeletedAsync();
     await userStoreDbContext.Database.EnsureCreatedAsync();

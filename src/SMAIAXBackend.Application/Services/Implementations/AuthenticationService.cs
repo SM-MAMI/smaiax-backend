@@ -4,15 +4,16 @@ using SMAIAXBackend.Application.DTOs;
 using SMAIAXBackend.Application.Exceptions;
 using SMAIAXBackend.Application.Services.Interfaces;
 using SMAIAXBackend.Domain.Model.Entities;
+using SMAIAXBackend.Domain.Model.ValueObjects;
 using SMAIAXBackend.Domain.Repositories;
 
 namespace SMAIAXBackend.Application.Services.Implementations;
 
-public class UserService(
+public class AuthenticationService(
     IUserRepository userRepository,
-    ITokenService tokenService,
+    ITokenRepository tokenRepository,
     UserManager<IdentityUser> userManager,
-    ILogger<UserService> logger) : IUserService
+    ILogger<AuthenticationService> logger) : IAuthenticationService
 {
     public async Task<Guid> RegisterAsync(RegisterDto registerDto)
     {
@@ -57,9 +58,10 @@ public class UserService(
 
         // To avoid the null reference warning
         var userName = user.UserName ?? string.Empty;
-        var tokenId = tokenService.NextIdentity();
-        var accessToken = await tokenService.GenerateAccessTokenAsync(tokenId.ToString(), user.Id, userName);
-        var refreshToken = await tokenService.GenerateRefreshTokenAsync(tokenId.ToString(), user.Id);
+        var jwtId = tokenRepository.NextIdentity();
+        var accessToken = await tokenRepository.GenerateAccessTokenAsync(jwtId.ToString(), user.Id, userName);
+        var refreshTokenId = new RefreshTokenId(tokenRepository.NextIdentity());
+        var refreshToken = await tokenRepository.GenerateRefreshTokenAsync(refreshTokenId, jwtId.ToString(), user.Id);
         var tokenDto = new TokenDto(accessToken, refreshToken.Token);
 
         return tokenDto;
@@ -67,7 +69,7 @@ public class UserService(
 
     public async Task<TokenDto> RefreshTokensAsync(TokenDto tokenDto)
     {
-        var existingRefreshToken = await tokenService.GetRefreshTokenByTokenAsync(tokenDto.RefreshToken);
+        var existingRefreshToken = await tokenRepository.GetRefreshTokenByTokenAsync(tokenDto.RefreshToken);
 
         if (existingRefreshToken == null || !existingRefreshToken.IsValid)
         {
@@ -78,19 +80,19 @@ public class UserService(
         if (existingRefreshToken.ExpiresAt < DateTime.UtcNow)
         {
             existingRefreshToken.Invalidate();
-            await tokenService.UpdateAsync(existingRefreshToken);
+            await tokenRepository.UpdateAsync(existingRefreshToken);
             logger.LogError("Expired refresh token: {RefreshToken}, Expired at: {ExpiresAt}", tokenDto.RefreshToken,
                 existingRefreshToken.ExpiresAt);
             throw new InvalidTokenException();
         }
 
-        var isAccessTokenValid = tokenService.ValidateAccessToken(tokenDto.AccessToken, existingRefreshToken.UserId,
+        var isAccessTokenValid = tokenRepository.ValidateAccessToken(tokenDto.AccessToken, existingRefreshToken.UserId,
             existingRefreshToken.JwtTokenId);
 
         if (!isAccessTokenValid)
         {
             existingRefreshToken.Invalidate();
-            await tokenService.UpdateAsync(existingRefreshToken);
+            await tokenRepository.UpdateAsync(existingRefreshToken);
             logger.LogError("Invalid access token for refresh token: {RefreshToken}, User ID: {UserId}",
                 tokenDto.RefreshToken, existingRefreshToken.UserId);
             throw new InvalidTokenException();
@@ -104,10 +106,11 @@ public class UserService(
             throw new InvalidTokenException();
         }
 
-        var tokenId = tokenService.NextIdentity();
-        var newRefreshToken = await tokenService.GenerateRefreshTokenAsync(tokenId.ToString(),
-            existingRefreshToken.UserId.Id.ToString());
-        var newAccessToken = await tokenService.GenerateAccessTokenAsync(tokenId.ToString(),
+        var jwtId = tokenRepository.NextIdentity();
+        var refreshTokenId = new RefreshTokenId(tokenRepository.NextIdentity());
+        var newRefreshToken = await tokenRepository.GenerateRefreshTokenAsync(refreshTokenId, jwtId.ToString(),
+            identityUser.Id);
+        var newAccessToken = await tokenRepository.GenerateAccessTokenAsync(jwtId.ToString(),
             identityUser.Id, identityUser.UserName!);
         var refreshedTokens = new TokenDto(newAccessToken, newRefreshToken.Token);
 

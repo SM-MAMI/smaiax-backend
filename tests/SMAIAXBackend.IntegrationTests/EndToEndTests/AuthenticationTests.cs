@@ -8,9 +8,9 @@ using SMAIAXBackend.Domain.Model.ValueObjects;
 namespace SMAIAXBackend.IntegrationTests.EndToEndTests;
 
 [TestFixture]
-public class UserTests : TestBase
+public class AuthenticationTests : TestBase
 {
-    private const string BaseUrl = "/api/users";
+    private const string BaseUrl = "/api/authentication";
 
     [Test]
     public async Task GivenUserInformation_WhenRegister_ThenDomainUserAndIdentityUserAreCreated()
@@ -68,7 +68,9 @@ public class UserTests : TestBase
         var responseContent = await response.Content.ReadAsStringAsync();
         Assert.That(responseContent, Is.Not.Null);
         Assert.That(responseContent, Does.Contain("Registration Error"));
-        Assert.That(responseContent, Does.Contain("Registration failed with the following errors: Passwords must have at least one non alphanumeric character."));
+        Assert.That(responseContent,
+            Does.Contain(
+                "Registration failed with the following errors: Passwords must have at least one non alphanumeric character."));
     }
 
     [Test]
@@ -78,7 +80,7 @@ public class UserTests : TestBase
         var loginDto = new LoginDto("john.doe@example.com", "P@ssw0rd");
         var httpContent = new StringContent(JsonConvert.SerializeObject(loginDto), Encoding.UTF8,
             "application/json");
-        
+
         // When
         var response = await HttpClient.PostAsync($"{BaseUrl}/login", httpContent);
         var responseContent = await response.Content.ReadAsStringAsync();
@@ -91,7 +93,7 @@ public class UserTests : TestBase
         Assert.That(tokenDto.AccessToken, Is.Not.Null);
         Assert.That(tokenDto.RefreshToken, Is.Not.Null);
     }
-    
+
     [Test]
     public async Task GivenInvalidUsernameAndValidPassword_WhenLogin_ThenErrorResponseIsReturned()
     {
@@ -99,7 +101,7 @@ public class UserTests : TestBase
         var loginDto = new LoginDto("john.invalid@example.com", "P@ssw0rd");
         var httpContent = new StringContent(JsonConvert.SerializeObject(loginDto), Encoding.UTF8,
             "application/json");
-        
+
         // When
         var response = await HttpClient.PostAsync($"{BaseUrl}/login", httpContent);
         var responseContent = await response.Content.ReadAsStringAsync();
@@ -110,7 +112,7 @@ public class UserTests : TestBase
         Assert.That(responseContent, Does.Contain("Unauthorized"));
         Assert.That(responseContent, Does.Contain("Username or password is wrong"));
     }
-    
+
     [Test]
     public async Task GivenValidUsernameAndInvalidPassword_WhenLogin_ThenErrorResponseIsReturned()
     {
@@ -118,7 +120,7 @@ public class UserTests : TestBase
         var loginDto = new LoginDto("john.doe@example.com", "InvalidPassword");
         var httpContent = new StringContent(JsonConvert.SerializeObject(loginDto), Encoding.UTF8,
             "application/json");
-        
+
         // When
         var response = await HttpClient.PostAsync($"{BaseUrl}/login", httpContent);
         var responseContent = await response.Content.ReadAsStringAsync();

@@ -4,9 +4,9 @@ using SMAIAXBackend.Application.Services.Interfaces;
 
 namespace SMAIAXBackend.API.Controllers;
 
-[Route("api/users")]
+[Route("api/authentication")]
 [ApiController]
-public class UserController(IUserService userService) : ControllerBase
+public class AuthenticationController(IAuthenticationService authenticationService) : ControllerBase
 {
     [HttpPost("register")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -15,7 +15,7 @@ public class UserController(IUserService userService) : ControllerBase
     [Consumes("application/json")]
     public async Task<ActionResult<Guid>> Register([FromBody] RegisterDto registerDto)
     {
-        var registeredUserId = await userService.RegisterAsync(registerDto);
+        var registeredUserId = await authenticationService.RegisterAsync(registerDto);
         return Ok(registeredUserId);
     }
 
@@ -27,7 +27,7 @@ public class UserController(IUserService userService) : ControllerBase
     [Consumes("application/json")]
     public async Task<ActionResult<TokenDto>> Login([FromBody] LoginDto loginDto)
     {
-        var tokenDto = await userService.LoginAsync(loginDto);
+        var tokenDto = await authenticationService.LoginAsync(loginDto);
         return Ok(tokenDto);
     }
 
@@ -39,7 +39,7 @@ public class UserController(IUserService userService) : ControllerBase
     [Consumes("application/json")]
     public async Task<ActionResult<TokenDto>> RefreshTokens([FromBody] TokenDto tokenDto)
     {
-        var refreshedTokens = await userService.RefreshTokensAsync(tokenDto);
+        var refreshedTokens = await authenticationService.RefreshTokensAsync(tokenDto);
         return Ok(refreshedTokens);
     }
 }

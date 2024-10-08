@@ -12,8 +12,8 @@ using SMAIAXBackend.Infrastructure.DbContexts;
 
 namespace SMAIAXBackend.Infrastructure.Repositories;
 
-public class JwtService(IOptions<JwtConfiguration> jwtConfigOptions, UserStoreDbContext userStoreDbContext)
-    : ITokenService
+public class TokenRepository(IOptions<JwtConfiguration> jwtConfigOptions, UserStoreDbContext userStoreDbContext)
+    : ITokenRepository
 {
     private readonly JwtConfiguration _jwtConfig = jwtConfigOptions.Value;
 
@@ -50,9 +50,11 @@ public class JwtService(IOptions<JwtConfiguration> jwtConfigOptions, UserStoreDb
         return Task.FromResult(tokenString);
     }
 
-    public async Task<RefreshToken> GenerateRefreshTokenAsync(string jwtTokenId, string userId)
+    public async Task<RefreshToken> GenerateRefreshTokenAsync(
+        RefreshTokenId refreshTokenId,
+        string jwtTokenId,
+        string userId)
     {
-        var refreshTokenId = new RefreshTokenId(Guid.NewGuid());
         var token = $"{Guid.NewGuid()}-{Guid.NewGuid()}";
         var refreshToken = RefreshToken.Create(refreshTokenId, new UserId(Guid.Parse(userId)), jwtTokenId,
             token, true, DateTime.UtcNow.AddMinutes(_jwtConfig.RefreshTokenExpirationMinutes));
