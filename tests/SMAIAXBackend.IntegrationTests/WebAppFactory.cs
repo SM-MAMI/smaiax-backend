@@ -8,13 +8,13 @@ public class WebAppFactory(string postgresConnectionString) : WebApplicationFact
 {
     private readonly Dictionary<string, string> _testAppSettings = new()
     {
-        ["ConnectionStrings:user-store"] = postgresConnectionString,
+        ["ConnectionStrings:smaiax-db"] = postgresConnectionString,
         ["JwtConfiguration:Secret"] = "YourNewStrongSecretKeyOfAtLeast32Characters!",
         ["JwtConfiguration:Issuer"] = "SMAIAX",
         ["JwtConfiguration:Audience"] = "SomeAudience",
         ["JwtConfiguration:ExpirationMinutes"] = "60"
     };
-    
+
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         ConfigureAppSettings(builder);

@@ -31,9 +31,9 @@ public class AuthenticationTests : TestBase
         response.EnsureSuccessStatusCode();
         Assert.That(responseContent, Is.Not.Null);
 
-        var identityUser = await UserStoreDbContext.Users
+        var identityUser = await ApplicationDbContext.Users
             .SingleOrDefaultAsync(u => u.Id == id.ToString());
-        var domainUser = await UserStoreDbContext.DomainUsers
+        var domainUser = await ApplicationDbContext.DomainUsers
             .SingleOrDefaultAsync(u => u.Id == new UserId(id));
 
         Assert.Multiple(() =>

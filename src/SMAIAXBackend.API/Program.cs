@@ -10,9 +10,9 @@ using SMAIAXBackend.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddDbContext<UserStoreDbContext>(options =>
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
-    options.UseNpgsql(builder.Configuration.GetConnectionString("user-store"));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("smaiax-db"));
 });
 
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
@@ -25,7 +25,7 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
         options.Password.RequiredLength = 8;
         options.Password.RequiredUniqueChars = 1;
     })
-    .AddEntityFrameworkStores<UserStoreDbContext>()
+    .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
 // Application Services.
@@ -52,7 +52,7 @@ if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("DockerDeve
     app.UseSwagger();
     app.UseSwaggerUI();
 
-    var userStoreDbContext = services.GetRequiredService<UserStoreDbContext>();
+    var userStoreDbContext = services.GetRequiredService<ApplicationDbContext>();
     await userStoreDbContext.Database.EnsureDeletedAsync();
     await userStoreDbContext.Database.EnsureCreatedAsync();
 }

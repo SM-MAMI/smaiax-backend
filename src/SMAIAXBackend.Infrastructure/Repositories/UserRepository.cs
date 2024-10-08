@@ -5,7 +5,7 @@ using SMAIAXBackend.Infrastructure.DbContexts;
 
 namespace SMAIAXBackend.Infrastructure.Repositories;
 
-public class UserRepository(UserStoreDbContext userStoreDbContext) : IUserRepository
+public class UserRepository(ApplicationDbContext applicationDbContext) : IUserRepository
 {
     public UserId NextIdentity()
     {
@@ -14,7 +14,7 @@ public class UserRepository(UserStoreDbContext userStoreDbContext) : IUserReposi
 
     public async Task AddAsync(User user)
     {
-        await userStoreDbContext.DomainUsers.AddAsync(user);
-        await userStoreDbContext.SaveChangesAsync();
+        await applicationDbContext.DomainUsers.AddAsync(user);
+        await applicationDbContext.SaveChangesAsync();
     }
 }

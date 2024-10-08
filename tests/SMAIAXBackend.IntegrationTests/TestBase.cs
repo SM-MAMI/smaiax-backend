@@ -7,20 +7,20 @@ namespace SMAIAXBackend.IntegrationTests;
 public class TestBase
 {
     protected readonly HttpClient HttpClient = IntegrationTestSetup.HttpClient;
-    protected readonly UserStoreDbContext UserStoreDbContext = IntegrationTestSetup.UserStoreDbContext;
+    protected readonly ApplicationDbContext ApplicationDbContext = IntegrationTestSetup.ApplicationDbContext;
 
     [SetUp]
     public async Task Setup()
     {
-        await IntegrationTestSetup.UserStoreDbContext.Database.EnsureCreatedAsync();
+        await IntegrationTestSetup.ApplicationDbContext.Database.EnsureCreatedAsync();
         await InsertTestData();
-        IntegrationTestSetup.UserStoreDbContext.ChangeTracker.Clear();
+        IntegrationTestSetup.ApplicationDbContext.ChangeTracker.Clear();
     }
 
     [TearDown]
     public async Task TearDown()
     {
-        await IntegrationTestSetup.UserStoreDbContext.Database.EnsureDeletedAsync();
+        await IntegrationTestSetup.ApplicationDbContext.Database.EnsureDeletedAsync();
     }
 
     private async Task InsertTestData()
@@ -75,10 +75,10 @@ public class TestBase
             expirationDate1
         );
 
-        await UserStoreDbContext.RefreshTokens.AddAsync(refreshToken1);
-        await UserStoreDbContext.RefreshTokens.AddAsync(refreshToken2);
-        await UserStoreDbContext.RefreshTokens.AddAsync(refreshToken3);
-        await UserStoreDbContext.RefreshTokens.AddAsync(refreshToken4);
-        await UserStoreDbContext.SaveChangesAsync();
+        await ApplicationDbContext.RefreshTokens.AddAsync(refreshToken1);
+        await ApplicationDbContext.RefreshTokens.AddAsync(refreshToken2);
+        await ApplicationDbContext.RefreshTokens.AddAsync(refreshToken3);
+        await ApplicationDbContext.RefreshTokens.AddAsync(refreshToken4);
+        await ApplicationDbContext.SaveChangesAsync();
     }
 }

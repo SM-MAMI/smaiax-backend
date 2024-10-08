@@ -12,7 +12,7 @@ using SMAIAXBackend.Infrastructure.DbContexts;
 
 namespace SMAIAXBackend.Infrastructure.Repositories;
 
-public class TokenRepository(IOptions<JwtConfiguration> jwtConfigOptions, UserStoreDbContext userStoreDbContext)
+public class TokenRepository(IOptions<JwtConfiguration> jwtConfigOptions, ApplicationDbContext applicationDbContext)
     : ITokenRepository
 {
     private readonly JwtConfiguration _jwtConfig = jwtConfigOptions.Value;
@@ -59,15 +59,15 @@ public class TokenRepository(IOptions<JwtConfiguration> jwtConfigOptions, UserSt
         var refreshToken = RefreshToken.Create(refreshTokenId, new UserId(Guid.Parse(userId)), jwtTokenId,
             token, true, DateTime.UtcNow.AddMinutes(_jwtConfig.RefreshTokenExpirationMinutes));
 
-        await userStoreDbContext.RefreshTokens.AddAsync(refreshToken);
-        await userStoreDbContext.SaveChangesAsync();
+        await applicationDbContext.RefreshTokens.AddAsync(refreshToken);
+        await applicationDbContext.SaveChangesAsync();
 
         return refreshToken;
     }
 
     public async Task<RefreshToken?> GetRefreshTokenByTokenAsync(string token)
     {
-        return await userStoreDbContext.RefreshTokens
+        return await applicationDbContext.RefreshTokens
             .Where(rt => rt.Token.Equals(token))
             .SingleOrDefaultAsync();
     }
@@ -84,7 +84,7 @@ public class TokenRepository(IOptions<JwtConfiguration> jwtConfigOptions, UserSt
 
     public async Task UpdateAsync(RefreshToken refreshToken)
     {
-        userStoreDbContext.RefreshTokens.Update(refreshToken);
-        await userStoreDbContext.SaveChangesAsync();
+        applicationDbContext.RefreshTokens.Update(refreshToken);
+        await applicationDbContext.SaveChangesAsync();
     }
 }
