@@ -7,7 +7,8 @@ using SMAIAXBackend.Infrastructure.EntityConfigurations;
 
 namespace SMAIAXBackend.Infrastructure.DbContexts;
 
-public class UserStoreDbContext(DbContextOptions<UserStoreDbContext> options) : IdentityDbContext<IdentityUser>(options)
+public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+    : IdentityDbContext<IdentityUser>(options)
 {
     public DbSet<User> DomainUsers { get; init; }
     public DbSet<RefreshToken> RefreshTokens { get; init; }
