@@ -2,8 +2,9 @@ using SMAIAXBackend.Application.DTOs;
 
 namespace SMAIAXBackend.Application.Services.Interfaces;
 
-public interface IUserService
+public interface IAuthenticationService
 {
     Task<Guid> RegisterAsync(RegisterDto registerDto);
-    Task<string> LoginAsync(LoginDto loginDto);
+    Task<TokenDto> LoginAsync(LoginDto loginDto);
+    Task<TokenDto> RefreshTokensAsync(TokenDto tokenDto);
 }
