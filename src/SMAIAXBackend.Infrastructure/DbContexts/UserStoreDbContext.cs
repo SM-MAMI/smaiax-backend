@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using SMAIAXBackend.Domain.Model.Entities;
+using SMAIAXBackend.Domain.Model.ValueObjects;
 using SMAIAXBackend.Infrastructure.EntityConfigurations;
 
 namespace SMAIAXBackend.Infrastructure.DbContexts;
@@ -22,7 +23,7 @@ public class UserStoreDbContext(DbContextOptions<UserStoreDbContext> options) : 
         base.OnModelCreating(builder);
         builder.ApplyConfiguration(new DomainUserConfiguration());
         builder.ApplyConfiguration(new RefreshTokenConfiguration());
-        
+
         SeedTestData(builder);
     }
 
@@ -30,9 +31,11 @@ public class UserStoreDbContext(DbContextOptions<UserStoreDbContext> options) : 
     {
         var hasher = new PasswordHasher<IdentityUser>();
 
-        var userName = "john.doe@example.com";
+        var userId = new UserId(Guid.Parse("3c07065a-b964-44a9-9cdf-fbd49d755ea7"));
+        const string userName = "john.doe@example.com";
         var testUser = new IdentityUser
         {
+            Id = userId.Id.ToString(),
             UserName = userName,
             NormalizedUserName = userName.ToUpper(),
             Email = userName,
