@@ -106,6 +106,9 @@ public class AuthenticationService(
             throw new InvalidTokenException();
         }
 
+        existingRefreshToken.Invalidate();
+        await tokenRepository.UpdateAsync(existingRefreshToken);
+
         var jwtId = tokenRepository.NextIdentity();
         var refreshTokenId = new RefreshTokenId(tokenRepository.NextIdentity());
         var newRefreshToken = await tokenRepository.GenerateRefreshTokenAsync(refreshTokenId, jwtId.ToString(),
