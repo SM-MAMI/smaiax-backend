@@ -7,6 +7,7 @@ using SMAIAXBackend.Application.Services.Implementations;
 using SMAIAXBackend.Domain.Model.Entities;
 using SMAIAXBackend.Domain.Model.ValueObjects;
 using SMAIAXBackend.Domain.Repositories;
+using SMAIAXBackend.Domain.Repositories.Transactions;
 
 namespace SMAIAXBackend.Application.UnitTests;
 
@@ -16,6 +17,7 @@ public class AuthenticationServiceTests
     private Mock<IUserRepository> _userRepositoryMock;
     private Mock<ITokenRepository> _tokenServiceMock;
     private Mock<UserManager<IdentityUser>> _userManagerMock;
+    private Mock<ITransactionManager> _transactionManagerMock;
     private Mock<ILogger<AuthenticationService>> _loggerMock;
     private AuthenticationService _authenticationService;
 
@@ -27,9 +29,13 @@ public class AuthenticationServiceTests
         _userManagerMock = new Mock<UserManager<IdentityUser>>(
             Mock.Of<IUserStore<IdentityUser>>(), null!, null!, null!, null!, null!, null!, null!, null!
         );
+        _transactionManagerMock = new Mock<ITransactionManager>();
+        _transactionManagerMock
+            .Setup(mgr => mgr.TransactionScope(It.IsAny<Func<Task>>()))
+            .Returns((Func<Task> transactionalOperation) => transactionalOperation());
         _loggerMock = new Mock<ILogger<AuthenticationService>>();
         _authenticationService = new AuthenticationService(_userRepositoryMock.Object, _tokenServiceMock.Object,
-            _userManagerMock.Object, _loggerMock.Object);
+            _userManagerMock.Object, _transactionManagerMock.Object, _loggerMock.Object);
     }
 
     [Test]
