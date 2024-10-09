@@ -3,11 +3,19 @@
     image: smaiax-backend
     container_name: "smaiax-backend"
     restart: always
+    ports:
+      - "5000:8080"
+      - "5001:8081"
+    environment:
+      ASPNETCORE_ENVIRONMENT: DockerDevelopment
     build:
       context: .
       dockerfile: Dockerfile
     depends_on:
       - postgres
+    networks:
+      - smaiax-frontend-network
+      - smaiax-backend-network
   postgres:
     image: postgres:16-bullseye
     container_name: "smaiax-backend-db"
@@ -18,3 +26,13 @@
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
       POSTGRES_DB: user-store
+    networks:
+      - smaiax-backend-network
+
+networks:
+  smaiax-backend-network:
+    name: "smaiax-backend-network"
+    driver: bridge
+  smaiax-frontend-network:
+    name: "smaiax-frontend-network"
+    driver: bridge

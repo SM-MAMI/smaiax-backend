@@ -9,21 +9,21 @@ public class DomainUserConfiguration : IEntityTypeConfiguration<User>
 {
     public void Configure(EntityTypeBuilder<User> builder)
     {
-        builder.ToTable("DomainUser");
-        
+        builder.ToTable("DomainUser", "domain");
+
         builder.HasKey(u => u.Id);
         builder.Property(u => u.Id)
             .HasConversion(
                 v => v.Id,
                 v => new UserId(v))
             .IsRequired();
-        
+
         builder.OwnsOne(u => u.Name, name =>
         {
             name.Property(fn => fn.FirstName).HasColumnName("firstName").IsRequired();
             name.Property(fn => fn.LastName).HasColumnName("lastName").IsRequired();
         });
-        
+
         builder.OwnsOne(u => u.Address, address =>
         {
             address.Property(a => a.Street).HasColumnName("street").IsRequired();
@@ -32,7 +32,7 @@ public class DomainUserConfiguration : IEntityTypeConfiguration<User>
             address.Property(a => a.ZipCode).HasColumnName("zipCode").IsRequired();
             address.Property(a => a.Country).HasColumnName("country").IsRequired();
         });
-        
+
         builder.Property(u => u.Email)
             .IsRequired();
     }

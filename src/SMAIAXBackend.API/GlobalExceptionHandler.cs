@@ -6,7 +6,10 @@ namespace SMAIAXBackend.API;
 
 public class GlobalExceptionHandler : IExceptionHandler
 {
-    public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
+    public async ValueTask<bool> TryHandleAsync(
+        HttpContext httpContext,
+        Exception exception,
+        CancellationToken cancellationToken)
     {
         var problemDetails = new ProblemDetails
         {
@@ -15,6 +18,12 @@ public class GlobalExceptionHandler : IExceptionHandler
 
         switch (exception)
         {
+            case InvalidTokenException:
+            case InvalidLoginException:
+                problemDetails.Type = "https://datatracker.ietf.org/doc/html/rfc9110#section-15.5.2";
+                problemDetails.Status = StatusCodes.Status401Unauthorized;
+                problemDetails.Title = "Unauthorized";
+                break;
             case RegistrationException:
                 problemDetails.Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1";
                 problemDetails.Status = StatusCodes.Status400BadRequest;
@@ -28,7 +37,7 @@ public class GlobalExceptionHandler : IExceptionHandler
                 problemDetails.Detail = "Something went wrong.";
                 break;
         }
-        
+
         httpContext.Response.StatusCode = problemDetails.Status ?? StatusCodes.Status500InternalServerError;
 
         await httpContext

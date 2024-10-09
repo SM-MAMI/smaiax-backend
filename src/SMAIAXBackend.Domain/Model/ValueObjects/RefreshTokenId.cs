@@ -1,6 +1,6 @@
 namespace SMAIAXBackend.Domain.Model.ValueObjects;
 
-public class UserId(Guid id) : ValueObject
+public class RefreshTokenId(Guid id) : ValueObject
 {
     public Guid Id { get; } = id;
 
