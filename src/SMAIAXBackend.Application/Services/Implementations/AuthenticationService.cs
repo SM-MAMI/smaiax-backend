@@ -119,4 +119,18 @@ public class AuthenticationService(
 
         return refreshedTokens;
     }
+
+    public async Task LogoutAsync(string refreshToken)
+    {
+        var token = await tokenRepository.GetRefreshTokenByTokenAsync(refreshToken);
+
+        if (token == null || !token.IsValid)
+        {
+            logger.LogWarning("Invalid or already used refresh token: '{RefreshToken}'.", refreshToken);
+            throw new UnauthorizedAccessException("Invalid or already used refresh token.");
+        }
+
+        token.Invalidate();
+        await tokenRepository.UpdateAsync(token);
+    }
 }

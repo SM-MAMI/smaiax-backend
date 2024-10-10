@@ -42,4 +42,15 @@ public class AuthenticationController(IAuthenticationService authenticationServi
         var refreshedTokens = await authenticationService.RefreshTokensAsync(tokenDto);
         return Ok(refreshedTokens);
     }
+
+    [HttpPost("logout")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [Consumes("application/json")]
+    public async Task<IActionResult> Logout([FromBody] TokenDto tokenDto)
+    {
+        await authenticationService.LogoutAsync(tokenDto.RefreshToken);
+        return Ok();
+    }
 }

@@ -18,6 +18,7 @@ public class GlobalExceptionHandler : IExceptionHandler
 
         switch (exception)
         {
+            case UnauthorizedAccessException:
             case InvalidTokenException:
             case InvalidLoginException:
                 problemDetails.Type = "https://datatracker.ietf.org/doc/html/rfc9110#section-15.5.2";
