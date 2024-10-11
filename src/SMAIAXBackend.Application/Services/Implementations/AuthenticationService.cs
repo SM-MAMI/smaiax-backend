@@ -32,7 +32,7 @@ public class AuthenticationService(
             throw new RegistrationException(errorMessages);
         }
 
-        var domainUser = User.Create(userId, registerDto.Name, registerDto.Address, registerDto.Email);
+        var domainUser = User.Create(userId, registerDto.Name, registerDto.Email);
         await userRepository.AddAsync(domainUser);
 
         return userId.Id;
