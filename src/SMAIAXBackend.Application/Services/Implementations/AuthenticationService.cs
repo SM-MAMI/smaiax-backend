@@ -6,6 +6,7 @@ using SMAIAXBackend.Application.Services.Interfaces;
 using SMAIAXBackend.Domain.Model.Entities;
 using SMAIAXBackend.Domain.Model.ValueObjects;
 using SMAIAXBackend.Domain.Repositories;
+using SMAIAXBackend.Domain.Repositories.Transactions;
 
 namespace SMAIAXBackend.Application.Services.Implementations;
 
@@ -13,28 +14,33 @@ public class AuthenticationService(
     IUserRepository userRepository,
     ITokenRepository tokenRepository,
     UserManager<IdentityUser> userManager,
+    ITransactionManager transactionManager,
     ILogger<AuthenticationService> logger) : IAuthenticationService
 {
     public async Task<Guid> RegisterAsync(RegisterDto registerDto)
     {
         var userId = userRepository.NextIdentity();
-        var identityUser = new IdentityUser
+
+        await transactionManager.TransactionScope(async () =>
         {
-            Id = userId.Id.ToString(), UserName = registerDto.Email, Email = registerDto.Email
-        };
+            var identityUser = new IdentityUser
+            {
+                Id = userId.Id.ToString(), UserName = registerDto.Email, Email = registerDto.Email
+            };
 
-        var result = await userManager.CreateAsync(identityUser, registerDto.Password);
+            var result = await userManager.CreateAsync(identityUser, registerDto.Password);
 
-        if (!result.Succeeded)
-        {
-            var errorMessages = string.Join(", ", result.Errors.Select(e => e.Description));
-            logger.LogError("Registration failed with the following errors: {ErrorMessages}", errorMessages);
-            throw new RegistrationException(errorMessages);
-        }
+            if (!result.Succeeded)
+            {
+                var errorMessages = string.Join(", ", result.Errors.Select(e => e.Description));
+                logger.LogError("Registration failed with the following errors: {ErrorMessages}", errorMessages);
+                throw new RegistrationException(errorMessages);
+            }
 
-        var domainUser = User.Create(userId, registerDto.Name, registerDto.Email);
-        await userRepository.AddAsync(domainUser);
-
+            var domainUser = User.Create(userId, registerDto.Name, registerDto.Email);
+            await userRepository.AddAsync(domainUser);
+        });
+        
         return userId.Id;
     }
 

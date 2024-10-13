@@ -4,6 +4,8 @@ using SMAIAXBackend.API;
 using SMAIAXBackend.Application.Services.Implementations;
 using SMAIAXBackend.Application.Services.Interfaces;
 using SMAIAXBackend.Domain.Repositories;
+using SMAIAXBackend.Domain.Repositories.Transactions;
+using SMAIAXBackend.Infrastructure;
 using SMAIAXBackend.Infrastructure.Configurations;
 using SMAIAXBackend.Infrastructure.DbContexts;
 using SMAIAXBackend.Infrastructure.Repositories;
@@ -34,6 +36,7 @@ builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 // Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ITokenRepository, TokenRepository>();
+builder.Services.AddScoped<ITransactionManager, TransactionManager>();
 
 builder.Services.Configure<JwtConfiguration>(builder.Configuration.GetSection("JwtConfiguration"));
 
