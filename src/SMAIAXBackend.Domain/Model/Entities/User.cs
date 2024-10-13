@@ -2,26 +2,26 @@ using SMAIAXBackend.Domain.Model.ValueObjects;
 
 namespace SMAIAXBackend.Domain.Model.Entities;
 
-public class User : IEqualityComparer<User> 
+public class User : IEqualityComparer<User>
 {
     public UserId Id { get; } = null!;
     public Name Name { get; } = null!;
-    public Address Address { get; } = null!;
     public string Email { get; } = null!;
 
-    public static User Create(UserId id, Name name, Address address, string email)
+    public static User Create(UserId id, Name name, string email)
     {
-        return new User(id, name, address, email);
+        return new User(id, name, email);
     }
-    
+
     // Needed by EF Core
-    private User() { }
-    
-    private User(UserId id, Name name, Address address, string email)
+    private User()
     {
-        Address = address;
-        Name = name;
+    }
+
+    private User(UserId id, Name name, string email)
+    {
         Id = id;
+        Name = name;
         Email = email;
     }
 
