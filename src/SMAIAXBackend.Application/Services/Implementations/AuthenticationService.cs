@@ -37,7 +37,7 @@ public class AuthenticationService(
                 throw new RegistrationException(errorMessages);
             }
 
-            var domainUser = User.Create(userId, registerDto.Name, registerDto.Address, registerDto.Email);
+            var domainUser = User.Create(userId, registerDto.Name, registerDto.Email);
             await userRepository.AddAsync(domainUser);
         });
         
@@ -124,5 +124,19 @@ public class AuthenticationService(
         var refreshedTokens = new TokenDto(newAccessToken, newRefreshToken.Token);
 
         return refreshedTokens;
+    }
+
+    public async Task LogoutAsync(string refreshToken)
+    {
+        var token = await tokenRepository.GetRefreshTokenByTokenAsync(refreshToken);
+
+        if (token == null || !token.IsValid)
+        {
+            logger.LogWarning("Invalid or already used refresh token: '{RefreshToken}'.", refreshToken);
+            throw new UnauthorizedAccessException("Invalid or already used refresh token.");
+        }
+
+        token.Invalidate();
+        await tokenRepository.UpdateAsync(token);
     }
 }

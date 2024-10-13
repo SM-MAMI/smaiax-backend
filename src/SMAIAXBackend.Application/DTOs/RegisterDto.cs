@@ -6,8 +6,7 @@ namespace SMAIAXBackend.Application.DTOs;
 public class RegisterDto(
     string email,
     string password,
-    Name name,
-    Address address)
+    Name name)
 {
     [Required]
     [EmailAddress]
@@ -18,7 +17,4 @@ public class RegisterDto(
 
     [Required]
     public Name Name { get; set; } = name;
-
-    [Required]
-    public Address Address { get; set; } = address;
 }
