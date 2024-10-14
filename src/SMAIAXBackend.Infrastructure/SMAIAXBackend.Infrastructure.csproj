@@ -13,11 +13,15 @@
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
+      <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="9.0.0-rc.2.24473.5" />
+      <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.0-rc.2.24473.5" />
+      <PackageReference Include="MQTTnet" Version="4.3.7.1207" />
       <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.8" />
       <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.1.0" />
     </ItemGroup>
     
     <ItemGroup>
+      <ProjectReference Include="..\SMAIAXBackend.Application\SMAIAXBackend.Application.csproj" />
       <ProjectReference Include="..\SMAIAXBackend.Domain\SMAIAXBackend.Domain.csproj" />
     </ItemGroup>
 
