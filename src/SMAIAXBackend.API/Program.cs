@@ -1,11 +1,13 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SMAIAXBackend.API;
+using SMAIAXBackend.Application.Interfaces;
 using SMAIAXBackend.Application.Services.Implementations;
 using SMAIAXBackend.Application.Services.Interfaces;
 using SMAIAXBackend.Domain.Repositories;
 using SMAIAXBackend.Infrastructure.Configurations;
 using SMAIAXBackend.Infrastructure.DbContexts;
+using SMAIAXBackend.Infrastructure.Messaging;
 using SMAIAXBackend.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -42,7 +44,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
-
+builder.Services.AddSingleton<IMqttReader, MqttReader>(); 
+builder.Services.AddHostedService<MessagingBackgroundService>();
 var app = builder.Build();
 using var scope = app.Services.CreateScope();
 var services = scope.ServiceProvider;
