@@ -24,17 +24,19 @@ internal static class IntegrationTestSetup
             .WithPassword("password")
             .WithDatabase("smaiax-db")
             .WithPortBinding(5432, true)
+            .WithWaitStrategy(Wait.ForUnixContainer().UntilPortIsAvailable(5432))
             .Build();
 
         await _postgresContainer.StartAsync();
-        
+
         _hiveMqContainer = new ContainerBuilder()
             .WithImage("hivemq/hivemq4")
             .WithPortBinding(1883, true)
+            .WithWaitStrategy(Wait.ForUnixContainer().UntilPortIsAvailable(1883))
             .Build();
 
         await _hiveMqContainer.StartAsync();
-        
+
         var postgresConnectionString = _postgresContainer.GetConnectionString();
         var hiveMqPort = _hiveMqContainer.GetMappedPublicPort(1883);
         _webAppFactory = new WebAppFactory(postgresConnectionString, hiveMqPort);
