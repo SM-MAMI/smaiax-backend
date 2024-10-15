@@ -28,6 +28,24 @@
       POSTGRES_DB: user-store
     networks:
       - smaiax-backend-network
+  hivemq:
+    image: hivemq/hivemq4
+    container_name: hivemq
+    ports:
+      - "15672:8080"  # HiveMQ Web UI port
+      - "8000:8000"  # HiveMQ WebSocket port
+      - "1883:1883"  # MQTT port
+    ulimits:
+      nofile:
+        soft: 500000
+        hard: 500000
+    networks:
+      - smaiax-backend-network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080" ]  # Simple check for HiveMQ Web UI
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 networks:
   smaiax-backend-network:

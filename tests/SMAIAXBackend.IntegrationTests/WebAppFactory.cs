@@ -4,7 +4,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace SMAIAXBackend.IntegrationTests;
 
-public class WebAppFactory(string postgresConnectionString) : WebApplicationFactory<Program>
+public class WebAppFactory(string postgresConnectionString, int hiveMqPort) : WebApplicationFactory<Program>
 {
     private readonly Dictionary<string, string> _testAppSettings = new()
     {
@@ -12,7 +12,13 @@ public class WebAppFactory(string postgresConnectionString) : WebApplicationFact
         ["JwtConfiguration:Secret"] = "YourNewStrongSecretKeyOfAtLeast32Characters!",
         ["JwtConfiguration:Issuer"] = "SMAIAX",
         ["JwtConfiguration:Audience"] = "SomeAudience",
-        ["JwtConfiguration:ExpirationMinutes"] = "60"
+        ["JwtConfiguration:ExpirationMinutes"] = "60",
+        ["MQTT:Port"] = hiveMqPort.ToString(),
+        ["MQTT:Broker"] = "localhost",
+        ["MQTT:ClientId"] = "SMAIAX-Integration-Tests",
+        ["MQTT:Username"] = "admin",
+        ["MQTT:Password"] = "hivemq",
+        ["MQTT:Topic"] = "test"
     };
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
