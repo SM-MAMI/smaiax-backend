@@ -47,6 +47,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
+builder.Services.Configure<MqttSettings>(builder.Configuration.GetSection("MQTT"));
 builder.Services.AddSingleton<IMqttReader, MqttReader>(); 
 builder.Services.AddHostedService<MessagingBackgroundService>();
 var app = builder.Build();

@@ -1,21 +1,16 @@
 using System.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using MQTTnet;
 using MQTTnet.Client;
 using SMAIAXBackend.Application.Interfaces;
 
 namespace SMAIAXBackend.Infrastructure.Messaging;
 
-public class MqttReader : IMqttReader
+public class MqttReader(IOptions<MqttSettings> mqttSettings) : IMqttReader
 {
-    private readonly MqttSettings _mqttSettings;
     private IMqttClient? _mqttClient;
-
-    public MqttReader(IConfiguration configuration)
-    {
-        _mqttSettings = configuration.GetSection("MQTT").Get<MqttSettings>();
-    }
 
     public async Task ConnectAndSubscribeAsync()
     {
@@ -23,9 +18,9 @@ public class MqttReader : IMqttReader
         _mqttClient = factory.CreateMqttClient();
 
         var options = new MqttClientOptionsBuilder()
-            .WithClientId(_mqttSettings.ClientId)
-            .WithTcpServer(_mqttSettings.Broker, _mqttSettings.Port)
-            .WithCredentials(_mqttSettings.Username, _mqttSettings.Password)
+            .WithClientId(mqttSettings.Value.ClientId)
+            .WithTcpServer(mqttSettings.Value.Broker, mqttSettings.Value.Port)
+            .WithCredentials(mqttSettings.Value.Username, mqttSettings.Value.Password)
             .WithCleanSession()
             .Build();
 
@@ -36,11 +31,11 @@ public class MqttReader : IMqttReader
 
             // Subscribe to the topic
             var topicFilter = new MqttTopicFilterBuilder()
-                .WithTopic(_mqttSettings.Topic)
+                .WithTopic(mqttSettings.Value.Topic)
                 .Build();
 
             await _mqttClient.SubscribeAsync(topicFilter);
-            Console.WriteLine($"Subscribed to topic {_mqttSettings.Topic}");
+            Console.WriteLine($"Subscribed to topic {mqttSettings.Value.Topic}");
         };
 
         // Handle disconnection

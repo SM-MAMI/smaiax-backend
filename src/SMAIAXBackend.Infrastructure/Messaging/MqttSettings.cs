@@ -1,11 +1,11 @@
-namespace SMAIAXBackend.Infrastructure;
+namespace SMAIAXBackend.Infrastructure.Messaging;
 
-public class MqttSettings(string broker, int port, string clientId, string username, string password, string topic)
+public class MqttSettings
 {
-    public string Broker { get; set; } = broker;
-    public int Port { get; set; } = port;
-    public string ClientId { get; set; } = clientId;
-    public string Username { get; set; } = username;
-    public string Password { get; set; } = password;
-    public string Topic { get; set; } = topic;
+    public required string Broker { get; init; }
+    public required int Port { get; init; }
+    public required string ClientId { get; init; }
+    public required string Username { get; init; }
+    public required string Password { get; init; }
+    public required string Topic { get; init; }
 }
