@@ -1,13 +1,13 @@
 namespace SMAIAXBackend.Domain.Model.ValueObjects;
 
 public class PolicyFilter(
-    MeasurementResolution measurementResolutions,
+    MeasurementResolution measurementResolution,
     List<int> houseHoldSizes,
     List<Location> locations,
     LocationResolution locationResolution,
     decimal maxPrice) : ValueObject
 {
-    public MeasurementResolution MeasurementResolution { get; set; } = measurementResolutions;
+    public MeasurementResolution MeasurementResolution { get; set; } = measurementResolution;
     public List<int> HouseHoldSizes { get; set; } = houseHoldSizes;
     public List<Location> Locations { get; set; } = locations;
     public LocationResolution LocationResolution { get; set; } = locationResolution;

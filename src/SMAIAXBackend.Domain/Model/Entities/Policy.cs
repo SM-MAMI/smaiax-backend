@@ -2,7 +2,6 @@ using SMAIAXBackend.Domain.Model.ValueObjects;
 
 namespace SMAIAXBackend.Domain.Model.Entities;
 
-// TODO: Implement ICloneable interface
 public class Policy : IEqualityComparer<Policy>
 {
     public PolicyId Id { get; } = null!;
@@ -21,6 +20,16 @@ public class Policy : IEqualityComparer<Policy>
         decimal price)
     {
         return new Policy(id, measurementResolution, householdSize, location, locationResolution, price);
+    }
+
+    public static Policy DeepClone(Policy policy)
+    {
+        var policyIdCopy = new PolicyId(policy.Id.Id);
+        var locationCopy = new Location(policy.Location.StreetName, policy.Location.City, policy.Location.State,
+            policy.Location.Country, policy.Location.Continent);
+
+        return new Policy(policyIdCopy, policy.MeasurementResolution, policy.HouseholdSize, locationCopy,
+            policy.LocationResolution, policy.Price);
     }
 
     // Needed by EF Core

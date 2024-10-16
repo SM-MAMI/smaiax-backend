@@ -2,7 +2,6 @@ using SMAIAXBackend.Domain.Model.ValueObjects;
 
 namespace SMAIAXBackend.Domain.Model.Entities;
 
-// TODO: Implement ICloneable interface
 public class PolicyRequest : IEqualityComparer<PolicyRequest>
 {
     public PolicyRequestId Id { get; }
@@ -15,6 +14,17 @@ public class PolicyRequest : IEqualityComparer<PolicyRequest>
         PolicyFilter policyFilter)
     {
         return new PolicyRequest(id, isAutomaticContractingEnabled, policyFilter);
+    }
+
+    public static PolicyRequest DeepClone(PolicyRequest policyRequest)
+    {
+        var idCopy = new PolicyRequestId(policyRequest.Id.Id);
+        var houseHoldSizesCopy = new List<int>(policyRequest.PolicyFilter.HouseHoldSizes);
+        var locationsCopy = new List<Location>(policyRequest.PolicyFilter.Locations);
+        var policyFilterCopy = new PolicyFilter(policyRequest.PolicyFilter.MeasurementResolution, houseHoldSizesCopy,
+            locationsCopy, policyRequest.PolicyFilter.LocationResolution, policyRequest.PolicyFilter.MaxPrice);
+
+        return new PolicyRequest(idCopy, policyRequest.IsAutomaticContractingEnabled, policyFilterCopy);
     }
 
     // Needed by EF Core

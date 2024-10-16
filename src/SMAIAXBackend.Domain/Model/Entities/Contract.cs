@@ -4,17 +4,20 @@ namespace SMAIAXBackend.Domain.Model.Entities;
 
 public class Contract : IEqualityComparer<Contract>
 {
-    public ContractId Id { get; }
+    public ContractId Id { get; } = null!;
     public DateTime CreatedAt { get; }
-    public Policy PolicyCopy { get; }
-    public PolicyRequest PolicyRequestCopy { get; }
+    public Policy PolicyCopy { get; } = null!;
+    public PolicyRequest PolicyRequestCopy { get; } = null!;
 
     private static Contract Create(
         ContractId id,
         DateTime createdAt,
-        Policy policyCopy,
-        PolicyRequest policyRequestCopy)
+        Policy policy,
+        PolicyRequest policyRequest)
     {
+        var policyCopy = Policy.DeepClone(policy);
+        var policyRequestCopy = PolicyRequest.DeepClone(policyRequest);
+
         return new Contract(id, createdAt, policyCopy, policyRequestCopy);
     }
 
