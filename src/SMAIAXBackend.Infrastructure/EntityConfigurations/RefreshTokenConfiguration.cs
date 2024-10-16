@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
 using SMAIAXBackend.Domain.Model.Entities;
 using SMAIAXBackend.Domain.Model.ValueObjects;
 

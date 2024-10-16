@@ -1,9 +1,11 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+
 using SMAIAXBackend.Domain.Model.Entities;
 using SMAIAXBackend.Domain.Model.ValueObjects;
 using SMAIAXBackend.Domain.Repositories;
@@ -30,10 +32,9 @@ public class TokenRepository(IOptions<JwtConfiguration> jwtConfigOptions, Applic
 
         var claims = new[]
         {
-            new Claim(JwtRegisteredClaimNames.Sub, userId),
-            new Claim(JwtRegisteredClaimNames.UniqueName, username),
-            new Claim(JwtRegisteredClaimNames.Jti, jwtTokenId),
-            new Claim(JwtRegisteredClaimNames.Iat, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(),
+            new Claim(JwtRegisteredClaimNames.Sub, userId), new Claim(JwtRegisteredClaimNames.UniqueName, username),
+            new Claim(JwtRegisteredClaimNames.Jti, jwtTokenId), new Claim(JwtRegisteredClaimNames.Iat,
+                DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(),
                 ClaimValueTypes.Integer64)
         };
 

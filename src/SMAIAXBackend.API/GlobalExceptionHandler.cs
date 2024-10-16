@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+
 using SMAIAXBackend.Application.Exceptions;
 
 namespace SMAIAXBackend.API;
@@ -11,10 +12,7 @@ public class GlobalExceptionHandler : IExceptionHandler
         Exception exception,
         CancellationToken cancellationToken)
     {
-        var problemDetails = new ProblemDetails
-        {
-            Detail = exception.Message
-        };
+        var problemDetails = new ProblemDetails { Detail = exception.Message };
 
         switch (exception)
         {

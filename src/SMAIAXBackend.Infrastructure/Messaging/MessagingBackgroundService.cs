@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Hosting;
+
 using SMAIAXBackend.Application.Interfaces;
 
 namespace SMAIAXBackend.Infrastructure.Messaging;

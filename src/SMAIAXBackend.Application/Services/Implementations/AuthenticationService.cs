@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
+
 using SMAIAXBackend.Application.DTOs;
 using SMAIAXBackend.Application.Exceptions;
 using SMAIAXBackend.Application.Services.Interfaces;
@@ -40,7 +41,7 @@ public class AuthenticationService(
             var domainUser = User.Create(userId, registerDto.Name, registerDto.Email);
             await userRepository.AddAsync(domainUser);
         });
-        
+
         return userId.Id;
     }
 

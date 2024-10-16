@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+
 using SMAIAXBackend.Domain.Model.ValueObjects;
 
 namespace SMAIAXBackend.Application.DTOs;

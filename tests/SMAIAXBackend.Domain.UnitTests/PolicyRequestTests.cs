@@ -1,4 +1,5 @@
 using System.Globalization;
+
 using SMAIAXBackend.Domain.Model.Entities;
 using SMAIAXBackend.Domain.Model.ValueObjects;
 

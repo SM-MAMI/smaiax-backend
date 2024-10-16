@@ -1,7 +1,10 @@
 using DotNet.Testcontainers.Builders;
 using DotNet.Testcontainers.Containers;
+
 using Microsoft.Extensions.DependencyInjection;
+
 using SMAIAXBackend.Infrastructure.DbContexts;
+
 using Testcontainers.PostgreSql;
 
 namespace SMAIAXBackend.IntegrationTests;

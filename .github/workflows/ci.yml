@@ -51,6 +51,9 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore
 
+      - name: Lint code
+        run: dotnet format --verify-no-changes --verbosity diagnostic
+
       - name: Start SonarScan
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

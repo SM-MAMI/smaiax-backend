@@ -1,9 +1,10 @@
 using System.Text;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
+
 using Microsoft.Extensions.Options;
+
 using MQTTnet;
 using MQTTnet.Client;
+
 using SMAIAXBackend.Application.Interfaces;
 
 namespace SMAIAXBackend.Infrastructure.Messaging;
@@ -56,7 +57,7 @@ public class MqttReader(IOptions<MqttSettings> mqttSettings) : IMqttReader
         // Start connection
         await _mqttClient.ConnectAsync(options);
     }
-    
+
     public async Task DisconnectAsync()
     {
         if (_mqttClient != null && _mqttClient.IsConnected)
