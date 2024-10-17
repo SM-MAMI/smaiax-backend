@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 
 using SMAIAXBackend.Application.DTOs;
 using SMAIAXBackend.Domain.Model.ValueObjects;
+using SMAIAXBackend.Domain.Model.ValueObjects.Ids;
 
 namespace SMAIAXBackend.IntegrationTests.EndToEndTests;
 

@@ -1,5 +1,5 @@
 using SMAIAXBackend.Domain.Model.Entities;
-using SMAIAXBackend.Domain.Model.ValueObjects;
+using SMAIAXBackend.Domain.Model.ValueObjects.Ids;
 using SMAIAXBackend.Infrastructure.DbContexts;
 
 namespace SMAIAXBackend.IntegrationTests;

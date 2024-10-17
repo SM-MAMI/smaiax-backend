@@ -1,5 +1,7 @@
 using System.Globalization;
 
+using SMAIAXBackend.Domain.Model.Enums;
+
 namespace SMAIAXBackend.Domain.Model.ValueObjects;
 
 public class Location(string? streetName, string? city, string? state, RegionInfo? country, Continent? continent)

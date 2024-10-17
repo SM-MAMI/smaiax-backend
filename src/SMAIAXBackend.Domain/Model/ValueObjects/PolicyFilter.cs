@@ -1,3 +1,5 @@
+using SMAIAXBackend.Domain.Model.Enums;
+
 namespace SMAIAXBackend.Domain.Model.ValueObjects;
 
 public class PolicyFilter(

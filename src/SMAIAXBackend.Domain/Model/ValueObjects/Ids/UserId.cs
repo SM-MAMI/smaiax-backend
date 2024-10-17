@@ -1,6 +1,6 @@
-namespace SMAIAXBackend.Domain.Model.ValueObjects;
+namespace SMAIAXBackend.Domain.Model.ValueObjects.Ids;
 
-public class ContractId(Guid id) : ValueObject
+public class UserId(Guid id) : ValueObject
 {
     public Guid Id { get; } = id;
 
