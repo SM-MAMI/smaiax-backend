@@ -71,7 +71,7 @@ Measurement .. Metadata : matching by timestamp
 Contract "0..*" -- "1" Policy : originates from copy
 Contract "0..*" -- "1" PolicyRequest : originates from copy
 Policy "0..*" -- "1" User : creates
-Policy -- PolicyFilter
+    PolicyRequest -- PolicyFilter
 PolicyRequest "0..*" -- "1" User : creates
 User "1" -- "0..*" SmartMeter : owns
 SmartMeter "0..*" -- "0..*" Policy : refers to
