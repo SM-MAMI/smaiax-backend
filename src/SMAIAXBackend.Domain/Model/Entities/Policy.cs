@@ -4,7 +4,7 @@ using SMAIAXBackend.Domain.Model.ValueObjects.Ids;
 
 namespace SMAIAXBackend.Domain.Model.Entities;
 
-public class Policy : IEqualityComparer<Policy>
+public sealed class Policy : IEquatable<Policy>
 {
     public PolicyId Id { get; } = null!;
     public MeasurementResolution MeasurementResolution { get; }
@@ -55,33 +55,43 @@ public class Policy : IEqualityComparer<Policy>
         Price = price;
     }
 
-    public bool Equals(Policy? x, Policy? y)
+    public bool Equals(Policy? other)
     {
-        if (ReferenceEquals(x, y))
+        if (other is null)
+        {
+            return false;
+        }
+
+        if (ReferenceEquals(this, other))
         {
             return true;
         }
 
-        if (x is null)
-        {
-            return false;
-        }
-
-        if (y is null)
-        {
-            return false;
-        }
-
-        if (x.GetType() != y.GetType())
-        {
-            return false;
-        }
-
-        return x.Id.Equals(y.Id);
+        return Id.Equals(other.Id);
     }
 
-    public int GetHashCode(Policy obj)
+    public override bool Equals(object? obj)
     {
-        return obj.Id.GetHashCode();
+        if (obj is null)
+        {
+            return false;
+        }
+
+        if (ReferenceEquals(this, obj))
+        {
+            return true;
+        }
+
+        if (obj.GetType() != GetType())
+        {
+            return false;
+        }
+
+        return Equals((Policy)obj);
+    }
+
+    public override int GetHashCode()
+    {
+        return Id.GetHashCode();
     }
 }

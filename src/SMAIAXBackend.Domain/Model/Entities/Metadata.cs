@@ -3,7 +3,7 @@ using SMAIAXBackend.Domain.Model.ValueObjects.Ids;
 
 namespace SMAIAXBackend.Domain.Model.Entities;
 
-public class Metadata : IEqualityComparer<Metadata>
+public sealed class Metadata : IEquatable<Metadata>
 {
     public MetadataId Id { get; } = null!;
     public DateTime CreatedAt { get; }
@@ -28,33 +28,43 @@ public class Metadata : IEqualityComparer<Metadata>
         HouseholdSize = householdSize;
     }
 
-    public bool Equals(Metadata? x, Metadata? y)
+    public bool Equals(Metadata? other)
     {
-        if (ReferenceEquals(x, y))
+        if (other is null)
+        {
+            return false;
+        }
+
+        if (ReferenceEquals(this, other))
         {
             return true;
         }
 
-        if (x is null)
-        {
-            return false;
-        }
-
-        if (y is null)
-        {
-            return false;
-        }
-
-        if (x.GetType() != y.GetType())
-        {
-            return false;
-        }
-
-        return x.Id.Equals(y.Id);
+        return Id.Equals(other.Id);
     }
 
-    public int GetHashCode(Metadata obj)
+    public override bool Equals(object? obj)
     {
-        return obj.Id.GetHashCode();
+        if (obj is null)
+        {
+            return false;
+        }
+
+        if (ReferenceEquals(this, obj))
+        {
+            return true;
+        }
+
+        if (obj.GetType() != GetType())
+        {
+            return false;
+        }
+
+        return Equals((Metadata)obj);
+    }
+
+    public override int GetHashCode()
+    {
+        return Id.GetHashCode();
     }
 }

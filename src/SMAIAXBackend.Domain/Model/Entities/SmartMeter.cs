@@ -2,7 +2,7 @@ using SMAIAXBackend.Domain.Model.ValueObjects.Ids;
 
 namespace SMAIAXBackend.Domain.Model.Entities;
 
-public class SmartMeter : IEqualityComparer<SmartMeter>
+public sealed class SmartMeter : IEquatable<SmartMeter>
 {
     public SmartMeterId Id { get; } = null!;
     public string Name { get; } = null!;
@@ -23,33 +23,43 @@ public class SmartMeter : IEqualityComparer<SmartMeter>
         Name = name;
     }
 
-    public bool Equals(SmartMeter? x, SmartMeter? y)
+    public bool Equals(SmartMeter? other)
     {
-        if (ReferenceEquals(x, y))
+        if (other is null)
+        {
+            return false;
+        }
+
+        if (ReferenceEquals(this, other))
         {
             return true;
         }
 
-        if (x is null)
-        {
-            return false;
-        }
-
-        if (y is null)
-        {
-            return false;
-        }
-
-        if (x.GetType() != y.GetType())
-        {
-            return false;
-        }
-
-        return x.Id.Equals(y.Id);
+        return Id.Equals(other.Id);
     }
 
-    public int GetHashCode(SmartMeter obj)
+    public override bool Equals(object? obj)
     {
-        return obj.Id.GetHashCode();
+        if (obj is null)
+        {
+            return false;
+        }
+
+        if (ReferenceEquals(this, obj))
+        {
+            return true;
+        }
+
+        if (obj.GetType() != GetType())
+        {
+            return false;
+        }
+
+        return Equals((SmartMeter)obj);
+    }
+
+    public override int GetHashCode()
+    {
+        return Id.GetHashCode();
     }
 }

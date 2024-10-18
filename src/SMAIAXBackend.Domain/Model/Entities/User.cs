@@ -3,7 +3,7 @@ using SMAIAXBackend.Domain.Model.ValueObjects.Ids;
 
 namespace SMAIAXBackend.Domain.Model.Entities;
 
-public class User : IEqualityComparer<User>
+public sealed class User : IEquatable<User>
 {
     public UserId Id { get; } = null!;
     public Name Name { get; } = null!;
@@ -26,33 +26,43 @@ public class User : IEqualityComparer<User>
         Email = email;
     }
 
-    public bool Equals(User? x, User? y)
+    public bool Equals(User? other)
     {
-        if (ReferenceEquals(x, y))
+        if (other is null)
+        {
+            return false;
+        }
+
+        if (ReferenceEquals(this, other))
         {
             return true;
         }
 
-        if (x is null)
-        {
-            return false;
-        }
-
-        if (y is null)
-        {
-            return false;
-        }
-
-        if (x.GetType() != y.GetType())
-        {
-            return false;
-        }
-
-        return x.Id.Equals(y.Id);
+        return Id.Equals(other.Id);
     }
 
-    public int GetHashCode(User obj)
+    public override bool Equals(object? obj)
     {
-        return obj.Id.GetHashCode();
+        if (obj is null)
+        {
+            return false;
+        }
+
+        if (ReferenceEquals(this, obj))
+        {
+            return true;
+        }
+
+        if (obj.GetType() != GetType())
+        {
+            return false;
+        }
+
+        return Equals((User)obj);
+    }
+
+    public override int GetHashCode()
+    {
+        return Id.GetHashCode();
     }
 }

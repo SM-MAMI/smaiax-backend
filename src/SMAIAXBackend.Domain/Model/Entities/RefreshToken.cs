@@ -2,7 +2,7 @@ using SMAIAXBackend.Domain.Model.ValueObjects.Ids;
 
 namespace SMAIAXBackend.Domain.Model.Entities;
 
-public class RefreshToken : IEqualityComparer<RefreshTokenId>
+public sealed class RefreshToken : IEquatable<RefreshToken>
 {
     public RefreshTokenId Id { get; }
 
@@ -53,33 +53,43 @@ public class RefreshToken : IEqualityComparer<RefreshTokenId>
         IsValid = false;
     }
 
-    public bool Equals(RefreshTokenId? x, RefreshTokenId? y)
+    public bool Equals(RefreshToken? other)
     {
-        if (ReferenceEquals(x, y))
+        if (other is null)
+        {
+            return false;
+        }
+
+        if (ReferenceEquals(this, other))
         {
             return true;
         }
 
-        if (x is null)
-        {
-            return false;
-        }
-
-        if (y is null)
-        {
-            return false;
-        }
-
-        if (x.GetType() != y.GetType())
-        {
-            return false;
-        }
-
-        return x.Id.Equals(y.Id);
+        return Id.Equals(other.Id);
     }
 
-    public int GetHashCode(RefreshTokenId obj)
+    public override bool Equals(object? obj)
     {
-        return obj.Id.GetHashCode();
+        if (obj is null)
+        {
+            return false;
+        }
+
+        if (ReferenceEquals(this, obj))
+        {
+            return true;
+        }
+
+        if (obj.GetType() != GetType())
+        {
+            return false;
+        }
+
+        return Equals((RefreshToken)obj);
+    }
+
+    public override int GetHashCode()
+    {
+        return Id.GetHashCode();
     }
 }
