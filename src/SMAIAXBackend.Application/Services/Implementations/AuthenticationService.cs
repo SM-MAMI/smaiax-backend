@@ -26,7 +26,9 @@ public class AuthenticationService(
         {
             var identityUser = new IdentityUser
             {
-                Id = userId.Id.ToString(), UserName = registerDto.Email, Email = registerDto.Email
+                Id = userId.Id.ToString(),
+                UserName = registerDto.Email,
+                Email = registerDto.Email
             };
 
             var result = await userManager.CreateAsync(identityUser, registerDto.Password);
