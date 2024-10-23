@@ -14,8 +14,7 @@ public class PolicyRequestTests
     public void GivenPolicyRequest_WhenDeepClone_ThenPropertiesAreEqualButObjectsAreNotTheSame()
     {
         // Given
-        var policyFilter = new PolicyFilter(MeasurementResolution.Hour,
-            [5],
+        var policyFilter = new PolicyFilter(MeasurementResolution.Hour, 2, 4,
             [new Location("Some street", "Some city", "Some state", new RegionInfo("de-AT"), Continent.Europe)],
             LocationResolution.Country, 200);
         UserId userId = new UserId(Guid.NewGuid());
@@ -33,8 +32,10 @@ public class PolicyRequestTests
                 Is.EqualTo(originalPolicyRequest.IsAutomaticContractingEnabled));
             Assert.That(copiedPolicyRequest.PolicyFilter.MeasurementResolution,
                 Is.EqualTo(originalPolicyRequest.PolicyFilter.MeasurementResolution));
-            Assert.That(copiedPolicyRequest.PolicyFilter.HouseHoldSizes,
-                Is.EqualTo(originalPolicyRequest.PolicyFilter.HouseHoldSizes));
+            Assert.That(copiedPolicyRequest.PolicyFilter.MinHouseHoldSize,
+                Is.EqualTo(originalPolicyRequest.PolicyFilter.MinHouseHoldSize));
+            Assert.That(copiedPolicyRequest.PolicyFilter.MaxHouseHoldSize,
+                Is.EqualTo(originalPolicyRequest.PolicyFilter.MaxHouseHoldSize));
             Assert.That(copiedPolicyRequest.PolicyFilter.Locations,
                 Is.EqualTo(originalPolicyRequest.PolicyFilter.Locations));
             Assert.That(copiedPolicyRequest.PolicyFilter.LocationResolution,
@@ -46,8 +47,6 @@ public class PolicyRequestTests
             Assert.That(copiedPolicyRequest, Is.Not.SameAs(originalPolicyRequest));
             Assert.That(copiedPolicyRequest.Id, Is.Not.SameAs(originalPolicyRequest.Id));
             Assert.That(copiedPolicyRequest.PolicyFilter, Is.Not.SameAs(originalPolicyRequest.PolicyFilter));
-            Assert.That(copiedPolicyRequest.PolicyFilter.HouseHoldSizes,
-                Is.Not.SameAs(originalPolicyRequest.PolicyFilter.HouseHoldSizes));
             Assert.That(copiedPolicyRequest.PolicyFilter.Locations,
                 Is.Not.SameAs(originalPolicyRequest.PolicyFilter.Locations));
             Assert.That(copiedPolicyRequest.UserId,

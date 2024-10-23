@@ -4,13 +4,15 @@ namespace SMAIAXBackend.Domain.Model.ValueObjects;
 
 public class PolicyFilter(
     MeasurementResolution measurementResolution,
-    List<int> houseHoldSizes,
+    int minHouseHoldSize,
+    int maxHouseHoldSize,
     List<Location> locations,
     LocationResolution locationResolution,
     decimal maxPrice) : ValueObject
 {
     public MeasurementResolution MeasurementResolution { get; set; } = measurementResolution;
-    public List<int> HouseHoldSizes { get; set; } = houseHoldSizes;
+    public int MinHouseHoldSize { get; } = minHouseHoldSize;
+    public int MaxHouseHoldSize { get; } = maxHouseHoldSize;
     public List<Location> Locations { get; set; } = locations;
     public LocationResolution LocationResolution { get; set; } = locationResolution;
     public decimal MaxPrice { get; set; } = maxPrice;
@@ -18,7 +20,8 @@ public class PolicyFilter(
     protected override IEnumerable<object> GetEqualityComponents()
     {
         yield return MeasurementResolution;
-        yield return HouseHoldSizes;
+        yield return MinHouseHoldSize;
+        yield return MaxHouseHoldSize;
         yield return Locations;
         yield return LocationResolution;
         yield return MaxPrice;

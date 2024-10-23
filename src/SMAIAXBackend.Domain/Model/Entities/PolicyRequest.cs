@@ -9,7 +9,6 @@ public sealed class PolicyRequest : IEquatable<PolicyRequest>
     public bool IsAutomaticContractingEnabled { get; }
     public PolicyFilter PolicyFilter { get; }
     public UserId UserId { get; }
-    public List<ContractId> ContractIds { get; }
 
     public static PolicyRequest Create(
         PolicyRequestId id,
@@ -23,10 +22,10 @@ public sealed class PolicyRequest : IEquatable<PolicyRequest>
     public static PolicyRequest DeepClone(PolicyRequest policyRequest)
     {
         var idCopy = new PolicyRequestId(policyRequest.Id.Id);
-        var houseHoldSizesCopy = new List<int>(policyRequest.PolicyFilter.HouseHoldSizes);
         var locationsCopy = new List<Location>(policyRequest.PolicyFilter.Locations);
-        var policyFilterCopy = new PolicyFilter(policyRequest.PolicyFilter.MeasurementResolution, houseHoldSizesCopy,
-            locationsCopy, policyRequest.PolicyFilter.LocationResolution, policyRequest.PolicyFilter.MaxPrice);
+        var policyFilterCopy = new PolicyFilter(policyRequest.PolicyFilter.MeasurementResolution,
+            policyRequest.PolicyFilter.MinHouseHoldSize, policyRequest.PolicyFilter.MaxHouseHoldSize, locationsCopy,
+            policyRequest.PolicyFilter.LocationResolution, policyRequest.PolicyFilter.MaxPrice);
         var userIdCopy = new UserId(policyRequest.UserId.Id);
 
         return new PolicyRequest(idCopy, policyRequest.IsAutomaticContractingEnabled, policyFilterCopy, userIdCopy);
@@ -47,7 +46,6 @@ public sealed class PolicyRequest : IEquatable<PolicyRequest>
         IsAutomaticContractingEnabled = isAutomaticContractingEnabled;
         PolicyFilter = policyFilter;
         UserId = userId;
-        ContractIds = [];
     }
 
     public bool Equals(PolicyRequest? other)

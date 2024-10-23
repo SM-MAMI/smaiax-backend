@@ -9,7 +9,6 @@ public sealed class SmartMeter : IEquatable<SmartMeter>
     public List<Metadata> Metadata { get; }
     public UserId UserId { get; }
     public List<PolicyId> PolicyIds { get; }
-    public List<MeasurementId> MeasurementIds { get; }
 
     public static SmartMeter Create(SmartMeterId smartMeterId, string name, UserId userId)
     {
@@ -28,7 +27,6 @@ public sealed class SmartMeter : IEquatable<SmartMeter>
         Metadata = [];
         UserId = userId;
         PolicyIds = [];
-        MeasurementIds = [];
     }
 
     public bool Equals(SmartMeter? other)

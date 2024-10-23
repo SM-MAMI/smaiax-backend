@@ -6,19 +6,20 @@ namespace SMAIAXBackend.Domain.Model.Entities;
 public sealed class Metadata : IEquatable<Metadata>
 {
     public MetadataId Id { get; } = null!;
-    public DateTime CreatedAt { get; }
+    public DateTime ValidFrom { get; }
     public Location Location { get; } = null!;
     public int HouseholdSize { get; }
     public SmartMeterId SmartMeterId { get; }
+    public SmartMeter SmartMeter { get; } = null!;
 
     public static Metadata Create(
         MetadataId metadataId,
-        DateTime createdAt,
+        DateTime validFrom,
         Location location,
         int householdSize,
         SmartMeterId smartMeterId)
     {
-        return new Metadata(metadataId, createdAt, location, householdSize, smartMeterId);
+        return new Metadata(metadataId, validFrom, location, householdSize, smartMeterId);
     }
 
     // Needed by EF Core
@@ -28,13 +29,13 @@ public sealed class Metadata : IEquatable<Metadata>
 
     private Metadata(
         MetadataId metadataId,
-        DateTime createdAt,
+        DateTime validFrom,
         Location location,
         int householdSize,
         SmartMeterId smartMeterId)
     {
         Id = metadataId;
-        CreatedAt = createdAt;
+        ValidFrom = validFrom;
         Location = location;
         HouseholdSize = householdSize;
         SmartMeterId = smartMeterId;

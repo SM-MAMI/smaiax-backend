@@ -6,19 +6,23 @@ public sealed class Contract : IEquatable<Contract>
 {
     public ContractId Id { get; } = null!;
     public DateTime CreatedAt { get; }
+    public PolicyId PolicyId { get; }
     public Policy PolicyCopy { get; } = null!;
+    public PolicyRequestId PolicyRequestId { get; }
     public PolicyRequest PolicyRequestCopy { get; } = null!;
 
     private static Contract Create(
         ContractId id,
         DateTime createdAt,
+        PolicyId policyId,
         Policy policy,
+        PolicyRequestId policyRequestId,
         PolicyRequest policyRequest)
     {
         var policyCopy = Policy.DeepClone(policy);
         var policyRequestCopy = PolicyRequest.DeepClone(policyRequest);
 
-        return new Contract(id, createdAt, policyCopy, policyRequestCopy);
+        return new Contract(id, createdAt, policyId, policyCopy, policyRequestId, policyRequestCopy);
     }
 
     // Needed by EF Core
@@ -26,11 +30,19 @@ public sealed class Contract : IEquatable<Contract>
     {
     }
 
-    private Contract(ContractId id, DateTime createdAt, Policy policyCopy, PolicyRequest policyRequestCopy)
+    private Contract(
+        ContractId id,
+        DateTime createdAt,
+        PolicyId policyId,
+        Policy policyCopy,
+        PolicyRequestId policyRequestId,
+        PolicyRequest policyRequestCopy)
     {
         Id = id;
         CreatedAt = createdAt;
+        PolicyId = policyId;
         PolicyCopy = policyCopy;
+        PolicyRequestId = policyRequestId;
         PolicyRequestCopy = policyRequestCopy;
     }
 

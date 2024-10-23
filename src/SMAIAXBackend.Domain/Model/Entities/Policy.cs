@@ -13,8 +13,6 @@ public sealed class Policy : IEquatable<Policy>
     public LocationResolution LocationResolution { get; }
     public decimal Price { get; }
     public UserId UserId { get; }
-    public List<SmartMeterId> SmartMeterIds { get; }
-    public List<ContractId> ContractIds { get; }
 
     public static Policy Create(
         PolicyId id,
@@ -60,8 +58,6 @@ public sealed class Policy : IEquatable<Policy>
         LocationResolution = locationResolution;
         Price = price;
         UserId = userId;
-        SmartMeterIds = [];
-        ContractIds = [];
     }
 
     public bool Equals(Policy? other)
