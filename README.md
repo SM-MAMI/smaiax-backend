@@ -68,7 +68,8 @@ classDiagram
         class PolicyFilter {
             <<ValueObject>>
             measurementResolution
-            householdSize
+            minHouseHoldSize
+            maxHouseHoldSize
             locations
             locationResolution
             maxPrice
