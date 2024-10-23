@@ -8,13 +8,16 @@ public sealed class PolicyRequest : IEquatable<PolicyRequest>
     public PolicyRequestId Id { get; }
     public bool IsAutomaticContractingEnabled { get; }
     public PolicyFilter PolicyFilter { get; }
+    public UserId UserId { get; }
+    public List<ContractId> ContractIds { get; }
 
     public static PolicyRequest Create(
         PolicyRequestId id,
         bool isAutomaticContractingEnabled,
-        PolicyFilter policyFilter)
+        PolicyFilter policyFilter,
+        UserId userId)
     {
-        return new PolicyRequest(id, isAutomaticContractingEnabled, policyFilter);
+        return new PolicyRequest(id, isAutomaticContractingEnabled, policyFilter, userId);
     }
 
     public static PolicyRequest DeepClone(PolicyRequest policyRequest)
@@ -24,8 +27,9 @@ public sealed class PolicyRequest : IEquatable<PolicyRequest>
         var locationsCopy = new List<Location>(policyRequest.PolicyFilter.Locations);
         var policyFilterCopy = new PolicyFilter(policyRequest.PolicyFilter.MeasurementResolution, houseHoldSizesCopy,
             locationsCopy, policyRequest.PolicyFilter.LocationResolution, policyRequest.PolicyFilter.MaxPrice);
+        var userIdCopy = new UserId(policyRequest.UserId.Id);
 
-        return new PolicyRequest(idCopy, policyRequest.IsAutomaticContractingEnabled, policyFilterCopy);
+        return new PolicyRequest(idCopy, policyRequest.IsAutomaticContractingEnabled, policyFilterCopy, userIdCopy);
     }
 
     // Needed by EF Core
@@ -33,11 +37,17 @@ public sealed class PolicyRequest : IEquatable<PolicyRequest>
     {
     }
 
-    private PolicyRequest(PolicyRequestId id, bool isAutomaticContractingEnabled, PolicyFilter policyFilter)
+    private PolicyRequest(
+        PolicyRequestId id,
+        bool isAutomaticContractingEnabled,
+        PolicyFilter policyFilter,
+        UserId userId)
     {
         Id = id;
         IsAutomaticContractingEnabled = isAutomaticContractingEnabled;
         PolicyFilter = policyFilter;
+        UserId = userId;
+        ContractIds = [];
     }
 
     public bool Equals(PolicyRequest? other)

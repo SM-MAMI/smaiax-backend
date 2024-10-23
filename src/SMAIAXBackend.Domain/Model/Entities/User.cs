@@ -8,6 +8,9 @@ public sealed class User : IEquatable<User>
     public UserId Id { get; } = null!;
     public Name Name { get; } = null!;
     public string Email { get; } = null!;
+    public List<SmartMeterId> SmartMeterIds { get; }
+    public List<PolicyId> PolicyIds { get; }
+    public List<PolicyRequestId> PolicyRequestIds { get; }
 
     public static User Create(UserId id, Name name, string email)
     {
@@ -24,6 +27,9 @@ public sealed class User : IEquatable<User>
         Id = id;
         Name = name;
         Email = email;
+        SmartMeterIds = [];
+        PolicyIds = [];
+        PolicyRequestIds = [];
     }
 
     public bool Equals(User? other)

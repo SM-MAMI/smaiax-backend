@@ -18,7 +18,9 @@ public class PolicyRequestTests
             [5],
             [new Location("Some street", "Some city", "Some state", new RegionInfo("de-AT"), Continent.Europe)],
             LocationResolution.Country, 200);
-        var originalPolicyRequest = PolicyRequest.Create(new PolicyRequestId(Guid.NewGuid()), false, policyFilter);
+        UserId userId = new UserId(Guid.NewGuid());
+        var originalPolicyRequest =
+            PolicyRequest.Create(new PolicyRequestId(Guid.NewGuid()), false, policyFilter, userId);
 
         // When
         var copiedPolicyRequest = PolicyRequest.DeepClone(originalPolicyRequest);
@@ -39,6 +41,8 @@ public class PolicyRequestTests
                 Is.EqualTo(originalPolicyRequest.PolicyFilter.LocationResolution));
             Assert.That(copiedPolicyRequest.PolicyFilter.MaxPrice,
                 Is.EqualTo(originalPolicyRequest.PolicyFilter.MaxPrice));
+            Assert.That(copiedPolicyRequest.UserId,
+                Is.EqualTo(originalPolicyRequest.UserId));
             Assert.That(copiedPolicyRequest, Is.Not.SameAs(originalPolicyRequest));
             Assert.That(copiedPolicyRequest.Id, Is.Not.SameAs(originalPolicyRequest.Id));
             Assert.That(copiedPolicyRequest.PolicyFilter, Is.Not.SameAs(originalPolicyRequest.PolicyFilter));
@@ -46,6 +50,8 @@ public class PolicyRequestTests
                 Is.Not.SameAs(originalPolicyRequest.PolicyFilter.HouseHoldSizes));
             Assert.That(copiedPolicyRequest.PolicyFilter.Locations,
                 Is.Not.SameAs(originalPolicyRequest.PolicyFilter.Locations));
+            Assert.That(copiedPolicyRequest.UserId,
+                Is.Not.SameAs(originalPolicyRequest.UserId));
         });
     }
 }

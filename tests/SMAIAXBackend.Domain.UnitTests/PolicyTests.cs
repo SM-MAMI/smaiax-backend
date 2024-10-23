@@ -16,7 +16,7 @@ public class PolicyTests
         // Given
         var originalPolicy = Policy.Create(new PolicyId(Guid.NewGuid()), MeasurementResolution.Hour, 5,
             new Location("Some street", "Some city", "Some state", new RegionInfo("de-AT"), Continent.Europe),
-            LocationResolution.Country, 200);
+            LocationResolution.Country, 200, new UserId(Guid.NewGuid()));
 
 
         // When
@@ -31,9 +31,11 @@ public class PolicyTests
             Assert.That(copiedPolicy.Location, Is.EqualTo(originalPolicy.Location));
             Assert.That(copiedPolicy.LocationResolution, Is.EqualTo(originalPolicy.LocationResolution));
             Assert.That(copiedPolicy.Price, Is.EqualTo(originalPolicy.Price));
+            Assert.That(copiedPolicy.UserId, Is.EqualTo(originalPolicy.UserId));
             Assert.That(copiedPolicy, Is.Not.SameAs(originalPolicy));
             Assert.That(copiedPolicy.Id, Is.Not.SameAs(originalPolicy.Id));
             Assert.That(copiedPolicy.Location, Is.Not.SameAs(originalPolicy.Location));
+            Assert.That(copiedPolicy.UserId, Is.Not.SameAs(originalPolicy.UserId));
         });
     }
 }

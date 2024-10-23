@@ -8,10 +8,15 @@ public sealed class Measurement : IEquatable<Measurement>
     public MeasurementId Id { get; } = null!;
     public DateTime Timestamp { get; }
     public MeasurementData Data { get; } = null!;
+    public SmartMeterId SmartMeterId { get; } = null!;
 
-    public static Measurement Create(MeasurementId id, DateTime timestamp, MeasurementData data)
+    public static Measurement Create(
+        MeasurementId id,
+        DateTime timestamp,
+        MeasurementData data,
+        SmartMeterId smartMeterId)
     {
-        return new Measurement(id, timestamp, data);
+        return new Measurement(id, timestamp, data, smartMeterId);
     }
 
     // Needed by EF Core
@@ -19,11 +24,12 @@ public sealed class Measurement : IEquatable<Measurement>
     {
     }
 
-    private Measurement(MeasurementId id, DateTime timestamp, MeasurementData data)
+    private Measurement(MeasurementId id, DateTime timestamp, MeasurementData data, SmartMeterId smartMeterId)
     {
         Id = id;
         Timestamp = timestamp;
         Data = data;
+        SmartMeterId = smartMeterId;
     }
 
     public bool Equals(Measurement? other)

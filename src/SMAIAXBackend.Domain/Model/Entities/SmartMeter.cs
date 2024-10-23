@@ -6,10 +6,14 @@ public sealed class SmartMeter : IEquatable<SmartMeter>
 {
     public SmartMeterId Id { get; } = null!;
     public string Name { get; } = null!;
+    public List<Metadata> Metadata { get; }
+    public UserId UserId { get; }
+    public List<PolicyId> PolicyIds { get; }
+    public List<MeasurementId> MeasurementIds { get; }
 
-    public static SmartMeter Create(SmartMeterId smartMeterId, string name)
+    public static SmartMeter Create(SmartMeterId smartMeterId, string name, UserId userId)
     {
-        return new SmartMeter(smartMeterId, name);
+        return new SmartMeter(smartMeterId, name, userId);
     }
 
     // Needed by EF Core
@@ -17,10 +21,14 @@ public sealed class SmartMeter : IEquatable<SmartMeter>
     {
     }
 
-    private SmartMeter(SmartMeterId smartMeterId, string name)
+    private SmartMeter(SmartMeterId smartMeterId, string name, UserId userId)
     {
         Id = smartMeterId;
         Name = name;
+        Metadata = [];
+        UserId = userId;
+        PolicyIds = [];
+        MeasurementIds = [];
     }
 
     public bool Equals(SmartMeter? other)
