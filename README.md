@@ -11,60 +11,78 @@
 ## Domain Model
 ```mermaid
 classDiagram
-direction LR    
-    
-class User {
-    id
-    name
-    email
+    direction LR
+
+    namespace UserAggregate {
+        class User {
+            <<AggregateRoot>>
+            id
+            name
+            email
+        }
 }
 
-class Contract {
-    id
-    createdAt
-    policyCopy
-    policyRequestCopy
+    namespace SmartMeterAggregate {
+        class SmartMeter {
+            <<AggregateRoot>>
+            id
+            name
+        }
+
+        class Metadata {
+            id
+            validFrom
+            location
+            householdSize
+        }
 }
 
-class Policy {
-    id
-    measurementResolution
-    location
-    locationResolution
-    price
-}
+    namespace MeasurementAggregate {
+        class Measurement {
+            <<AggregateRoot>>
+            id
+            timestamp
+            measurementData
+        }
+    }
 
-class SmartMeter {
-    id
-    name
-}
+    namespace PolicyAggregate {
+        class Policy {
+            <<AggregateRoot>>
+            id
+            measurementResolution
+            location
+            locationResolution
+            price
+        }
+    }
 
-class Metadata {
-    id
-    createdAt
-    location
-    householdSize
-}
+    namespace PolicyRequestAggregate {
+        class PolicyRequest {
+            <<AggregateRoot>>
+            id
+            isAutomaticContractingEnabled
+            policyFilter
+        }
 
-class Measurement {
-    id
-    timestamp
-    measurementData
-}
+        class PolicyFilter {
+            <<ValueObject>>
+            measurementResolution
+            householdSize
+            locations
+            locationResolution
+            maxPrice
+        }
+    }
 
-class PolicyRequest {
-    id
-    isAutomaticContractingEnabled
-    policyFilter
-}
-
-class PolicyFilter {
-    <<ValueObject>>
-    measurementResolution
-    householdSize
-    locations
-    locationResolution
-    maxPrice
+    namespace ContractAggregate {
+        class Contract {
+            <<AggregateRoot>>
+            id
+            createdAt
+            policyCopy
+            policyRequestCopy
+        }
 }
 
 Measurement .. Metadata : matching by timestamp
