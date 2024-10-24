@@ -25,7 +25,9 @@ public class AuthenticationService(
         {
             var identityUser = new IdentityUser
             {
-                Id = userId.Id.ToString(), UserName = registerDto.Email, Email = registerDto.Email
+                Id = userId.Id.ToString(),
+                UserName = registerDto.Email,
+                Email = registerDto.Email
             };
 
             var result = await userManager.CreateAsync(identityUser, registerDto.Password);
@@ -37,10 +39,11 @@ public class AuthenticationService(
                 throw new RegistrationException(errorMessages);
             }
 
-            var domainUser = User.Create(userId, registerDto.Name, registerDto.Email);
+            var name = new Name(registerDto.Name.FirstName, registerDto.Name.LastName);
+            var domainUser = User.Create(userId, name, registerDto.Email);
             await userRepository.AddAsync(domainUser);
         });
-        
+
         return userId.Id;
     }
 

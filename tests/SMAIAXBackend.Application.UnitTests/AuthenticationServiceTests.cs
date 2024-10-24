@@ -42,7 +42,7 @@ public class AuthenticationServiceTests
     public async Task GivenValidRegisterDto_WhenRegistrationSucceeds_ThenUserIsAddedToRepository()
     {
         // Given
-        var registerDto = new RegisterDto("test@example.com", "Password123!", new Name("John", "Doe"));
+        var registerDto = new RegisterDto("test@example.com", "Password123!", new NameDto("John", "Doe"));
 
         _userManagerMock
             .Setup(um => um.CreateAsync(It.IsAny<IdentityUser>(), It.IsAny<string>()))
@@ -66,7 +66,7 @@ public class AuthenticationServiceTests
     public void GivenInvalidRegisterDto_WhenUserCreationFails_ThenRegistrationExceptionIsThrown()
     {
         // Given
-        var registerDto = new RegisterDto("test@example.com", "WeakPassword123!", new Name("John", "Doe"));
+        var registerDto = new RegisterDto("test@example.com", "WeakPassword123!", new NameDto("John", "Doe"));
 
         var identityErrors = new List<IdentityError> { new() { Description = "Password is too weak" } };
         var identityResult = IdentityResult.Failed(identityErrors.ToArray());

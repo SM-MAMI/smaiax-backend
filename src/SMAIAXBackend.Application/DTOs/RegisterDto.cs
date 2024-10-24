@@ -1,12 +1,11 @@
 using System.ComponentModel.DataAnnotations;
-using SMAIAXBackend.Domain.Model.ValueObjects;
 
 namespace SMAIAXBackend.Application.DTOs;
 
 public class RegisterDto(
     string email,
     string password,
-    Name name)
+    NameDto name)
 {
     [Required]
     [EmailAddress]
@@ -16,5 +15,5 @@ public class RegisterDto(
     public string Password { get; set; } = password;
 
     [Required]
-    public Name Name { get; set; } = name;
+    public NameDto Name { get; set; } = name;
 }
