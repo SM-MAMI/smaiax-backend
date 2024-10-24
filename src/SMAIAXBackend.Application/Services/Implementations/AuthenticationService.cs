@@ -1,10 +1,12 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
+
 using SMAIAXBackend.Application.DTOs;
 using SMAIAXBackend.Application.Exceptions;
 using SMAIAXBackend.Application.Services.Interfaces;
 using SMAIAXBackend.Domain.Model.Entities;
 using SMAIAXBackend.Domain.Model.ValueObjects;
+using SMAIAXBackend.Domain.Model.ValueObjects.Ids;
 using SMAIAXBackend.Domain.Repositories;
 using SMAIAXBackend.Domain.Repositories.Transactions;
 

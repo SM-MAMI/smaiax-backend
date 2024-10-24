@@ -3,30 +3,36 @@ using SMAIAXBackend.Domain.Model.ValueObjects.Ids;
 
 namespace SMAIAXBackend.Domain.Model.Entities;
 
-public sealed class User : IEquatable<User>
+public sealed class Measurement : IEquatable<Measurement>
 {
-    public UserId Id { get; } = null!;
-    public Name Name { get; } = null!;
-    public string Email { get; } = null!;
+    public MeasurementId Id { get; } = null!;
+    public DateTime Timestamp { get; }
+    public MeasurementData Data { get; } = null!;
+    public SmartMeterId SmartMeterId { get; } = null!;
 
-    public static User Create(UserId id, Name name, string email)
+    public static Measurement Create(
+        MeasurementId id,
+        DateTime timestamp,
+        MeasurementData data,
+        SmartMeterId smartMeterId)
     {
-        return new User(id, name, email);
+        return new Measurement(id, timestamp, data, smartMeterId);
     }
 
     // Needed by EF Core
-    private User()
+    private Measurement()
     {
     }
 
-    private User(UserId id, Name name, string email)
+    private Measurement(MeasurementId id, DateTime timestamp, MeasurementData data, SmartMeterId smartMeterId)
     {
         Id = id;
-        Name = name;
-        Email = email;
+        Timestamp = timestamp;
+        Data = data;
+        SmartMeterId = smartMeterId;
     }
 
-    public bool Equals(User? other)
+    public bool Equals(Measurement? other)
     {
         if (other is null)
         {
@@ -58,7 +64,7 @@ public sealed class User : IEquatable<User>
             return false;
         }
 
-        return Equals((User)obj);
+        return Equals((Measurement)obj);
     }
 
     public override int GetHashCode()

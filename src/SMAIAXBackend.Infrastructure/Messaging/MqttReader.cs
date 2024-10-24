@@ -1,7 +1,10 @@
 using System.Text;
+
 using Microsoft.Extensions.Options;
+
 using MQTTnet;
 using MQTTnet.Client;
+
 using SMAIAXBackend.Application.Interfaces;
 
 namespace SMAIAXBackend.Infrastructure.Messaging;

@@ -1,32 +1,35 @@
-using SMAIAXBackend.Domain.Model.ValueObjects;
 using SMAIAXBackend.Domain.Model.ValueObjects.Ids;
 
 namespace SMAIAXBackend.Domain.Model.Entities;
 
-public sealed class User : IEquatable<User>
+public sealed class SmartMeter : IEquatable<SmartMeter>
 {
-    public UserId Id { get; } = null!;
-    public Name Name { get; } = null!;
-    public string Email { get; } = null!;
+    public SmartMeterId Id { get; } = null!;
+    public string Name { get; } = null!;
+    public List<Metadata> Metadata { get; }
+    public UserId UserId { get; }
+    public List<PolicyId> PolicyIds { get; }
 
-    public static User Create(UserId id, Name name, string email)
+    public static SmartMeter Create(SmartMeterId smartMeterId, string name, UserId userId)
     {
-        return new User(id, name, email);
+        return new SmartMeter(smartMeterId, name, userId);
     }
 
     // Needed by EF Core
-    private User()
+    private SmartMeter()
     {
     }
 
-    private User(UserId id, Name name, string email)
+    private SmartMeter(SmartMeterId smartMeterId, string name, UserId userId)
     {
-        Id = id;
+        Id = smartMeterId;
         Name = name;
-        Email = email;
+        Metadata = [];
+        UserId = userId;
+        PolicyIds = [];
     }
 
-    public bool Equals(User? other)
+    public bool Equals(SmartMeter? other)
     {
         if (other is null)
         {
@@ -58,7 +61,7 @@ public sealed class User : IEquatable<User>
             return false;
         }
 
-        return Equals((User)obj);
+        return Equals((SmartMeter)obj);
     }
 
     public override int GetHashCode()

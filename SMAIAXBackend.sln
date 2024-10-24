@@ -16,11 +16,16 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		docker-compose.yml = docker-compose.yml
 		Dockerfile = Dockerfile
+		README.md = README.md
+		.editorconfig = .editorconfig
+		.github\workflows\ci.yml = .github\workflows\ci.yml
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SMAIAXBackend.Application.UnitTests", "tests\SMAIAXBackend.Application.UnitTests\SMAIAXBackend.Application.UnitTests.csproj", "{EEDBD571-1267-427B-B4F3-55F26BF243D3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SMAIAXBackend.IntegrationTests", "tests\SMAIAXBackend.IntegrationTests\SMAIAXBackend.IntegrationTests.csproj", "{796B1580-516C-4F60-8E5A-439243B9BF0A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SMAIAXBackend.Domain.UnitTests", "tests\SMAIAXBackend.Domain.UnitTests\SMAIAXBackend.Domain.UnitTests.csproj", "{F45E7D79-3117-4A23-A19A-334FEBE63B1B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -52,6 +57,10 @@ Global
 		{796B1580-516C-4F60-8E5A-439243B9BF0A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{796B1580-516C-4F60-8E5A-439243B9BF0A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{796B1580-516C-4F60-8E5A-439243B9BF0A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F45E7D79-3117-4A23-A19A-334FEBE63B1B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F45E7D79-3117-4A23-A19A-334FEBE63B1B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F45E7D79-3117-4A23-A19A-334FEBE63B1B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F45E7D79-3117-4A23-A19A-334FEBE63B1B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{C4C844F3-5B6A-4CCA-93EF-F5D99C8E8A9C} = {72346843-F601-44F0-A851-9D455A9F46BF}
@@ -60,5 +69,6 @@ Global
 		{327D3AA5-5726-4C95-BAA9-337109DE82AF} = {72346843-F601-44F0-A851-9D455A9F46BF}
 		{EEDBD571-1267-427B-B4F3-55F26BF243D3} = {109CC1BC-1290-420D-9240-5069F4F96FBD}
 		{796B1580-516C-4F60-8E5A-439243B9BF0A} = {109CC1BC-1290-420D-9240-5069F4F96FBD}
+		{F45E7D79-3117-4A23-A19A-334FEBE63B1B} = {109CC1BC-1290-420D-9240-5069F4F96FBD}
 	EndGlobalSection
 EndGlobal

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+
 using SMAIAXBackend.API;
 using SMAIAXBackend.Application.Interfaces;
 using SMAIAXBackend.Application.Services.Implementations;

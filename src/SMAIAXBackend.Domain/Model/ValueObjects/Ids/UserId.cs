@@ -1,4 +1,4 @@
-namespace SMAIAXBackend.Domain.Model.ValueObjects;
+namespace SMAIAXBackend.Domain.Model.ValueObjects.Ids;
 
 public class UserId(Guid id) : ValueObject
 {
