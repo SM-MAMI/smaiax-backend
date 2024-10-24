@@ -20,7 +20,7 @@ public class AuthenticationTests : TestBase
     public async Task GivenUserInformation_WhenRegister_ThenDomainUserAndIdentityUserAreCreated()
     {
         // Given
-        var registerDto = new RegisterDto("user@example.com", "P@ssw0rd", new Name("John", "Doe"));
+        var registerDto = new RegisterDto("user@example.com", "P@ssw0rd", new NameDto("John", "Doe"));
 
         var httpContent = new StringContent(JsonConvert.SerializeObject(registerDto), Encoding.UTF8,
             "application/json");
@@ -48,7 +48,8 @@ public class AuthenticationTests : TestBase
         Assert.Multiple(() =>
         {
             Assert.That(domainUser.Email, Is.EqualTo(registerDto.Email));
-            Assert.That(domainUser.Name, Is.EqualTo(registerDto.Name));
+            Assert.That(domainUser.Name.FirstName, Is.EqualTo(registerDto.Name.FirstName));
+            Assert.That(domainUser.Name.LastName, Is.EqualTo(registerDto.Name.LastName));
         });
     }
 
@@ -56,7 +57,7 @@ public class AuthenticationTests : TestBase
     public async Task GivenInvalidUserInformation_WhenRegister_ThenErrorResponseIsReturned()
     {
         // Given
-        var registerDto = new RegisterDto("user@example.com", "Passw0rd", new Name("John", "Doe"));
+        var registerDto = new RegisterDto("user@example.com", "Passw0rd", new NameDto("John", "Doe"));
 
         var httpContent = new StringContent(JsonConvert.SerializeObject(registerDto), Encoding.UTF8,
             "application/json");

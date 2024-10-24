@@ -40,7 +40,8 @@ public class AuthenticationService(
                 throw new RegistrationException(errorMessages);
             }
 
-            var domainUser = User.Create(userId, registerDto.Name, registerDto.Email);
+            var name = new Name(registerDto.Name.FirstName, registerDto.Name.LastName);
+            var domainUser = User.Create(userId, name, registerDto.Email);
             await userRepository.AddAsync(domainUser);
         });
 
