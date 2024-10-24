@@ -1,5 +1,8 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 
 using SMAIAXBackend.API;
 using SMAIAXBackend.Application.Interfaces;
@@ -45,7 +48,55 @@ builder.Services.Configure<JwtConfiguration>(builder.Configuration.GetSection("J
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "JWT Authorization header using the Bearer scheme. Example: \"Bearer {token}\"",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
+    });
+
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                },
+                In = ParameterLocation.Header,
+                Name = "Bearer"
+            },
+            new List<string>()
+        }
+    });
+});
+
+builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(x =>
+    {
+        x.TokenValidationParameters = new TokenValidationParameters
+        {
+            IssuerSigningKey = new SymmetricSecurityKey("YourNewStrongSecretKeyOfAtLeast32Characters!"u8.ToArray()),
+            ValidIssuer = "SMAIAX",
+            ValidAudience = "SomeAudience",
+            ValidateIssuerSigningKey = true,
+            ValidateLifetime = true,
+            ValidateIssuer = true,
+            ValidateAudience = true
+        };
+    });
+
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 builder.Services.Configure<MqttSettings>(builder.Configuration.GetSection("MQTT"));
@@ -67,6 +118,7 @@ if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("DockerDeve
 
 app.UseExceptionHandler();
 app.UseHttpsRedirection();
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
