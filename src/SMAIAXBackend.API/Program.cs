@@ -55,20 +55,16 @@ builder.Services.AddHostedService<MessagingBackgroundService>();
 if (builder.Environment.IsDevelopment() || builder.Environment.IsEnvironment("DockerDevelopment"))
 {
     builder.Configuration.AddJsonFile("Properties/launchSettings.json", optional: true, reloadOnChange: true);
-    var httpProfileUrl = builder.Configuration["profiles:http:applicationUrl"];
+    builder.Services.AddSwaggerGen(options =>
+    {
+        options.SwaggerDoc("v1", new OpenApiInfo { Title = "SMAIAX Backend API", Version = "v1" });
 
-    if (!string.IsNullOrEmpty(httpProfileUrl))
-    {
-        builder.Services.AddSwaggerGen(options =>
+        var httpProfileUrl = builder.Configuration["profiles:http:applicationUrl"];
+        if (!string.IsNullOrEmpty(httpProfileUrl))
         {
-            options.SwaggerDoc("v1", new OpenApiInfo { Title = "SMAIAX Backend API", Version = "v1" });
             options.AddServer(new OpenApiServer { Url = httpProfileUrl.Trim(), Description = "Development server" });
-        });
-    }
-    else
-    {
-        builder.Services.AddSwaggerGen();
-    }
+        }
+    });
 }
 
 var app = builder.Build();
