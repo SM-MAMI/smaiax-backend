@@ -1,3 +1,4 @@
+using SMAIAXBackend.Domain.Model.Enums;
 using SMAIAXBackend.Domain.Model.ValueObjects;
 using SMAIAXBackend.Domain.Model.ValueObjects.Ids;
 
@@ -8,6 +9,7 @@ public sealed class PolicyRequest : IEquatable<PolicyRequest>
     public PolicyRequestId Id { get; }
     public bool IsAutomaticContractingEnabled { get; }
     public PolicyFilter PolicyFilter { get; }
+    public PolicyRequestState State { get; }
     public UserId UserId { get; }
 
     public static PolicyRequest Create(
@@ -17,18 +19,6 @@ public sealed class PolicyRequest : IEquatable<PolicyRequest>
         UserId userId)
     {
         return new PolicyRequest(id, isAutomaticContractingEnabled, policyFilter, userId);
-    }
-
-    public static PolicyRequest DeepClone(PolicyRequest policyRequest)
-    {
-        var idCopy = new PolicyRequestId(policyRequest.Id.Id);
-        var locationsCopy = new List<Location>(policyRequest.PolicyFilter.Locations);
-        var policyFilterCopy = new PolicyFilter(policyRequest.PolicyFilter.MeasurementResolution,
-            policyRequest.PolicyFilter.MinHouseHoldSize, policyRequest.PolicyFilter.MaxHouseHoldSize, locationsCopy,
-            policyRequest.PolicyFilter.LocationResolution, policyRequest.PolicyFilter.MaxPrice);
-        var userIdCopy = new UserId(policyRequest.UserId.Id);
-
-        return new PolicyRequest(idCopy, policyRequest.IsAutomaticContractingEnabled, policyFilterCopy, userIdCopy);
     }
 
     // Needed by EF Core
@@ -46,6 +36,7 @@ public sealed class PolicyRequest : IEquatable<PolicyRequest>
         IsAutomaticContractingEnabled = isAutomaticContractingEnabled;
         PolicyFilter = policyFilter;
         UserId = userId;
+        State = PolicyRequestState.Pending;
     }
 
     public bool Equals(PolicyRequest? other)

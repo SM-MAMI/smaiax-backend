@@ -50,6 +50,8 @@ public class PolicyRequestConfiguration : IEntityTypeConfiguration<PolicyRequest
             policyFilter.Property(pf => pf.MaxPrice).HasColumnName("MaxPrice").IsRequired();
         });
 
+        builder.Property(p => p.State).HasConversion<string>().IsRequired();
+
         builder.Property(p => p.UserId)
             .HasConversion(
                 v => v.Id,

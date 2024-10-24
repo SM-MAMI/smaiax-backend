@@ -12,6 +12,7 @@ public sealed class Policy : IEquatable<Policy>
     public Location Location { get; } = null!;
     public LocationResolution LocationResolution { get; }
     public decimal Price { get; }
+    public PolicyState State { get; }
     public UserId UserId { get; }
 
     public static Policy Create(
@@ -24,17 +25,6 @@ public sealed class Policy : IEquatable<Policy>
         UserId userId)
     {
         return new Policy(id, measurementResolution, householdSize, location, locationResolution, price, userId);
-    }
-
-    public static Policy DeepClone(Policy policy)
-    {
-        var policyIdCopy = new PolicyId(policy.Id.Id);
-        var locationCopy = new Location(policy.Location.StreetName, policy.Location.City, policy.Location.State,
-            policy.Location.Country, policy.Location.Continent);
-        var userIdCopy = new UserId(policy.UserId.Id);
-
-        return new Policy(policyIdCopy, policy.MeasurementResolution, policy.HouseholdSize, locationCopy,
-            policy.LocationResolution, policy.Price, userIdCopy);
     }
 
     // Needed by EF Core
@@ -57,6 +47,7 @@ public sealed class Policy : IEquatable<Policy>
         Location = location;
         LocationResolution = locationResolution;
         Price = price;
+        State = PolicyState.Active;
         UserId = userId;
     }
 

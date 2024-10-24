@@ -42,6 +42,8 @@ public class PolicyConfiguration : IEntityTypeConfiguration<Policy>
                 v => new UserId(v))
             .IsRequired();
 
+        builder.Property(p => p.State).HasConversion<string>().IsRequired();
+
         builder.HasMany<SmartMeter>()
             .WithMany()
             .UsingEntity<Dictionary<string, object>>(

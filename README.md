@@ -54,6 +54,7 @@ classDiagram
             location
             locationResolution
             price
+            state
         }
     }
 
@@ -63,6 +64,7 @@ classDiagram
             id
             isAutomaticContractingEnabled
             policyFilter
+            state
         }
 
         class PolicyFilter {
@@ -81,14 +83,12 @@ classDiagram
             <<AggregateRoot>>
             id
             createdAt
-            policyCopy
-            policyRequestCopy
         }
 }
 
 Measurement .. Metadata : matching by timestamp
-Contract "0..*" -- "1" Policy : originates from copy
-Contract "0..*" -- "1" PolicyRequest : originates from copy
+Contract "0..*" -- "1" Policy
+Contract "0..*" -- "1" PolicyRequest
 Policy "0..*" -- "1" User : creates
 PolicyRequest -- PolicyFilter
 PolicyRequest "0..*" -- "1" User : creates
