@@ -62,11 +62,7 @@ if (builder.Environment.IsDevelopment() || builder.Environment.IsEnvironment("Do
         builder.Services.AddSwaggerGen(options =>
         {
             options.SwaggerDoc("v1", new OpenApiInfo { Title = "SMAIAX Backend API", Version = "v1" });
-            options.AddServer(new OpenApiServer
-            {
-                Url = httpProfileUrl.Trim(),
-                Description = "Development server"
-            });
+            options.AddServer(new OpenApiServer { Url = httpProfileUrl.Trim(), Description = "Development server" });
         });
     }
     else
