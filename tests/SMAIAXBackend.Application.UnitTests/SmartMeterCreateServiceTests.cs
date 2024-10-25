@@ -41,7 +41,7 @@ public class SmartMeterCreateServiceTests
 
         _userRepositoryMock.Setup(repo => repo.GetByIdAsync(userId)).ReturnsAsync(user);
         _smartMeterRepositoryMock.Setup(repo => repo.NextIdentity()).Returns(smartMeterIdExpected);
-        
+
         // When
         var smartMeterIdActual = await _smartMeterCreateService.AddSmartMeterAsync(smartMeterCreateDto, userId.Id.ToString());
 
@@ -49,30 +49,30 @@ public class SmartMeterCreateServiceTests
         Assert.That(smartMeterIdActual, Is.EqualTo(smartMeterIdExpected.Id));
         _smartMeterRepositoryMock.Verify(repo => repo.AddAsync(It.IsAny<SmartMeter>()), Times.Once);
     }
-    
+
     [Test]
     public void GivenSmartMeterCreateDtoAndNoUserId_WhenAddSmartMeter_ThenInvalidTokenExceptionIsThrown()
     {
         // Given
         var smartMeterCreateDto = new SmartMeterCreateDto("Test Smart Meter");
-        
+
         // When ... Then
         Assert.ThrowsAsync<InvalidTokenException>(async () =>
              await _smartMeterCreateService.AddSmartMeterAsync(smartMeterCreateDto, null));
     }
-    
+
     [Test]
     public void GivenSmartMeterCreateDtoAndInvalidUserId_WhenAddSmartMeter_ThenInvalidTokenExceptionIsThrown()
     {
         // Given
         var smartMeterCreateDto = new SmartMeterCreateDto("Test Smart Meter");
         const string userId = "42";
-        
+
         // When ... Then
         Assert.ThrowsAsync<InvalidTokenException>(async () =>
             await _smartMeterCreateService.AddSmartMeterAsync(smartMeterCreateDto, userId));
     }
-    
+
     [Test]
     public void GivenSmartMeterCreateDtoAndNonExistentUserId_WhenAddSmartMeter_ThenUserNotFoundExceptionIsThrown()
     {
@@ -81,7 +81,7 @@ public class SmartMeterCreateServiceTests
         var userId = new UserId(Guid.NewGuid());
 
         _userRepositoryMock.Setup(repo => repo.GetByIdAsync(userId)).ReturnsAsync((User)null!);
-        
+
         // When ... Then
         Assert.ThrowsAsync<UserNotFoundException>(async () =>
             await _smartMeterCreateService.AddSmartMeterAsync(smartMeterCreateDto, userId.Id.ToString()));

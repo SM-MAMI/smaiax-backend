@@ -22,7 +22,7 @@ public class SmartMeterTests : TestBase
         var httpContent = new StringContent(JsonConvert.SerializeObject(smartMeterCreateDto), Encoding.UTF8,
             "application/json");
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", AccessToken);
-        
+
         // When
         var response = await HttpClient.PostAsync(BaseUrl, httpContent);
 
@@ -35,7 +35,7 @@ public class SmartMeterTests : TestBase
         var smartMeterActual =
             ApplicationDbContext.SmartMeters.FirstOrDefault(x =>
                 x.Id.Equals(new SmartMeterId(Guid.Parse(responseGuidString))));
-        
+
         Assert.That(smartMeterActual, Is.Not.Null);
         Assert.That(smartMeterActual.Name, Is.EqualTo(smartMeterCreateDto.Name));
     }
@@ -48,10 +48,10 @@ public class SmartMeterTests : TestBase
         var httpContent = new StringContent(JsonConvert.SerializeObject(smartMeterCreateDto), Encoding.UTF8,
             "application/json");
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "");
-        
+
         // When
         var response = await HttpClient.PostAsync(BaseUrl, httpContent);
-        
+
         // Then
         Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
     }

@@ -12,7 +12,7 @@ public class PolicySmartMeterConfiguration : IEntityTypeConfiguration<PolicySmar
     {
         builder.ToTable("PolicySmartMeter", "domain");
 
-        builder.HasKey(e => new { e.PolicyId, e.SmartMeterId});
+        builder.HasKey(e => new { e.PolicyId, e.SmartMeterId });
 
         builder
             .HasOne<Policy>()

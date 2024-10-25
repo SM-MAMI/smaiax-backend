@@ -15,7 +15,6 @@ public sealed class Policy : IEquatable<Policy>
     public decimal Price { get; }
     public PolicyState State { get; }
     public UserId UserId { get; }
-    
     public List<PolicySmartMeter> SmartMeters { get; }
 
     public static Policy Create(

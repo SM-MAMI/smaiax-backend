@@ -18,7 +18,7 @@ public class SmartMeterConfiguration : IEntityTypeConfiguration<SmartMeter>
                 v => v.Id,
                 v => new SmartMeterId(v))
             .IsRequired();
-        
+
         builder.Property(sm => sm.Name).IsRequired();
 
         builder.HasMany(sm => sm.Metadata)

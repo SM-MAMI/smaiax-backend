@@ -12,7 +12,7 @@ public class TestBase
     protected readonly HttpClient HttpClient = IntegrationTestSetup.HttpClient;
     protected readonly ApplicationDbContext ApplicationDbContext = IntegrationTestSetup.ApplicationDbContext;
     protected readonly string AccessToken = IntegrationTestSetup.AccessToken;
-    
+
     [SetUp]
     public async Task Setup()
     {
@@ -44,7 +44,7 @@ public class TestBase
         var passwordHash = hasher.HashPassword(testUser, "P@ssw0rd");
         testUser.PasswordHash = passwordHash;
         var domainUser = User.Create(userId, new Name("John", "Doe"), userName);
-        
+
         // Valid refresh token
         const string jwtId = "19f77b2e-e485-4031-8506-62f6d3b69e4d";
         const string token1 = "4dffb63c-581d-4588-8b4b-4b075f17d015-abcb30f4-5f32-4fbb-80c4-99cea98273ca";
@@ -93,7 +93,7 @@ public class TestBase
             true,
             expirationDate1
         );
-        
+
         await ApplicationDbContext.Users.AddAsync(testUser);
         await ApplicationDbContext.DomainUsers.AddAsync(domainUser);
         await ApplicationDbContext.RefreshTokens.AddAsync(refreshToken1);

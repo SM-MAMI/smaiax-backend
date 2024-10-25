@@ -3,11 +3,12 @@ namespace SMAIAXBackend.Domain.Model.ValueObjects.Ids;
 public class PolicyId : ValueObject
 {
     public Guid Id { get; }
-    
+
     // Needed by EF Core
     private PolicyId() { }
-    
-    public PolicyId(Guid id) {
+
+    public PolicyId(Guid id)
+    {
         Id = id;
     }
 

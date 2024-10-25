@@ -62,7 +62,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         var passwordHash = hasher.HashPassword(testUser, "P@ssw0rd");
         testUser.PasswordHash = passwordHash;
         var domainUser = User.Create(userId, new Name("John", "Doe"), userName);
-        
+
         await Users.AddAsync(testUser);
         await DomainUsers.AddAsync(domainUser);
         await SaveChangesAsync();
