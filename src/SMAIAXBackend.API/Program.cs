@@ -1,5 +1,7 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
 using SMAIAXBackend.API;
@@ -36,16 +38,67 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 
 // Application Services.
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
+builder.Services.AddScoped<ISmartMeterCreateService, SmartMeterCreateService>();
 
 // Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ITokenRepository, TokenRepository>();
 builder.Services.AddScoped<ITransactionManager, TransactionManager>();
+builder.Services.AddScoped<ISmartMeterRepository, SmartMeterRepository>();
 
 builder.Services.Configure<JwtConfiguration>(builder.Configuration.GetSection("JwtConfiguration"));
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "JWT Authorization header using the Bearer scheme. Example: \"Bearer {token}\"",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
+    });
+
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                },
+                In = ParameterLocation.Header,
+                Name = "Bearer"
+            },
+            new List<string>()
+        }
+    });
+});
+
+builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(x =>
+    {
+        x.TokenValidationParameters = new TokenValidationParameters
+        {
+            IssuerSigningKey = new SymmetricSecurityKey("YourNewStrongSecretKeyOfAtLeast32Characters!"u8.ToArray()),
+            ValidIssuer = "SMAIAX",
+            ValidAudience = "SomeAudience",
+            ValidateIssuerSigningKey = true,
+            ValidateLifetime = true,
+            ValidateIssuer = true,
+            ValidateAudience = true
+        };
+    });
+
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 builder.Services.Configure<MqttSettings>(builder.Configuration.GetSection("MQTT"));
@@ -76,9 +129,10 @@ if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("DockerDeve
     app.UseSwagger();
     app.UseSwaggerUI();
 
-    var userStoreDbContext = services.GetRequiredService<ApplicationDbContext>();
-    await userStoreDbContext.Database.EnsureDeletedAsync();
-    await userStoreDbContext.Database.EnsureCreatedAsync();
+    var applicationDbContext = services.GetRequiredService<ApplicationDbContext>();
+    await applicationDbContext.Database.EnsureDeletedAsync();
+    await applicationDbContext.Database.EnsureCreatedAsync();
+    await applicationDbContext.SeedTestData();
 }
 
 app.UseExceptionHandler();

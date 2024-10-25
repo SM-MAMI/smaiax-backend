@@ -1,3 +1,4 @@
+using SMAIAXBackend.Domain.Model.RelationshipHelpers;
 using SMAIAXBackend.Domain.Model.ValueObjects.Ids;
 
 namespace SMAIAXBackend.Domain.Model.Entities;
@@ -8,11 +9,13 @@ public sealed class SmartMeter : IEquatable<SmartMeter>
     public string Name { get; } = null!;
     public List<Metadata> Metadata { get; }
     public UserId UserId { get; }
-    public List<PolicyId> PolicyIds { get; }
+    public List<PolicySmartMeter> Policies { get; }
 
     public static SmartMeter Create(SmartMeterId smartMeterId, string name, UserId userId)
     {
-        return new SmartMeter(smartMeterId, name, userId);
+        var metadata = new List<Metadata>();
+        var policies = new List<PolicySmartMeter>();
+        return new SmartMeter(smartMeterId, name, metadata, userId, policies);
     }
 
     // Needed by EF Core
@@ -20,13 +23,13 @@ public sealed class SmartMeter : IEquatable<SmartMeter>
     {
     }
 
-    private SmartMeter(SmartMeterId smartMeterId, string name, UserId userId)
+    private SmartMeter(SmartMeterId smartMeterId, string name, List<Metadata> metadata, UserId userId, List<PolicySmartMeter> policies)
     {
         Id = smartMeterId;
         Name = name;
-        Metadata = [];
+        Metadata = metadata;
         UserId = userId;
-        PolicyIds = [];
+        Policies = policies;
     }
 
     public bool Equals(SmartMeter? other)

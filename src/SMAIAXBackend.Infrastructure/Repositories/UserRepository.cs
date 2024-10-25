@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+
 using SMAIAXBackend.Domain.Model.Entities;
 using SMAIAXBackend.Domain.Model.ValueObjects.Ids;
 using SMAIAXBackend.Domain.Repositories;
@@ -16,5 +18,10 @@ public class UserRepository(ApplicationDbContext applicationDbContext) : IUserRe
     {
         await applicationDbContext.DomainUsers.AddAsync(user);
         await applicationDbContext.SaveChangesAsync();
+    }
+
+    public async Task<User?> GetUserByIdAsync(UserId userId)
+    {
+        return await applicationDbContext.DomainUsers.FirstOrDefaultAsync(u => u.Id.Equals(userId));
     }
 }

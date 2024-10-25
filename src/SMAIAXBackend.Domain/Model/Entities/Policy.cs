@@ -1,4 +1,5 @@
 using SMAIAXBackend.Domain.Model.Enums;
+using SMAIAXBackend.Domain.Model.RelationshipHelpers;
 using SMAIAXBackend.Domain.Model.ValueObjects;
 using SMAIAXBackend.Domain.Model.ValueObjects.Ids;
 
@@ -14,6 +15,7 @@ public sealed class Policy : IEquatable<Policy>
     public decimal Price { get; }
     public PolicyState State { get; }
     public UserId UserId { get; }
+    public List<PolicySmartMeter> SmartMeters { get; }
 
     public static Policy Create(
         PolicyId id,
@@ -24,7 +26,8 @@ public sealed class Policy : IEquatable<Policy>
         decimal price,
         UserId userId)
     {
-        return new Policy(id, measurementResolution, householdSize, location, locationResolution, price, userId);
+        var smartMeters = new List<PolicySmartMeter>();
+        return new Policy(id, measurementResolution, householdSize, location, locationResolution, price, userId, smartMeters);
     }
 
     // Needed by EF Core
@@ -39,7 +42,8 @@ public sealed class Policy : IEquatable<Policy>
         Location location,
         LocationResolution locationResolution,
         decimal price,
-        UserId userId)
+        UserId userId,
+        List<PolicySmartMeter> smartMeters)
     {
         Id = id;
         MeasurementResolution = measurementResolution;
@@ -49,6 +53,7 @@ public sealed class Policy : IEquatable<Policy>
         Price = price;
         State = PolicyState.Active;
         UserId = userId;
+        SmartMeters = smartMeters;
     }
 
     public bool Equals(Policy? other)

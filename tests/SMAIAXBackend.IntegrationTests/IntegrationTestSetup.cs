@@ -3,6 +3,7 @@ using DotNet.Testcontainers.Containers;
 
 using Microsoft.Extensions.DependencyInjection;
 
+using SMAIAXBackend.Domain.Repositories;
 using SMAIAXBackend.Infrastructure.DbContexts;
 
 using Testcontainers.PostgreSql;
@@ -17,6 +18,7 @@ internal static class IntegrationTestSetup
     private static WebAppFactory _webAppFactory = null!;
     public static ApplicationDbContext ApplicationDbContext { get; private set; } = null!;
     public static HttpClient HttpClient { get; private set; } = null!;
+    public static string AccessToken { get; private set; } = null!;
 
     [OneTimeSetUp]
     public static async Task OneTimeSetup()
@@ -47,6 +49,9 @@ internal static class IntegrationTestSetup
         HttpClient = _webAppFactory.CreateClient();
 
         ApplicationDbContext = _webAppFactory.Services.GetRequiredService<ApplicationDbContext>();
+        var tokenRepository = _webAppFactory.Services.GetRequiredService<ITokenRepository>();
+        AccessToken = await tokenRepository.GenerateAccessTokenAsync($"{Guid.NewGuid()}-{Guid.NewGuid()}",
+            "3c07065a-b964-44a9-9cdf-fbd49d755ea7", "john.doe@example.com");
     }
 
     [OneTimeTearDown]

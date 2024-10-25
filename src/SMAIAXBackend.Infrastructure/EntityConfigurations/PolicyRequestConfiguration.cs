@@ -1,7 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
+using Newtonsoft.Json;
+
 using SMAIAXBackend.Domain.Model.Entities;
+using SMAIAXBackend.Domain.Model.ValueObjects;
 using SMAIAXBackend.Domain.Model.ValueObjects.Ids;
 
 namespace SMAIAXBackend.Infrastructure.EntityConfigurations;
@@ -30,19 +33,10 @@ public class PolicyRequestConfiguration : IEntityTypeConfiguration<PolicyRequest
 
             policyFilter.Property(pf => pf.MaxHouseHoldSize).HasColumnName("MaxHouseHoldSize").IsRequired();
 
-            policyFilter.OwnsMany(pf => pf.Locations, location =>
-            {
-                location.Property(l => l.StreetName).HasColumnName("StreetName");
-                location.Property(l => l.City).HasColumnName("City");
-                location.Property(l => l.State).HasColumnName("State");
-                location.Property(l => l.Country).HasColumnName("Country");
-                location.Property(l => l.Continent)
-                    .HasColumnName("Continent")
-                    .HasConversion<string>()
-                    .IsRequired();
-
-                location.WithOwner();
-            });
+            policyFilter.Property(pf => pf.Locations).HasConversion<string>(
+                v => JsonConvert.SerializeObject(v),
+                v => JsonConvert.DeserializeObject<List<Location>>(v)!
+            );
 
             policyFilter.Property(pf => pf.LocationResolution).HasColumnName("LocationResolution")
                 .HasConversion<string>().IsRequired();

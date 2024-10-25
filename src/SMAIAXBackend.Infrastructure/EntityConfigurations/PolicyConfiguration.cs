@@ -19,17 +19,18 @@ public class PolicyConfiguration : IEntityTypeConfiguration<Policy>
                 v => new PolicyId(v))
             .IsRequired();
 
+
         builder.Property(p => p.MeasurementResolution).HasConversion<string>().IsRequired();
 
         builder.Property(p => p.HouseholdSize).IsRequired();
 
         builder.OwnsOne(p => p.Location, location =>
         {
-            location.Property(l => l.StreetName).HasColumnName("StreetName");
-            location.Property(l => l.City).HasColumnName("City");
-            location.Property(l => l.State).HasColumnName("State");
-            location.Property(l => l.Country).HasColumnName("Country");
-            location.Property(l => l.Continent).HasColumnName("Continent").HasConversion<string>();
+            location.Property(l => l.StreetName).HasColumnName("streetName");
+            location.Property(l => l.City).HasColumnName("city");
+            location.Property(l => l.State).HasColumnName("state");
+            location.Property(l => l.Country).HasColumnName("country");
+            location.Property(l => l.Continent).HasColumnName("continent").HasConversion<string>();
         });
 
         builder.Property(p => p.LocationResolution).HasConversion<string>().IsRequired();
@@ -43,23 +44,5 @@ public class PolicyConfiguration : IEntityTypeConfiguration<Policy>
             .IsRequired();
 
         builder.Property(p => p.State).HasConversion<string>().IsRequired();
-
-        builder.HasMany<SmartMeter>()
-            .WithMany()
-            .UsingEntity<Dictionary<string, object>>(
-                "PolicySmartMeters",
-                j => j.HasOne<SmartMeter>()
-                    .WithMany()
-                    .HasForeignKey("SmartMeterId")
-                    .OnDelete(DeleteBehavior.Cascade),
-                j => j.HasOne<Policy>()
-                    .WithMany()
-                    .HasForeignKey("PolicyId")
-                    .OnDelete(DeleteBehavior.Cascade),
-                j =>
-                {
-                    j.HasKey("PolicyId", "SmartMeterId");
-                    j.ToTable("PolicySmartMeters");
-                });
     }
 }
