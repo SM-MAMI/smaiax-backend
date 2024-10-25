@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 
 using SMAIAXBackend.API;
 using SMAIAXBackend.Application.Interfaces;
@@ -45,12 +46,27 @@ builder.Services.Configure<JwtConfiguration>(builder.Configuration.GetSection("J
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 builder.Services.Configure<MqttSettings>(builder.Configuration.GetSection("MQTT"));
 builder.Services.AddSingleton<IMqttReader, MqttReader>();
 builder.Services.AddHostedService<MessagingBackgroundService>();
+
+if (builder.Environment.IsDevelopment() || builder.Environment.IsEnvironment("DockerDevelopment"))
+{
+    builder.Configuration.AddJsonFile("Properties/launchSettings.json", optional: true, reloadOnChange: true);
+    builder.Services.AddSwaggerGen(options =>
+    {
+        options.SwaggerDoc("v1", new OpenApiInfo { Title = "SMAIAX Backend API", Version = "v1" });
+
+        var httpProfileUrl = builder.Configuration["profiles:http:applicationUrl"];
+        if (!string.IsNullOrEmpty(httpProfileUrl))
+        {
+            options.AddServer(new OpenApiServer { Url = httpProfileUrl.Trim(), Description = "Development server" });
+        }
+    });
+}
+
 var app = builder.Build();
 using var scope = app.Services.CreateScope();
 var services = scope.ServiceProvider;
