@@ -20,7 +20,7 @@ public class UserRepository(ApplicationDbContext applicationDbContext) : IUserRe
         await applicationDbContext.SaveChangesAsync();
     }
 
-    public async Task<User?> GetByIdAsync(UserId userId)
+    public async Task<User?> GetUserByIdAsync(UserId userId)
     {
         return await applicationDbContext.DomainUsers.FirstOrDefaultAsync(u => u.Id.Equals(userId));
     }

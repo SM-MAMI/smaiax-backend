@@ -39,7 +39,7 @@ public class SmartMeterCreateServiceTests
         var userId = new UserId(Guid.NewGuid());
         var user = User.Create(userId, new Name("John", "Doe"), "john.doe@example.com");
 
-        _userRepositoryMock.Setup(repo => repo.GetByIdAsync(userId)).ReturnsAsync(user);
+        _userRepositoryMock.Setup(repo => repo.GetUserByIdAsync(userId)).ReturnsAsync(user);
         _smartMeterRepositoryMock.Setup(repo => repo.NextIdentity()).Returns(smartMeterIdExpected);
 
         // When
@@ -80,7 +80,7 @@ public class SmartMeterCreateServiceTests
         var smartMeterCreateDto = new SmartMeterCreateDto("Test Smart Meter");
         var userId = new UserId(Guid.NewGuid());
 
-        _userRepositoryMock.Setup(repo => repo.GetByIdAsync(userId)).ReturnsAsync((User)null!);
+        _userRepositoryMock.Setup(repo => repo.GetUserByIdAsync(userId)).ReturnsAsync((User)null!);
 
         // When ... Then
         Assert.ThrowsAsync<UserNotFoundException>(async () =>

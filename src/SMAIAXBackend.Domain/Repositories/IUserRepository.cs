@@ -7,5 +7,5 @@ public interface IUserRepository
 {
     UserId NextIdentity();
     Task AddAsync(User user);
-    Task<User?> GetByIdAsync(UserId userId);
+    Task<User?> GetUserByIdAsync(UserId userId);
 }

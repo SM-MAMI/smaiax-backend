@@ -28,7 +28,7 @@ public class SmartMeterCreateService(
             throw new InvalidTokenException();
         }
 
-        var user = await userRepository.GetByIdAsync(new UserId(userIdGuid));
+        var user = await userRepository.GetUserByIdAsync(new UserId(userIdGuid));
 
         if (user is null)
         {
