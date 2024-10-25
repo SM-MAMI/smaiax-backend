@@ -9,7 +9,7 @@ namespace SMAIAXBackend.API.Controllers;
 [ApiController]
 public class AuthenticationController(IAuthenticationService authenticationService) : ControllerBase
 {
-    [HttpPost("register")]
+    [HttpPost("register", Name = "register")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -20,7 +20,7 @@ public class AuthenticationController(IAuthenticationService authenticationServi
         return Ok(registeredUserId);
     }
 
-    [HttpPost("login")]
+    [HttpPost("login", Name = "login")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -32,7 +32,7 @@ public class AuthenticationController(IAuthenticationService authenticationServi
         return Ok(tokenDto);
     }
 
-    [HttpPost("refresh")]
+    [HttpPost("refresh", Name = "refresh")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -44,7 +44,7 @@ public class AuthenticationController(IAuthenticationService authenticationServi
         return Ok(refreshedTokens);
     }
 
-    [HttpPost("logout")]
+    [HttpPost("logout", Name = "logout")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
