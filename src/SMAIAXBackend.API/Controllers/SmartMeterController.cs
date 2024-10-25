@@ -1,3 +1,5 @@
+using System.Security.Claims;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,7 +20,8 @@ public class SmartMeterController(ISmartMeterCreateService smartMeterCreateServi
     [Authorize]
     public async Task<ActionResult<Guid>> AddSmartMeter([FromBody] SmartMeterCreateDto smartMeterCreateDto)
     {
-        var id = await smartMeterCreateService.AddSmartMeterAsync(smartMeterCreateDto, User);
+        var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+        var id = await smartMeterCreateService.AddSmartMeterAsync(smartMeterCreateDto, userIdClaim);
 
         // TODO: Change to CreatedAtRoute when GetById exists
         return Ok(id);

@@ -1,5 +1,3 @@
-using System.Security.Claims;
-
 using Microsoft.Extensions.Logging;
 
 using SMAIAXBackend.Application.DTOs;
@@ -16,24 +14,20 @@ public class SmartMeterCreateService(
     IUserRepository userRepository,
     ILogger<SmartMeterCreateService> logger) : ISmartMeterCreateService
 {
-    public async Task<Guid> AddSmartMeterAsync(
-        SmartMeterCreateDto smartMeterCreateDto,
-        ClaimsPrincipal userClaimsPrincipal)
+    public async Task<Guid> AddSmartMeterAsync(SmartMeterCreateDto smartMeterCreateDto, string? userId)
     {
-        var userIdClaim = userClaimsPrincipal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-
-        if (string.IsNullOrEmpty(userIdClaim))
+        if (string.IsNullOrEmpty(userId))
         {
             logger.LogWarning("No user claim found in claims principal.");
             throw new InvalidTokenException();
         }
 
-        if (!Guid.TryParse(userIdClaim, out var userIdGuid))
+        if (!Guid.TryParse(userId, out var userIdGuid))
         {
             logger.LogWarning("Invalid user claim found in claims principal.");
             throw new InvalidTokenException();
         }
-        
+
         var user = await userRepository.GetByIdAsync(new UserId(userIdGuid));
 
         if (user is null)
