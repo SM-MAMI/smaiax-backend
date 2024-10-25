@@ -18,7 +18,7 @@ public class SmartMeterConfiguration : IEntityTypeConfiguration<SmartMeter>
                 v => v.Id,
                 v => new SmartMeterId(v))
             .IsRequired();
-
+        
         builder.Property(sm => sm.Name).IsRequired();
 
         builder.HasMany(sm => sm.Metadata)
@@ -30,29 +30,6 @@ public class SmartMeterConfiguration : IEntityTypeConfiguration<SmartMeter>
             .HasConversion(
                 v => v.Id,
                 v => new UserId(v))
-            .IsRequired();
-
-        builder.HasMany<Policy>()
-            .WithMany()
-            .UsingEntity<Dictionary<string, object>>(
-                "PolicySmartMeters",
-                j => j.HasOne<Policy>()
-                    .WithMany()
-                    .HasForeignKey("PolicyId")
-                    .OnDelete(DeleteBehavior.Cascade),
-                j => j.HasOne<SmartMeter>()
-                    .WithMany()
-                    .HasForeignKey("SmartMeterId")
-                    .OnDelete(DeleteBehavior.Cascade),
-                j =>
-                {
-                    j.HasKey("PolicyId", "SmartMeterId");
-                    j.ToTable("PolicySmartMeters");
-                });
-
-        builder.HasMany(sm => sm.Metadata)
-            .WithOne(md => md.SmartMeter)
-            .HasForeignKey(md => md.SmartMeterId)
             .IsRequired();
     }
 }

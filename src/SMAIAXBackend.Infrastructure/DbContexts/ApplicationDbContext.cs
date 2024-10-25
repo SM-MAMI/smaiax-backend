@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 using SMAIAXBackend.Domain.Model.Entities;
+using SMAIAXBackend.Domain.Model.ValueObjects;
 using SMAIAXBackend.Domain.Model.ValueObjects.Ids;
 using SMAIAXBackend.Infrastructure.EntityConfigurations;
 
@@ -13,6 +14,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 {
     public DbSet<User> DomainUsers { get; init; }
     public DbSet<RefreshToken> RefreshTokens { get; init; }
+    public DbSet<SmartMeter> SmartMeters { get; init; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -23,8 +25,14 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
+        builder.ApplyConfiguration(new ContractConfiguration());
         builder.ApplyConfiguration(new DomainUserConfiguration());
+        builder.ApplyConfiguration(new MeasurementConfiguration());
+        builder.ApplyConfiguration(new MetadataConfiguration());
+        builder.ApplyConfiguration(new PolicyConfiguration());
+        builder.ApplyConfiguration(new PolicyRequestConfiguration());
         builder.ApplyConfiguration(new RefreshTokenConfiguration());
+        builder.ApplyConfiguration(new SmartMeterConfiguration());
 
         // Place Identity tables in the "auth" schema
         builder.Entity<IdentityUser>(entity => entity.ToTable(name: "AspNetUsers", schema: "auth"));
@@ -34,11 +42,9 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         builder.Entity<IdentityUserLogin<string>>(entity => entity.ToTable("AspNetUserLogins", schema: "auth"));
         builder.Entity<IdentityRoleClaim<string>>(entity => entity.ToTable("AspNetRoleClaims", schema: "auth"));
         builder.Entity<IdentityUserToken<string>>(entity => entity.ToTable("AspNetUserTokens", schema: "auth"));
-
-        SeedTestData(builder);
     }
 
-    private static void SeedTestData(ModelBuilder builder)
+    public async Task SeedTestData()
     {
         var hasher = new PasswordHasher<IdentityUser>();
 
@@ -54,7 +60,10 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         };
         var passwordHash = hasher.HashPassword(testUser, "P@ssw0rd");
         testUser.PasswordHash = passwordHash;
-
-        builder.Entity<IdentityUser>().HasData(testUser);
+        var domainUser = User.Create(userId, new Name("John", "Doe"), userName);
+        
+        await Users.AddAsync(testUser);
+        await DomainUsers.AddAsync(domainUser);
+        await SaveChangesAsync();
     }
 }

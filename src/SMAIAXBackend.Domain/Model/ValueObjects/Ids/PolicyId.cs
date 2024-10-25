@@ -1,8 +1,15 @@
 namespace SMAIAXBackend.Domain.Model.ValueObjects.Ids;
 
-public class PolicyId(Guid id) : ValueObject
+public class PolicyId : ValueObject
 {
-    public Guid Id { get; } = id;
+    public Guid Id { get; }
+    
+    // Needed by EF Core
+    private PolicyId() { }
+    
+    public PolicyId(Guid id) {
+        Id = id;
+    }
 
     protected override IEnumerable<object> GetEqualityComponents()
     {

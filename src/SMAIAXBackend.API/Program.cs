@@ -38,11 +38,13 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 
 // Application Services.
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
+builder.Services.AddScoped<ISmartMeterCreateService, SmartMeterCreateService>();
 
 // Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ITokenRepository, TokenRepository>();
 builder.Services.AddScoped<ITransactionManager, TransactionManager>();
+builder.Services.AddScoped<ISmartMeterRepository, SmartMeterRepository>();
 
 builder.Services.Configure<JwtConfiguration>(builder.Configuration.GetSection("JwtConfiguration"));
 
@@ -111,9 +113,10 @@ if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("DockerDeve
     app.UseSwagger();
     app.UseSwaggerUI();
 
-    var userStoreDbContext = services.GetRequiredService<ApplicationDbContext>();
-    await userStoreDbContext.Database.EnsureDeletedAsync();
-    await userStoreDbContext.Database.EnsureCreatedAsync();
+    var applicationDbContext = services.GetRequiredService<ApplicationDbContext>();
+    await applicationDbContext.Database.EnsureDeletedAsync();
+    await applicationDbContext.Database.EnsureCreatedAsync();
+    await applicationDbContext.SeedTestData();
 }
 
 app.UseExceptionHandler();

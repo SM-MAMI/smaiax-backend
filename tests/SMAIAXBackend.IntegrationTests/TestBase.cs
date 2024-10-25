@@ -1,4 +1,7 @@
+using Microsoft.AspNetCore.Identity;
+
 using SMAIAXBackend.Domain.Model.Entities;
+using SMAIAXBackend.Domain.Model.ValueObjects;
 using SMAIAXBackend.Domain.Model.ValueObjects.Ids;
 using SMAIAXBackend.Infrastructure.DbContexts;
 
@@ -8,7 +11,8 @@ public class TestBase
 {
     protected readonly HttpClient HttpClient = IntegrationTestSetup.HttpClient;
     protected readonly ApplicationDbContext ApplicationDbContext = IntegrationTestSetup.ApplicationDbContext;
-
+    protected readonly string AccessToken = IntegrationTestSetup.AccessToken;
+    
     [SetUp]
     public async Task Setup()
     {
@@ -25,8 +29,23 @@ public class TestBase
 
     private async Task InsertTestData()
     {
-        // Valid refresh token
+        var hasher = new PasswordHasher<IdentityUser>();
+
         var userId = new UserId(Guid.Parse("3c07065a-b964-44a9-9cdf-fbd49d755ea7"));
+        const string userName = "john.doe@example.com";
+        var testUser = new IdentityUser
+        {
+            Id = userId.Id.ToString(),
+            UserName = userName,
+            NormalizedUserName = userName.ToUpper(),
+            Email = userName,
+            NormalizedEmail = userName.ToUpper(),
+        };
+        var passwordHash = hasher.HashPassword(testUser, "P@ssw0rd");
+        testUser.PasswordHash = passwordHash;
+        var domainUser = User.Create(userId, new Name("John", "Doe"), userName);
+        
+        // Valid refresh token
         const string jwtId = "19f77b2e-e485-4031-8506-62f6d3b69e4d";
         const string token1 = "4dffb63c-581d-4588-8b4b-4b075f17d015-abcb30f4-5f32-4fbb-80c4-99cea98273ca";
         var expirationDate1 = DateTime.UtcNow.AddDays(100);
@@ -74,7 +93,9 @@ public class TestBase
             true,
             expirationDate1
         );
-
+        
+        await ApplicationDbContext.Users.AddAsync(testUser);
+        await ApplicationDbContext.DomainUsers.AddAsync(domainUser);
         await ApplicationDbContext.RefreshTokens.AddAsync(refreshToken1);
         await ApplicationDbContext.RefreshTokens.AddAsync(refreshToken2);
         await ApplicationDbContext.RefreshTokens.AddAsync(refreshToken3);
