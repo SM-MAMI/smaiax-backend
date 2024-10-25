@@ -93,6 +93,11 @@ public class TestBase
             true,
             expirationDate1
         );
+        
+        var smartMeter1 = SmartMeter.Create(new SmartMeterId(Guid.Parse("5e9db066-1b47-46cc-bbde-0b54c30167cd")),
+            "Smart Meter 1", domainUser.Id);
+        var smartMeter2 = SmartMeter.Create(new SmartMeterId(Guid.Parse("f4c70232-6715-4c15-966f-bf4bcef46d39")),
+            "Smart Meter 2", domainUser.Id);
 
         await ApplicationDbContext.Users.AddAsync(testUser);
         await ApplicationDbContext.DomainUsers.AddAsync(domainUser);
@@ -100,6 +105,8 @@ public class TestBase
         await ApplicationDbContext.RefreshTokens.AddAsync(refreshToken2);
         await ApplicationDbContext.RefreshTokens.AddAsync(refreshToken3);
         await ApplicationDbContext.RefreshTokens.AddAsync(refreshToken4);
+        await ApplicationDbContext.SmartMeters.AddAsync(smartMeter1);
+        await ApplicationDbContext.SmartMeters.AddAsync(smartMeter2);
         await ApplicationDbContext.SaveChangesAsync();
     }
 }

@@ -39,6 +39,7 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 // Application Services.
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<ISmartMeterCreateService, SmartMeterCreateService>();
+builder.Services.AddScoped<ISmartMeterListService, SmartMeterListService>();
 
 // Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();

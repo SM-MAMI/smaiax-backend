@@ -61,10 +61,16 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         };
         var passwordHash = hasher.HashPassword(testUser, "P@ssw0rd");
         testUser.PasswordHash = passwordHash;
+        
         var domainUser = User.Create(userId, new Name("John", "Doe"), userName);
 
+        var smartMeter1 = SmartMeter.Create(new SmartMeterId(Guid.NewGuid()), "Smart Meter 1", domainUser.Id);
+        var smartMeter2 = SmartMeter.Create(new SmartMeterId(Guid.NewGuid()), "Smart Meter 2", domainUser.Id);
+        
         await Users.AddAsync(testUser);
         await DomainUsers.AddAsync(domainUser);
+        await SmartMeters.AddAsync(smartMeter1);
+        await SmartMeters.AddAsync(smartMeter2);
         await SaveChangesAsync();
     }
 }
