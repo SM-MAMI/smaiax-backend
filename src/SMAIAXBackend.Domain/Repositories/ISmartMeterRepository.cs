@@ -7,4 +7,5 @@ public interface ISmartMeterRepository
 {
     SmartMeterId NextIdentity();
     Task AddAsync(SmartMeter meter);
+    Task<List<SmartMeter>> GetSmartMetersByUserIdAsync(UserId userId);
 }

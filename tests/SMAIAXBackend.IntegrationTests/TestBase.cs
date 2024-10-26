@@ -3,27 +3,30 @@ using Microsoft.AspNetCore.Identity;
 using SMAIAXBackend.Domain.Model.Entities;
 using SMAIAXBackend.Domain.Model.ValueObjects;
 using SMAIAXBackend.Domain.Model.ValueObjects.Ids;
+using SMAIAXBackend.Domain.Repositories;
 using SMAIAXBackend.Infrastructure.DbContexts;
 
 namespace SMAIAXBackend.IntegrationTests;
 
 public class TestBase
 {
-    protected readonly HttpClient HttpClient = IntegrationTestSetup.HttpClient;
-    protected readonly ApplicationDbContext ApplicationDbContext = IntegrationTestSetup.ApplicationDbContext;
-    protected readonly string AccessToken = IntegrationTestSetup.AccessToken;
+    protected readonly HttpClient _httpClient = IntegrationTestSetup.HttpClient;
+    protected readonly ApplicationDbContext _applicationDbContext = IntegrationTestSetup.ApplicationDbContext;
+    protected readonly ISmartMeterRepository _smartMeterRepository = IntegrationTestSetup.SmartMeterRepository;
+    protected readonly IUserRepository _userRepository = IntegrationTestSetup.UserRepository;
+    protected readonly string _accessToken = IntegrationTestSetup.AccessToken;
 
     [SetUp]
     public async Task Setup()
     {
         await IntegrationTestSetup.ApplicationDbContext.Database.EnsureCreatedAsync();
         await InsertTestData();
-        IntegrationTestSetup.ApplicationDbContext.ChangeTracker.Clear();
     }
 
     [TearDown]
     public async Task TearDown()
     {
+        IntegrationTestSetup.ApplicationDbContext.ChangeTracker.Clear();
         await IntegrationTestSetup.ApplicationDbContext.Database.EnsureDeletedAsync();
     }
 
@@ -94,12 +97,19 @@ public class TestBase
             expirationDate1
         );
 
-        await ApplicationDbContext.Users.AddAsync(testUser);
-        await ApplicationDbContext.DomainUsers.AddAsync(domainUser);
-        await ApplicationDbContext.RefreshTokens.AddAsync(refreshToken1);
-        await ApplicationDbContext.RefreshTokens.AddAsync(refreshToken2);
-        await ApplicationDbContext.RefreshTokens.AddAsync(refreshToken3);
-        await ApplicationDbContext.RefreshTokens.AddAsync(refreshToken4);
-        await ApplicationDbContext.SaveChangesAsync();
+        var smartMeter1 = SmartMeter.Create(new SmartMeterId(Guid.Parse("5e9db066-1b47-46cc-bbde-0b54c30167cd")),
+            "Smart Meter 1", domainUser.Id);
+        var smartMeter2 = SmartMeter.Create(new SmartMeterId(Guid.Parse("f4c70232-6715-4c15-966f-bf4bcef46d39")),
+            "Smart Meter 2", domainUser.Id);
+
+        await _applicationDbContext.Users.AddAsync(testUser);
+        await _applicationDbContext.DomainUsers.AddAsync(domainUser);
+        await _applicationDbContext.RefreshTokens.AddAsync(refreshToken1);
+        await _applicationDbContext.RefreshTokens.AddAsync(refreshToken2);
+        await _applicationDbContext.RefreshTokens.AddAsync(refreshToken3);
+        await _applicationDbContext.RefreshTokens.AddAsync(refreshToken4);
+        await _applicationDbContext.SmartMeters.AddAsync(smartMeter1);
+        await _applicationDbContext.SmartMeters.AddAsync(smartMeter2);
+        await _applicationDbContext.SaveChangesAsync();
     }
 }
