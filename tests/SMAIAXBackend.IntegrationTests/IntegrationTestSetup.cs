@@ -53,7 +53,7 @@ internal static class IntegrationTestSetup
         ApplicationDbContext = _webAppFactory.Services.GetRequiredService<ApplicationDbContext>();
         SmartMeterRepository = _webAppFactory.Services.GetRequiredService<ISmartMeterRepository>();
         UserRepository = _webAppFactory.Services.GetRequiredService<IUserRepository>();
-        
+
         var tokenRepository = _webAppFactory.Services.GetRequiredService<ITokenRepository>();
         AccessToken = await tokenRepository.GenerateAccessTokenAsync($"{Guid.NewGuid()}-{Guid.NewGuid()}",
             "3c07065a-b964-44a9-9cdf-fbd49d755ea7", "john.doe@example.com");

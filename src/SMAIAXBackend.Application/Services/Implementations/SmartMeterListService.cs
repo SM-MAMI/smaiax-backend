@@ -12,7 +12,7 @@ public class SmartMeterListService(
     public async Task<List<SmartMeterOverviewDto>> GetSmartMetersByUserIdAsync(string? userId)
     {
         var validatedUserId = await userValidationService.ValidateUserAsync(userId);
-        
+
         List<SmartMeter> smartMeters = await smartMeterRepository.GetSmartMetersByUserIdAsync(validatedUserId);
         var smartMeterOverviewDtos = new List<SmartMeterOverviewDto>();
 

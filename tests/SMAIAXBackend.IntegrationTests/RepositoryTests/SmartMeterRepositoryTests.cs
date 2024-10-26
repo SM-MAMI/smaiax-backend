@@ -13,13 +13,13 @@ public class SmartMeterRepositoryTests : TestBase
     {
         // Given
         var smartMeterExpected = SmartMeter.Create(new SmartMeterId(Guid.NewGuid()), "Test", new UserId(Guid.Parse("3c07065a-b964-44a9-9cdf-fbd49d755ea7")));
-        
+
         // When
         await _smartMeterRepository.AddAsync(smartMeterExpected);
         var smartMeterActual = await _applicationDbContext.SmartMeters
             .AsNoTracking()
             .FirstOrDefaultAsync(sm => sm.Id.Equals(smartMeterExpected.Id));
-        
+
         // Then
         Assert.That(smartMeterActual, Is.Not.Null);
         Assert.Multiple(() =>
@@ -40,7 +40,7 @@ public class SmartMeterRepositoryTests : TestBase
             SmartMeter.Create(new SmartMeterId(Guid.Parse("5e9db066-1b47-46cc-bbde-0b54c30167cd")), "Smart Meter 1", userId),
             SmartMeter.Create(new SmartMeterId(Guid.Parse("f4c70232-6715-4c15-966f-bf4bcef46d39")), "Smart Meter 2", userId)
         };
-        
+
         // When
         var smartMetersActual = await _smartMeterRepository.GetSmartMetersByUserIdAsync(userId);
 

@@ -22,7 +22,7 @@ public class UserValidationService(IUserRepository userRepository, ILogger<UserV
             logger.LogWarning("Invalid user claim found in claims principal.");
             throw new InvalidTokenException();
         }
-        
+
         var user = await userRepository.GetUserByIdAsync(new UserId(userIdGuid));
 
         if (user is null)
@@ -30,7 +30,7 @@ public class UserValidationService(IUserRepository userRepository, ILogger<UserV
             logger.LogWarning("User with id {UserId} not found in database.", userIdGuid);
             throw new UserNotFoundException(userIdGuid);
         }
-        
+
         return new UserId(userIdGuid);
     }
 }

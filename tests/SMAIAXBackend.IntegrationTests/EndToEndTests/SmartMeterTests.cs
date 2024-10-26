@@ -66,7 +66,7 @@ public class SmartMeterTests : TestBase
             new(Guid.Parse("f4c70232-6715-4c15-966f-bf4bcef46d39"), "Smart Meter 2", 0, 0)
         };
         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _accessToken);
-        
+
         // When
         var response = await _httpClient.GetAsync(BaseUrl);
 
@@ -74,7 +74,7 @@ public class SmartMeterTests : TestBase
         Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
         var responseContent = await response.Content.ReadAsStringAsync();
         Assert.That(responseContent, Is.Not.Null);
-        
+
         var smartMetersActual = JsonConvert.DeserializeObject<List<SmartMeterOverviewDto>>(responseContent);
         Assert.That(smartMetersActual, Is.Not.Null);
         Assert.That(smartMetersActual, Has.Count.EqualTo(smartMetersExpected.Count));
@@ -90,7 +90,7 @@ public class SmartMeterTests : TestBase
             });
         }
     }
-    
+
     [Test]
     public async Task GivenNoAccessToken_WhenGetSmartMeters_ThenUnauthorizedIsReturned()
     {

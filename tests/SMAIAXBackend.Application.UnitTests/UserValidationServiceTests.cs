@@ -17,7 +17,7 @@ public class UserValidationServiceTests
     private Mock<IUserRepository> _userRepositoryMock;
     private Mock<ILogger<UserValidationService>> _loggerMock;
     private UserValidationService _userValidationService;
-    
+
     [SetUp]
     public void Setup()
     {
@@ -31,17 +31,17 @@ public class UserValidationServiceTests
     {
         // Given
         var userIdExpected = new UserId(Guid.NewGuid());
-        var user = User.Create(userIdExpected, new  Name("John", "Doe"), "john.doe@example.com");
-        
+        var user = User.Create(userIdExpected, new Name("John", "Doe"), "john.doe@example.com");
+
         _userRepositoryMock.Setup(repo => repo.GetUserByIdAsync(userIdExpected)).ReturnsAsync(user);
-        
+
         // When
         var userIdActual = await _userValidationService.ValidateUserAsync(userIdExpected.Id.ToString());
-        
+
         // Then
         Assert.That(userIdActual, Is.EqualTo(userIdExpected));
     }
-    
+
     [Test]
     public void GivenSmartMeterCreateDtoAndNoUserId_WhenAddSmartMeter_ThenInvalidTokenExceptionIsThrown()
     {

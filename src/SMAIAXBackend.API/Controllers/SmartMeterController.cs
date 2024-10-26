@@ -25,7 +25,7 @@ public class SmartMeterController(ISmartMeterCreateService smartMeterCreateServi
 
         return Ok(smartMeters);
     }
-    
+
     [HttpPost(Name = "addSmartMeter")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
