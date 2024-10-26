@@ -26,11 +26,11 @@ public static class AuthenticationServiceExtensions
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders();
     }
-    
+
     public static void AddJwtAuthentication(this IServiceCollection services, IConfiguration configuration)
     {
         services.Configure<JwtConfiguration>(configuration.GetSection("JwtConfiguration"));
-        
+
         services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
