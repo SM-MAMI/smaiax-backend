@@ -21,10 +21,10 @@ public class SmartMeterTests : TestBase
         var smartMeterCreateDto = new SmartMeterCreateDto("Test Smart Meter");
         var httpContent = new StringContent(JsonConvert.SerializeObject(smartMeterCreateDto), Encoding.UTF8,
             "application/json");
-        HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", AccessToken);
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _accessToken);
 
         // When
-        var response = await HttpClient.PostAsync(BaseUrl, httpContent);
+        var response = await _httpClient.PostAsync(BaseUrl, httpContent);
 
         // Then
         Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
@@ -33,7 +33,7 @@ public class SmartMeterTests : TestBase
 
         var responseGuidString = responseContent.Trim('"');
         var smartMeterActual =
-            ApplicationDbContext.SmartMeters.FirstOrDefault(x =>
+            _applicationDbContext.SmartMeters.FirstOrDefault(x =>
                 x.Id.Equals(new SmartMeterId(Guid.Parse(responseGuidString))));
 
         Assert.That(smartMeterActual, Is.Not.Null);
@@ -47,10 +47,10 @@ public class SmartMeterTests : TestBase
         var smartMeterCreateDto = new SmartMeterCreateDto("Test Smart Meter");
         var httpContent = new StringContent(JsonConvert.SerializeObject(smartMeterCreateDto), Encoding.UTF8,
             "application/json");
-        HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "");
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "");
 
         // When
-        var response = await HttpClient.PostAsync(BaseUrl, httpContent);
+        var response = await _httpClient.PostAsync(BaseUrl, httpContent);
 
         // Then
         Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
@@ -65,10 +65,10 @@ public class SmartMeterTests : TestBase
             new(Guid.Parse("5e9db066-1b47-46cc-bbde-0b54c30167cd"), "Smart Meter 1", 0, 0),
             new(Guid.Parse("f4c70232-6715-4c15-966f-bf4bcef46d39"), "Smart Meter 2", 0, 0)
         };
-        HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", AccessToken);
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _accessToken);
         
         // When
-        var response = await HttpClient.GetAsync(BaseUrl);
+        var response = await _httpClient.GetAsync(BaseUrl);
 
         // Then
         Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
@@ -95,10 +95,10 @@ public class SmartMeterTests : TestBase
     public async Task GivenNoAccessToken_WhenGetSmartMeters_ThenUnauthorizedIsReturned()
     {
         // Given
-        HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "");
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "");
 
         // When
-        var response = await HttpClient.GetAsync(BaseUrl);
+        var response = await _httpClient.GetAsync(BaseUrl);
 
         // Then
         Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));

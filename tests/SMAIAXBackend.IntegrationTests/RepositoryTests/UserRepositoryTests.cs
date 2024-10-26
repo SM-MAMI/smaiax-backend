@@ -15,8 +15,8 @@ public class UserRepositoryTests : TestBase
         var userExpected = User.Create(new UserId(Guid.NewGuid()), new Name("Test", "Test"), "test@test.com");
 
         // When
-        await UserRepository.AddAsync(userExpected);
-        var userActual = await ApplicationDbContext.DomainUsers
+        await _userRepository.AddAsync(userExpected);
+        var userActual = await _applicationDbContext.DomainUsers
             .AsNoTracking()
             .FirstOrDefaultAsync(u => u.Id.Equals(userExpected.Id));
 
@@ -38,7 +38,7 @@ public class UserRepositoryTests : TestBase
             new Name("John", "Doe"), "john.doe@example.com");
 
         // When
-        var userActual = await UserRepository.GetUserByIdAsync(userExpected.Id);
+        var userActual = await _userRepository.GetUserByIdAsync(userExpected.Id);
 
         // Then
         Assert.That(userActual, Is.Not.Null);

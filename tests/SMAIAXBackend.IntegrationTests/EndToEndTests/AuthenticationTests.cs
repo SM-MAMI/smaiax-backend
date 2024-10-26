@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
 using SMAIAXBackend.Application.DTOs;
-using SMAIAXBackend.Domain.Model.ValueObjects;
 using SMAIAXBackend.Domain.Model.ValueObjects.Ids;
 
 namespace SMAIAXBackend.IntegrationTests.EndToEndTests;
@@ -26,7 +25,7 @@ public class AuthenticationTests : TestBase
             "application/json");
 
         // When
-        var response = await HttpClient.PostAsync($"{BaseUrl}/register", httpContent);
+        var response = await _httpClient.PostAsync($"{BaseUrl}/register", httpContent);
         var responseContent = await response.Content.ReadAsStringAsync();
         var id = JsonConvert.DeserializeObject<Guid>(responseContent);
 
@@ -34,9 +33,9 @@ public class AuthenticationTests : TestBase
         response.EnsureSuccessStatusCode();
         Assert.That(responseContent, Is.Not.Null);
 
-        var identityUser = await ApplicationDbContext.Users
+        var identityUser = await _applicationDbContext.Users
             .SingleOrDefaultAsync(u => u.Id == id.ToString());
-        var domainUser = await ApplicationDbContext.DomainUsers
+        var domainUser = await _applicationDbContext.DomainUsers
             .SingleOrDefaultAsync(u => u.Id == new UserId(id));
 
         Assert.Multiple(() =>
@@ -63,7 +62,7 @@ public class AuthenticationTests : TestBase
             "application/json");
 
         // When
-        var response = await HttpClient.PostAsync($"{BaseUrl}/register", httpContent);
+        var response = await _httpClient.PostAsync($"{BaseUrl}/register", httpContent);
 
         // Then
         Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
@@ -84,7 +83,7 @@ public class AuthenticationTests : TestBase
             "application/json");
 
         // When
-        var response = await HttpClient.PostAsync($"{BaseUrl}/login", httpContent);
+        var response = await _httpClient.PostAsync($"{BaseUrl}/login", httpContent);
         var responseContent = await response.Content.ReadAsStringAsync();
 
         // Then
@@ -108,7 +107,7 @@ public class AuthenticationTests : TestBase
             "application/json");
 
         // When
-        var response = await HttpClient.PostAsync($"{BaseUrl}/login", httpContent);
+        var response = await _httpClient.PostAsync($"{BaseUrl}/login", httpContent);
         var responseContent = await response.Content.ReadAsStringAsync();
 
         // Then
@@ -130,7 +129,7 @@ public class AuthenticationTests : TestBase
             "application/json");
 
         // When
-        var response = await HttpClient.PostAsync($"{BaseUrl}/login", httpContent);
+        var response = await _httpClient.PostAsync($"{BaseUrl}/login", httpContent);
         var responseContent = await response.Content.ReadAsStringAsync();
 
         // Then
@@ -156,7 +155,7 @@ public class AuthenticationTests : TestBase
             "application/json");
 
         // When
-        var response = await HttpClient.PostAsync($"{BaseUrl}/refresh", httpContent);
+        var response = await _httpClient.PostAsync($"{BaseUrl}/refresh", httpContent);
         var responseContent = await response.Content.ReadAsStringAsync();
 
         // Then
@@ -185,7 +184,7 @@ public class AuthenticationTests : TestBase
             "application/json");
 
         // When
-        var response = await HttpClient.PostAsync($"{BaseUrl}/refresh", httpContent);
+        var response = await _httpClient.PostAsync($"{BaseUrl}/refresh", httpContent);
 
         // Then
         Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
@@ -203,7 +202,7 @@ public class AuthenticationTests : TestBase
             "application/json");
 
         // When
-        var response = await HttpClient.PostAsync($"{BaseUrl}/refresh", httpContent);
+        var response = await _httpClient.PostAsync($"{BaseUrl}/refresh", httpContent);
 
         // Then
         Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
@@ -222,7 +221,7 @@ public class AuthenticationTests : TestBase
             "application/json");
 
         // When
-        var response = await HttpClient.PostAsync($"{BaseUrl}/refresh", httpContent);
+        var response = await _httpClient.PostAsync($"{BaseUrl}/refresh", httpContent);
 
         // Then
         Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
