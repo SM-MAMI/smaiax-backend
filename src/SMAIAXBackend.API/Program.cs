@@ -50,34 +50,44 @@ builder.Services.Configure<JwtConfiguration>(builder.Configuration.GetSection("J
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(options =>
-{
-    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-    {
-        Description = "JWT Authorization header using the Bearer scheme. Example: \"Bearer {token}\"",
-        Name = "Authorization",
-        In = ParameterLocation.Header,
-        Type = SecuritySchemeType.ApiKey,
-        Scheme = "Bearer"
-    });
 
-    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+if (builder.Environment.IsDevelopment() || builder.Environment.IsEnvironment("DockerDevelopment"))
+{
+    builder.Configuration.AddJsonFile("Properties/launchSettings.json", optional: true, reloadOnChange: true);
+
+    builder.Services.AddSwaggerGen(options =>
     {
+        options.SwaggerDoc("v1", new OpenApiInfo { Title = "SMAIAX Backend API", Version = "v1" });
+
+        options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
         {
-            new OpenApiSecurityScheme
+            Description = "JWT Authorization header using the Bearer scheme. Example: \"Bearer {token}\"",
+            Name = "Authorization",
+            In = ParameterLocation.Header,
+            Type = SecuritySchemeType.ApiKey,
+            Scheme = "Bearer"
+        });
+
+        options.AddSecurityRequirement(new OpenApiSecurityRequirement
+        {
             {
-                Reference = new OpenApiReference
+                new OpenApiSecurityScheme
                 {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
+                    Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" },
+                    In = ParameterLocation.Header,
+                    Name = "Bearer"
                 },
-                In = ParameterLocation.Header,
-                Name = "Bearer"
-            },
-            new List<string>()
+                new List<string>()
+            }
+        });
+
+        var httpProfileUrl = builder.Configuration["profiles:http:applicationUrl"];
+        if (!string.IsNullOrEmpty(httpProfileUrl))
+        {
+            options.AddServer(new OpenApiServer { Url = httpProfileUrl.Trim(), Description = "Development server" });
         }
     });
-});
+}
 
 builder.Services.AddAuthentication(options =>
     {
@@ -104,21 +114,6 @@ builder.Services.AddProblemDetails();
 builder.Services.Configure<MqttSettings>(builder.Configuration.GetSection("MQTT"));
 builder.Services.AddSingleton<IMqttReader, MqttReader>();
 builder.Services.AddHostedService<MessagingBackgroundService>();
-
-if (builder.Environment.IsDevelopment() || builder.Environment.IsEnvironment("DockerDevelopment"))
-{
-    builder.Configuration.AddJsonFile("Properties/launchSettings.json", optional: true, reloadOnChange: true);
-    builder.Services.AddSwaggerGen(options =>
-    {
-        options.SwaggerDoc("v1", new OpenApiInfo { Title = "SMAIAX Backend API", Version = "v1" });
-
-        var httpProfileUrl = builder.Configuration["profiles:http:applicationUrl"];
-        if (!string.IsNullOrEmpty(httpProfileUrl))
-        {
-            options.AddServer(new OpenApiServer { Url = httpProfileUrl.Trim(), Description = "Development server" });
-        }
-    });
-}
 
 var app = builder.Build();
 using var scope = app.Services.CreateScope();
