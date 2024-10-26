@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using SMAIAXBackend.Domain.Model.Entities;
 using SMAIAXBackend.Domain.Model.ValueObjects;
 using SMAIAXBackend.Domain.Model.ValueObjects.Ids;
+using SMAIAXBackend.Domain.Repositories;
 using SMAIAXBackend.Infrastructure.DbContexts;
 
 namespace SMAIAXBackend.IntegrationTests;
@@ -11,6 +12,8 @@ public class TestBase
 {
     protected readonly HttpClient HttpClient = IntegrationTestSetup.HttpClient;
     protected readonly ApplicationDbContext ApplicationDbContext = IntegrationTestSetup.ApplicationDbContext;
+    protected readonly ISmartMeterRepository SmartMeterRepository = IntegrationTestSetup.SmartMeterRepository;
+    protected readonly IUserRepository UserRepository = IntegrationTestSetup.UserRepository;
     protected readonly string AccessToken = IntegrationTestSetup.AccessToken;
 
     [SetUp]
@@ -18,12 +21,12 @@ public class TestBase
     {
         await IntegrationTestSetup.ApplicationDbContext.Database.EnsureCreatedAsync();
         await InsertTestData();
-        IntegrationTestSetup.ApplicationDbContext.ChangeTracker.Clear();
     }
 
     [TearDown]
     public async Task TearDown()
     {
+        IntegrationTestSetup.ApplicationDbContext.ChangeTracker.Clear();
         await IntegrationTestSetup.ApplicationDbContext.Database.EnsureDeletedAsync();
     }
 
