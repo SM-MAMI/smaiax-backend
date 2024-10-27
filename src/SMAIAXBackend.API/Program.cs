@@ -21,7 +21,7 @@ if (builder.Environment.IsDevelopment() || builder.Environment.IsEnvironment("Do
 {
     builder.Configuration.AddJsonFile("Properties/launchSettings.json", optional: true, reloadOnChange: true);
     builder.Services.AddSwaggerConfigurations(builder.Configuration);
-    
+
     builder.Services.AddCors(options =>
     {
         options.AddPolicy("AllowAll", policyBuilder =>
