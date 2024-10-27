@@ -156,10 +156,10 @@ public class AuthenticationTests : TestBase
 
         // When
         var response = await _httpClient.PostAsync($"{BaseUrl}/refresh", httpContent);
-        var responseContent = await response.Content.ReadAsStringAsync();
 
         // Then
         Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+        var responseContent = await response.Content.ReadAsStringAsync();
         Assert.That(responseContent, Is.Not.Null);
         var responseTokenDto = JsonConvert.DeserializeObject<TokenDto>(responseContent);
         Assert.That(responseTokenDto, Is.Not.Null);

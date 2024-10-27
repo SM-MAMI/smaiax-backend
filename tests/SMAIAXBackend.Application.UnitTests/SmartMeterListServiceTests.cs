@@ -86,10 +86,13 @@ public class SmartMeterListServiceTests
 
         // Then
         Assert.That(smartMeterActual, Is.Not.Null);
-        Assert.That(smartMeterActual.Id, Is.EqualTo(smartMeterExpected.Id.Id));
-        Assert.That(smartMeterActual.Name, Is.EqualTo(smartMeterExpected.Name));
-        Assert.That(smartMeterActual.MetadataCount, Is.EqualTo(smartMeterExpected.Metadata.Count));
-        Assert.That(smartMeterActual.PolicyCount, Is.EqualTo(smartMeterExpected.Policies.Count));
+        Assert.Multiple(() =>
+        {
+            Assert.That(smartMeterActual.Id, Is.EqualTo(smartMeterExpected.Id.Id));
+            Assert.That(smartMeterActual.Name, Is.EqualTo(smartMeterExpected.Name));
+            Assert.That(smartMeterActual.MetadataCount, Is.EqualTo(smartMeterExpected.Metadata.Count));
+            Assert.That(smartMeterActual.PolicyCount, Is.EqualTo(smartMeterExpected.Policies.Count));
+        });
     }
 
     [Test]
