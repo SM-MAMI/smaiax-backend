@@ -58,4 +58,25 @@ public class SmartMeterRepositoryTests : TestBase
             });
         }
     }
+
+    [Test]
+    public async Task GivenSmartMeterInRepository_WhenGetSmartMeterByIdAndUserId_ThenExpectedSmartMeterIsReturned()
+    {
+        // Given
+        var userId = new UserId(Guid.Parse("3c07065a-b964-44a9-9cdf-fbd49d755ea7"));
+        var smartMeterExpected = SmartMeter.Create(new SmartMeterId(Guid.Parse("5e9db066-1b47-46cc-bbde-0b54c30167cd")),
+            "Smart Meter 1", userId);
+
+        // When
+        var smartMeterActual = await _smartMeterRepository.GetSmartMeterByIdAndUserIdAsync(smartMeterExpected.Id, userId);
+
+        // Then
+        Assert.That(smartMeterActual, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(smartMeterActual.Id, Is.EqualTo(smartMeterExpected.Id));
+            Assert.That(smartMeterActual.Name, Is.EqualTo(smartMeterExpected.Name));
+            Assert.That(smartMeterActual.UserId, Is.EqualTo(smartMeterExpected.UserId));
+        });
+    }
 }

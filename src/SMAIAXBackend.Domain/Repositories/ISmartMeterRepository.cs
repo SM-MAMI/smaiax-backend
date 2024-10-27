@@ -8,4 +8,5 @@ public interface ISmartMeterRepository
     SmartMeterId NextIdentity();
     Task AddAsync(SmartMeter meter);
     Task<List<SmartMeter>> GetSmartMetersByUserIdAsync(UserId userId);
+    Task<SmartMeter?> GetSmartMeterByIdAndUserIdAsync(SmartMeterId smartMeterId, UserId userId);
 }
