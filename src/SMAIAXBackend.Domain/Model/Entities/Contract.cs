@@ -9,7 +9,7 @@ public sealed class Contract : IEquatable<Contract>
     public PolicyId PolicyId { get; }
     public PolicyRequestId PolicyRequestId { get; }
 
-    private static Contract Create(
+    public static Contract Create(
         ContractId id,
         DateTime createdAt,
         PolicyId policyId,
