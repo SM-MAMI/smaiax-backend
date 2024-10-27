@@ -26,13 +26,13 @@ public class AuthenticationTests : TestBase
 
         // When
         var response = await _httpClient.PostAsync($"{BaseUrl}/register", httpContent);
-        
+
 
         // Then
         Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
         var responseContent = await response.Content.ReadAsStringAsync();
         Assert.That(responseContent, Is.Not.Null);
-        
+
         var id = JsonConvert.DeserializeObject<Guid>(responseContent);
         var identityUser = await _applicationDbContext.Users
             .SingleOrDefaultAsync(u => u.Id == id.ToString());
@@ -85,13 +85,13 @@ public class AuthenticationTests : TestBase
 
         // When
         var response = await _httpClient.PostAsync($"{BaseUrl}/login", httpContent);
-       
+
 
         // Then
         Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
         var responseContent = await response.Content.ReadAsStringAsync();
         Assert.That(responseContent, Is.Not.Null);
-        
+
         var tokenDto = JsonConvert.DeserializeObject<TokenDto>(responseContent);
         Assert.That(tokenDto, Is.Not.Null);
         Assert.Multiple(() =>
@@ -111,7 +111,7 @@ public class AuthenticationTests : TestBase
 
         // When
         var response = await _httpClient.PostAsync($"{BaseUrl}/login", httpContent);
-        
+
         // Then
         Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
         var responseContent = await response.Content.ReadAsStringAsync();
@@ -238,13 +238,13 @@ public class AuthenticationTests : TestBase
 
         var httpContent = new StringContent(JsonConvert.SerializeObject(tokenDto), Encoding.UTF8,
             "application/json");
-        
+
         // When
         var response = await _httpClient.PostAsync($"{BaseUrl}/logout", httpContent);
-        
+
         // Then
         Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
-        
+
         var invalidatedRefreshToken = await _applicationDbContext.RefreshTokens
             .AsNoTracking()
             .SingleOrDefaultAsync(rt => rt.Token.Equals(refreshToken));

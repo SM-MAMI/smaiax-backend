@@ -1,7 +1,10 @@
+using System.Diagnostics.CodeAnalysis;
+
 using Microsoft.OpenApi.Models;
 
 namespace SMAIAXBackend.API.ApplicationConfigurations;
 
+[ExcludeFromCodeCoverage]
 public static class SwaggerServiceExtensions
 {
     public static void AddSwaggerConfigurations(this IServiceCollection services, IConfiguration configuration)

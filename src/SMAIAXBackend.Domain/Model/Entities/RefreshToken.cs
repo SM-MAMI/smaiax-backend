@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 using SMAIAXBackend.Domain.Model.ValueObjects.Ids;
 
 namespace SMAIAXBackend.Domain.Model.Entities;
@@ -28,6 +30,7 @@ public sealed class RefreshToken : IEquatable<RefreshToken>
     }
 
     // Needed by EF Core
+    [ExcludeFromCodeCoverage]
     private RefreshToken()
     {
     }
@@ -53,6 +56,7 @@ public sealed class RefreshToken : IEquatable<RefreshToken>
         IsValid = false;
     }
 
+    [ExcludeFromCodeCoverage]
     public bool Equals(RefreshToken? other)
     {
         if (other is null)
@@ -68,6 +72,7 @@ public sealed class RefreshToken : IEquatable<RefreshToken>
         return Id.Equals(other.Id);
     }
 
+    [ExcludeFromCodeCoverage]
     public override bool Equals(object? obj)
     {
         if (obj is null)
@@ -88,6 +93,7 @@ public sealed class RefreshToken : IEquatable<RefreshToken>
         return Equals((RefreshToken)obj);
     }
 
+    [ExcludeFromCodeCoverage]
     public override int GetHashCode()
     {
         return Id.GetHashCode();

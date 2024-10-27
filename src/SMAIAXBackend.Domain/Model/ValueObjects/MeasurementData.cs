@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace SMAIAXBackend.Domain.Model.ValueObjects;
 
 public class MeasurementData(
@@ -33,6 +35,7 @@ public class MeasurementData(
     public string Uptime { get; set; } = uptime;
     public DateTime Timestamp { get; set; } = timestamp;
 
+    [ExcludeFromCodeCoverage]
     protected override IEnumerable<object> GetEqualityComponents()
     {
         yield return PositiveActivePower;

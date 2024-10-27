@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 using SMAIAXBackend.API;
 using SMAIAXBackend.API.ApplicationConfigurations;
 using SMAIAXBackend.Infrastructure.DbContexts;
@@ -58,4 +60,5 @@ app.MapControllers();
 await app.RunAsync();
 
 // For integration tests
+[ExcludeFromCodeCoverage]
 public abstract partial class Program { }

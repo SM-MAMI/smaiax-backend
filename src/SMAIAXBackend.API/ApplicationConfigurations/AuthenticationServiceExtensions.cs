@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -9,6 +10,7 @@ using SMAIAXBackend.Infrastructure.DbContexts;
 
 namespace SMAIAXBackend.API.ApplicationConfigurations;
 
+[ExcludeFromCodeCoverage]
 public static class AuthenticationServiceExtensions
 {
     public static void AddIdentityConfigurations(this IServiceCollection services)
