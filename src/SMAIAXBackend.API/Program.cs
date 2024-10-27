@@ -21,6 +21,16 @@ if (builder.Environment.IsDevelopment() || builder.Environment.IsEnvironment("Do
 {
     builder.Configuration.AddJsonFile("Properties/launchSettings.json", optional: true, reloadOnChange: true);
     builder.Services.AddSwaggerConfigurations(builder.Configuration);
+    
+    builder.Services.AddCors(options =>
+    {
+        options.AddPolicy("AllowAll", policyBuilder =>
+        {
+            policyBuilder.AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader();
+        });
+    });
 }
 
 var app = builder.Build();
@@ -30,6 +40,7 @@ if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("DockerDeve
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseCors("AllowAll");
 
     using var scope = app.Services.CreateScope();
     var services = scope.ServiceProvider;
