@@ -33,6 +33,7 @@ public static class AuthenticationServiceExtensions
     {
         services.Configure<JwtConfiguration>(configuration.GetSection("JwtConfiguration"));
 
+        services.AddAuthorization();
         services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

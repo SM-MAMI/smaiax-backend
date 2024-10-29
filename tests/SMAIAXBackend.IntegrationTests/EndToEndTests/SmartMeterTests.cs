@@ -28,13 +28,13 @@ public class SmartMeterTests : TestBase
 
         // Then
         Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));
-        var responseContent = await response.Content.ReadAsStringAsync();
-        Assert.That(responseContent, Is.Not.Null);
+        var locationHeader = response.Headers.Location;
+        Assert.That(locationHeader, Is.Not.Null);
 
-        var responseGuidString = responseContent.Trim('"');
+        var id = locationHeader.Segments[^1];
         var smartMeterActual =
             _applicationDbContext.SmartMeters.FirstOrDefault(x =>
-                x.Id.Equals(new SmartMeterId(Guid.Parse(responseGuidString))));
+                x.Id.Equals(new SmartMeterId(Guid.Parse(id))));
 
         Assert.That(smartMeterActual, Is.Not.Null);
         Assert.That(smartMeterActual.Name, Is.EqualTo(smartMeterCreateDto.Name));
