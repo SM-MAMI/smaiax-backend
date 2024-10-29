@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 
 using SMAIAXBackend.API;
 using SMAIAXBackend.API.ApplicationConfigurations;
+using SMAIAXBackend.API.Endpoints.Authentication;
 using SMAIAXBackend.Infrastructure.DbContexts;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -56,6 +57,7 @@ app.UseExceptionHandler();
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
+app.MapAuthenticationEndpoints();
 
 await app.RunAsync();
 
