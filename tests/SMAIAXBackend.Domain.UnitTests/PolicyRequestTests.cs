@@ -1,0 +1,34 @@
+using SMAIAXBackend.Domain.Model.Entities;
+using SMAIAXBackend.Domain.Model.Enums;
+using SMAIAXBackend.Domain.Model.ValueObjects;
+using SMAIAXBackend.Domain.Model.ValueObjects.Ids;
+
+namespace SMAIAXBackend.Domain.UnitTests;
+
+[TestFixture]
+public class PolicyRequestTests
+{
+    [Test]
+    public void GivenPolicyRequestDetails_WhenCreatePolicyRequest_ThenDetailsEquals()
+    {
+        // Given
+        var policyRequestId = new PolicyRequestId(Guid.NewGuid());
+        var isAutomaticContractingEnabled = true;
+        var policyFilter = new PolicyFilter(MeasurementResolution.Raw, 1, 5, [],
+            LocationResolution.City, 100);
+        var userId = new UserId(Guid.NewGuid());
+
+        // When
+        var policyRequest = PolicyRequest.Create(policyRequestId, isAutomaticContractingEnabled, policyFilter, userId);
+
+        // Then
+        Assert.Multiple(() =>
+        {
+            Assert.That(policyRequest.Id, Is.EqualTo(policyRequestId));
+            Assert.That(policyRequest.IsAutomaticContractingEnabled, Is.EqualTo(isAutomaticContractingEnabled));
+            Assert.That(policyRequest.PolicyFilter, Is.EqualTo(policyFilter));
+            Assert.That(policyRequest.UserId, Is.EqualTo(userId));
+            Assert.That(policyRequest.State, Is.EqualTo(PolicyRequestState.Pending));
+        });
+    }
+}

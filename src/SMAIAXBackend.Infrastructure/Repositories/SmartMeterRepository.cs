@@ -28,4 +28,12 @@ public class SmartMeterRepository(ApplicationDbContext applicationDbContext) : I
             .Include(sm => sm.Policies)
             .ToListAsync();
     }
+
+    public Task<SmartMeter?> GetSmartMeterByIdAndUserIdAsync(SmartMeterId smartMeterId, UserId userId)
+    {
+        return applicationDbContext.SmartMeters
+            .Include(sm => sm.Metadata)
+            .Include(sm => sm.Policies)
+            .FirstOrDefaultAsync(sm => sm.Id.Equals(smartMeterId) && sm.UserId.Equals(userId));
+    }
 }

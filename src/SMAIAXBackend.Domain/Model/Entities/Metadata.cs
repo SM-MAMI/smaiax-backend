@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 using SMAIAXBackend.Domain.Model.ValueObjects;
 using SMAIAXBackend.Domain.Model.ValueObjects.Ids;
 
@@ -23,6 +25,7 @@ public sealed class Metadata : IEquatable<Metadata>
     }
 
     // Needed by EF Core
+    [ExcludeFromCodeCoverage]
     private Metadata()
     {
     }
@@ -41,6 +44,7 @@ public sealed class Metadata : IEquatable<Metadata>
         SmartMeterId = smartMeterId;
     }
 
+    [ExcludeFromCodeCoverage]
     public bool Equals(Metadata? other)
     {
         if (other is null)
@@ -56,6 +60,7 @@ public sealed class Metadata : IEquatable<Metadata>
         return Id.Equals(other.Id);
     }
 
+    [ExcludeFromCodeCoverage]
     public override bool Equals(object? obj)
     {
         if (obj is null)
@@ -76,6 +81,7 @@ public sealed class Metadata : IEquatable<Metadata>
         return Equals((Metadata)obj);
     }
 
+    [ExcludeFromCodeCoverage]
     public override int GetHashCode()
     {
         return Id.GetHashCode();

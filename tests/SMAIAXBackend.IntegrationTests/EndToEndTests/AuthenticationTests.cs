@@ -26,13 +26,14 @@ public class AuthenticationTests : TestBase
 
         // When
         var response = await _httpClient.PostAsync($"{BaseUrl}/register", httpContent);
-        var responseContent = await response.Content.ReadAsStringAsync();
-        var id = JsonConvert.DeserializeObject<Guid>(responseContent);
+
 
         // Then
-        response.EnsureSuccessStatusCode();
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+        var responseContent = await response.Content.ReadAsStringAsync();
         Assert.That(responseContent, Is.Not.Null);
 
+        var id = JsonConvert.DeserializeObject<Guid>(responseContent);
         var identityUser = await _applicationDbContext.Users
             .SingleOrDefaultAsync(u => u.Id == id.ToString());
         var domainUser = await _applicationDbContext.DomainUsers
@@ -84,11 +85,13 @@ public class AuthenticationTests : TestBase
 
         // When
         var response = await _httpClient.PostAsync($"{BaseUrl}/login", httpContent);
-        var responseContent = await response.Content.ReadAsStringAsync();
+
 
         // Then
-        response.EnsureSuccessStatusCode();
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+        var responseContent = await response.Content.ReadAsStringAsync();
         Assert.That(responseContent, Is.Not.Null);
+
         var tokenDto = JsonConvert.DeserializeObject<TokenDto>(responseContent);
         Assert.That(tokenDto, Is.Not.Null);
         Assert.Multiple(() =>
@@ -108,14 +111,11 @@ public class AuthenticationTests : TestBase
 
         // When
         var response = await _httpClient.PostAsync($"{BaseUrl}/login", httpContent);
-        var responseContent = await response.Content.ReadAsStringAsync();
 
         // Then
-        Assert.Multiple(() =>
-        {
-            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
-            Assert.That(responseContent, Is.Not.Null);
-        });
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
+        var responseContent = await response.Content.ReadAsStringAsync();
+        Assert.That(responseContent, Is.Not.Null);
         Assert.That(responseContent, Does.Contain("Unauthorized"));
         Assert.That(responseContent, Does.Contain("Username or password is wrong"));
     }
@@ -156,10 +156,10 @@ public class AuthenticationTests : TestBase
 
         // When
         var response = await _httpClient.PostAsync($"{BaseUrl}/refresh", httpContent);
-        var responseContent = await response.Content.ReadAsStringAsync();
 
         // Then
-        response.EnsureSuccessStatusCode();
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+        var responseContent = await response.Content.ReadAsStringAsync();
         Assert.That(responseContent, Is.Not.Null);
         var responseTokenDto = JsonConvert.DeserializeObject<TokenDto>(responseContent);
         Assert.That(responseTokenDto, Is.Not.Null);
@@ -225,5 +225,30 @@ public class AuthenticationTests : TestBase
 
         // Then
         Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
+    }
+
+    [Test]
+    public async Task GivenValidAccessTokenAndValidRefreshToken_WhenLogout_ThenOkIsReturnedAndRefreshTokenIsInvalidated()
+    {
+        // Given
+        const string accessToken =
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzYzA3MDY1YS1iOTY0LTQ0YTktOWNkZi1mYmQ0OWQ3NTVlYTciLCJ1bmlxdWVfbmFtZSI6ImpvaG4uZG9lQGV4YW1wbGUuY29tIiwianRpIjoiMTlmNzdiMmUtZTQ4NS00MDMxLTg1MDYtNjJmNmQzYjY5ZTRkIiwiaWF0IjoxNzI4Mzg5MzkxLCJleHAiOjE3MjgzOTI5OTEsImlzcyI6IlNNQUlBWCIsImF1ZCI6IlNvbWVBdWRpZW5jZSJ9.chHm391Tbcwo-Adq3QPPQses9NJuyUzM0vMjQUR6FmA";
+        const string refreshToken = "4dffb63c-581d-4588-8b4b-4b075f17d015-abcb30f4-5f32-4fbb-80c4-99cea98273ca";
+        var tokenDto = new TokenDto(accessToken, refreshToken);
+
+        var httpContent = new StringContent(JsonConvert.SerializeObject(tokenDto), Encoding.UTF8,
+            "application/json");
+
+        // When
+        var response = await _httpClient.PostAsync($"{BaseUrl}/logout", httpContent);
+
+        // Then
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+
+        var invalidatedRefreshToken = await _applicationDbContext.RefreshTokens
+            .AsNoTracking()
+            .SingleOrDefaultAsync(rt => rt.Token.Equals(refreshToken));
+        Assert.That(invalidatedRefreshToken, Is.Not.Null);
+        Assert.That(invalidatedRefreshToken.IsValid, Is.False);
     }
 }

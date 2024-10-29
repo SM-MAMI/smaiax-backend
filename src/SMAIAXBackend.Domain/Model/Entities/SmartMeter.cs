@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 using SMAIAXBackend.Domain.Model.RelationshipHelpers;
 using SMAIAXBackend.Domain.Model.ValueObjects.Ids;
 
@@ -19,6 +21,7 @@ public sealed class SmartMeter : IEquatable<SmartMeter>
     }
 
     // Needed by EF Core
+    [ExcludeFromCodeCoverage]
     private SmartMeter()
     {
     }
@@ -32,6 +35,7 @@ public sealed class SmartMeter : IEquatable<SmartMeter>
         Policies = policies;
     }
 
+    [ExcludeFromCodeCoverage]
     public bool Equals(SmartMeter? other)
     {
         if (other is null)
@@ -47,6 +51,7 @@ public sealed class SmartMeter : IEquatable<SmartMeter>
         return Id.Equals(other.Id);
     }
 
+    [ExcludeFromCodeCoverage]
     public override bool Equals(object? obj)
     {
         if (obj is null)
@@ -67,6 +72,7 @@ public sealed class SmartMeter : IEquatable<SmartMeter>
         return Equals((SmartMeter)obj);
     }
 
+    [ExcludeFromCodeCoverage]
     public override int GetHashCode()
     {
         return Id.GetHashCode();

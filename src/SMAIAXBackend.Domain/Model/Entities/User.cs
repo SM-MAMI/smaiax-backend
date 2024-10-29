@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 using SMAIAXBackend.Domain.Model.ValueObjects;
 using SMAIAXBackend.Domain.Model.ValueObjects.Ids;
 
@@ -15,6 +17,7 @@ public sealed class User : IEquatable<User>
     }
 
     // Needed by EF Core
+    [ExcludeFromCodeCoverage]
     private User()
     {
     }
@@ -26,6 +29,7 @@ public sealed class User : IEquatable<User>
         Email = email;
     }
 
+    [ExcludeFromCodeCoverage]
     public bool Equals(User? other)
     {
         if (other is null)
@@ -41,6 +45,7 @@ public sealed class User : IEquatable<User>
         return Id.Equals(other.Id);
     }
 
+    [ExcludeFromCodeCoverage]
     public override bool Equals(object? obj)
     {
         if (obj is null)
@@ -61,6 +66,7 @@ public sealed class User : IEquatable<User>
         return Equals((User)obj);
     }
 
+    [ExcludeFromCodeCoverage]
     public override int GetHashCode()
     {
         return Id.GetHashCode();

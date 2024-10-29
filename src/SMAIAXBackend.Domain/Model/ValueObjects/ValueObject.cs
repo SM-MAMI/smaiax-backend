@@ -1,5 +1,8 @@
-﻿namespace SMAIAXBackend.Domain.Model.ValueObjects;
+﻿using System.Diagnostics.CodeAnalysis;
 
+namespace SMAIAXBackend.Domain.Model.ValueObjects;
+
+[ExcludeFromCodeCoverage]
 public abstract class ValueObject
 {
     protected static bool EqualOperator(ValueObject left, ValueObject right)

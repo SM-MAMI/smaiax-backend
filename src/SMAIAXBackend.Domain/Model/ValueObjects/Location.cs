@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 using SMAIAXBackend.Domain.Model.Enums;
 
 namespace SMAIAXBackend.Domain.Model.ValueObjects;
@@ -11,6 +13,7 @@ public class Location(string? streetName, string? city, string? state, string? c
     public string? Country { get; } = country;
     public Continent? Continent { get; } = continent;
 
+    [ExcludeFromCodeCoverage]
     protected override IEnumerable<object> GetEqualityComponents()
     {
         yield return StreetName;

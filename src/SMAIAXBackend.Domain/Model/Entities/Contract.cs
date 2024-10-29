@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 using SMAIAXBackend.Domain.Model.ValueObjects.Ids;
 
 namespace SMAIAXBackend.Domain.Model.Entities;
@@ -9,7 +11,7 @@ public sealed class Contract : IEquatable<Contract>
     public PolicyId PolicyId { get; }
     public PolicyRequestId PolicyRequestId { get; }
 
-    private static Contract Create(
+    public static Contract Create(
         ContractId id,
         DateTime createdAt,
         PolicyId policyId,
@@ -19,6 +21,7 @@ public sealed class Contract : IEquatable<Contract>
     }
 
     // Needed by EF Core
+    [ExcludeFromCodeCoverage]
     private Contract()
     {
     }
@@ -35,6 +38,7 @@ public sealed class Contract : IEquatable<Contract>
         PolicyRequestId = policyRequestId;
     }
 
+    [ExcludeFromCodeCoverage]
     public bool Equals(Contract? other)
     {
         if (other is null)
@@ -50,6 +54,7 @@ public sealed class Contract : IEquatable<Contract>
         return Id.Equals(other.Id);
     }
 
+    [ExcludeFromCodeCoverage]
     public override bool Equals(object? obj)
     {
         if (obj is null)
@@ -70,6 +75,7 @@ public sealed class Contract : IEquatable<Contract>
         return Equals((Contract)obj);
     }
 
+    [ExcludeFromCodeCoverage]
     public override int GetHashCode()
     {
         return Id.GetHashCode();

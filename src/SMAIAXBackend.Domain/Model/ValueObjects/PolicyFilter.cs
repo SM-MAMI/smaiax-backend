@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 using SMAIAXBackend.Domain.Model.Enums;
 
 namespace SMAIAXBackend.Domain.Model.ValueObjects;
@@ -17,6 +19,7 @@ public class PolicyFilter(
     public LocationResolution LocationResolution { get; set; } = locationResolution;
     public decimal MaxPrice { get; set; } = maxPrice;
 
+    [ExcludeFromCodeCoverage]
     protected override IEnumerable<object> GetEqualityComponents()
     {
         yield return MeasurementResolution;

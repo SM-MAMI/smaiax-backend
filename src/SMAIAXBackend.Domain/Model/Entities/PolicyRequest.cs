@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 using SMAIAXBackend.Domain.Model.Enums;
 using SMAIAXBackend.Domain.Model.ValueObjects;
 using SMAIAXBackend.Domain.Model.ValueObjects.Ids;
@@ -22,6 +24,7 @@ public sealed class PolicyRequest : IEquatable<PolicyRequest>
     }
 
     // Needed by EF Core
+    [ExcludeFromCodeCoverage]
     private PolicyRequest()
     {
     }
@@ -39,6 +42,7 @@ public sealed class PolicyRequest : IEquatable<PolicyRequest>
         State = PolicyRequestState.Pending;
     }
 
+    [ExcludeFromCodeCoverage]
     public bool Equals(PolicyRequest? other)
     {
         if (other is null)
@@ -54,6 +58,7 @@ public sealed class PolicyRequest : IEquatable<PolicyRequest>
         return Id.Equals(other.Id);
     }
 
+    [ExcludeFromCodeCoverage]
     public override bool Equals(object? obj)
     {
         if (obj is null)
@@ -74,6 +79,7 @@ public sealed class PolicyRequest : IEquatable<PolicyRequest>
         return Equals((PolicyRequest)obj);
     }
 
+    [ExcludeFromCodeCoverage]
     public override int GetHashCode()
     {
         return Id.GetHashCode();

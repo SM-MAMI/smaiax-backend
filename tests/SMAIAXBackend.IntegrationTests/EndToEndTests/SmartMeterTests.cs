@@ -27,7 +27,7 @@ public class SmartMeterTests : TestBase
         var response = await _httpClient.PostAsync(BaseUrl, httpContent);
 
         // Then
-        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));
         var responseContent = await response.Content.ReadAsStringAsync();
         Assert.That(responseContent, Is.Not.Null);
 
@@ -99,6 +99,47 @@ public class SmartMeterTests : TestBase
 
         // When
         var response = await _httpClient.GetAsync(BaseUrl);
+
+        // Then
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
+    }
+
+    [Test]
+    public async Task GivenSmartMeterIdAndAccessToken_WhenGetSmartMeterById_ThenExpectedSmartMetersAreReturned()
+    {
+        // Given
+        var smartMeterExpected =
+            new SmartMeterOverviewDto(Guid.Parse("5e9db066-1b47-46cc-bbde-0b54c30167cd"), "Smart Meter 1", 0, 0);
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _accessToken);
+
+        // When
+        var response = await _httpClient.GetAsync($"{BaseUrl}/{smartMeterExpected.Id}");
+
+        // Then
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+        var responseContent = await response.Content.ReadAsStringAsync();
+        Assert.That(responseContent, Is.Not.Null);
+
+        var smartMeterActual = JsonConvert.DeserializeObject<SmartMeterOverviewDto>(responseContent);
+        Assert.That(smartMeterActual, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(smartMeterActual.Id, Is.EqualTo(smartMeterExpected.Id));
+            Assert.That(smartMeterActual.Name, Is.EqualTo(smartMeterExpected.Name));
+            Assert.That(smartMeterActual.MetadataCount, Is.EqualTo(smartMeterExpected.MetadataCount));
+            Assert.That(smartMeterActual.PolicyCount, Is.EqualTo(smartMeterExpected.PolicyCount));
+        });
+    }
+
+    [Test]
+    public async Task GivenSmartMeterIdAndNoAccessToken_WhenGetSmartMeterById_ThenUnauthorizedIsReturned()
+    {
+        // Given
+        var smartMeterId = Guid.Parse("5e9db066-1b47-46cc-bbde-0b54c30167cd");
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "");
+
+        // When
+        var response = await _httpClient.GetAsync($"{BaseUrl}/{smartMeterId}");
 
         // Then
         Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
