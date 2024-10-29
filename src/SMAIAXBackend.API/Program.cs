@@ -2,6 +2,8 @@ using System.Diagnostics.CodeAnalysis;
 
 using SMAIAXBackend.API;
 using SMAIAXBackend.API.ApplicationConfigurations;
+using SMAIAXBackend.API.Endpoints.Authentication;
+using SMAIAXBackend.API.Endpoints.SmartMeter;
 using SMAIAXBackend.Infrastructure.DbContexts;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,7 +15,6 @@ builder.Services.AddIdentityConfigurations();
 builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddMqttServices(builder.Configuration);
 
-builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
@@ -55,7 +56,8 @@ if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("DockerDeve
 app.UseExceptionHandler();
 app.UseHttpsRedirection();
 app.UseAuthorization();
-app.MapControllers();
+app.MapAuthenticationEndpoints()
+    .MapSmartMeterEndpoints();
 
 await app.RunAsync();
 
