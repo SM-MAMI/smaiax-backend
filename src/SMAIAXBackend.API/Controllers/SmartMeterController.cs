@@ -28,7 +28,7 @@ public class SmartMeterController(
         return Ok(smartMeters);
     }
 
-    [HttpGet("{id:guid}", Name = "GetSmartMeterById")]
+    [HttpGet("{id:guid}", Name = "getSmartMeterById")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -53,6 +53,6 @@ public class SmartMeterController(
         var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
         var id = await smartMeterCreateService.AddSmartMeterAsync(smartMeterCreateDto, userIdClaim);
 
-        return CreatedAtRoute("GetSmartMeterById", new { id }, id);
+        return CreatedAtRoute("getSmartMeterById", new { id }, id);
     }
 }
