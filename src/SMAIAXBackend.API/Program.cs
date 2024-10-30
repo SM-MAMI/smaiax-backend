@@ -13,7 +13,6 @@ builder.Services.AddRepositoryConfigurations();
 builder.Services.AddServiceConfigurations();
 builder.Services.AddIdentityConfigurations();
 builder.Services.AddJwtAuthentication(builder.Configuration);
-builder.Services.AddMqttServices(builder.Configuration);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddProblemDetails();
