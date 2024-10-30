@@ -9,4 +9,5 @@ public interface ISmartMeterRepository
     Task AddAsync(SmartMeter meter);
     Task<List<SmartMeter>> GetSmartMetersByUserIdAsync(UserId userId);
     Task<SmartMeter?> GetSmartMeterByIdAndUserIdAsync(SmartMeterId smartMeterId, UserId userId);
+    Task UpdateAsync(SmartMeter smartMeter);
 }

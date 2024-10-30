@@ -21,6 +21,7 @@ public class TestBase
     {
         await IntegrationTestSetup.ApplicationDbContext.Database.EnsureCreatedAsync();
         await InsertTestData();
+        IntegrationTestSetup.ApplicationDbContext.ChangeTracker.Clear();
     }
 
     [TearDown]
