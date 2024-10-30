@@ -14,7 +14,6 @@ namespace SMAIAXBackend.IntegrationTests;
 internal static class IntegrationTestSetup
 {
     private static PostgreSqlContainer _postgresContainer = null!;
-    private static IContainer _hiveMqContainer = null!;
     private static WebAppFactory _webAppFactory = null!;
     public static ApplicationDbContext ApplicationDbContext { get; private set; } = null!;
     public static ISmartMeterRepository SmartMeterRepository { get; private set; } = null!;
@@ -36,17 +35,8 @@ internal static class IntegrationTestSetup
 
         await _postgresContainer.StartAsync();
 
-        _hiveMqContainer = new ContainerBuilder()
-            .WithImage("hivemq/hivemq4")
-            .WithPortBinding(1883, true)
-            .WithWaitStrategy(Wait.ForUnixContainer().UntilPortIsAvailable(1883))
-            .Build();
-
-        await _hiveMqContainer.StartAsync();
-
         var postgresConnectionString = _postgresContainer.GetConnectionString();
-        var hiveMqPort = _hiveMqContainer.GetMappedPublicPort(1883);
-        _webAppFactory = new WebAppFactory(postgresConnectionString, hiveMqPort);
+        _webAppFactory = new WebAppFactory(postgresConnectionString);
 
         HttpClient = _webAppFactory.CreateClient();
 
