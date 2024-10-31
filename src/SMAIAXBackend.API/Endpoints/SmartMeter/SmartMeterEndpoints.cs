@@ -41,7 +41,7 @@ public static class SmartMeterEndpoints
             .ProducesProblem(StatusCodes.Status401Unauthorized)
             .ProducesProblem(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status500InternalServerError);
-        
+
         group.MapPost("/{id:guid}/metadata", AddMetadataEndpoint.Handle)
             .WithName("addMetadata")
             .Accepts<MetadataCreateDto>(contentType)
