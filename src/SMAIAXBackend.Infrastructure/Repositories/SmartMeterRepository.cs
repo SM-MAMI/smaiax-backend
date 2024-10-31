@@ -36,4 +36,10 @@ public class SmartMeterRepository(ApplicationDbContext applicationDbContext) : I
             .Include(sm => sm.Policies)
             .FirstOrDefaultAsync(sm => sm.Id.Equals(smartMeterId) && sm.UserId.Equals(userId));
     }
+
+    public async Task UpdateAsync(SmartMeter smartMeter)
+    {
+        applicationDbContext.SmartMeters.Update(smartMeter);
+        await applicationDbContext.SaveChangesAsync();
+    }
 }

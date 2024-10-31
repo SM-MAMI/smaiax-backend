@@ -11,7 +11,7 @@ public class SmartMeterTests
     {
         // Given
         var smartMeterId = new SmartMeterId(Guid.NewGuid());
-        var name = "SmartMeter";
+        const string name = "SmartMeter";
         var userId = new UserId(Guid.NewGuid());
 
         // When
@@ -26,5 +26,21 @@ public class SmartMeterTests
             Assert.That(smartMeter.UserId, Is.EqualTo(userId));
             Assert.That(smartMeter.Policies, Is.Empty);
         });
+    }
+
+    [Test]
+    public void GivenSmartMeterAndNewName_WhenUpdateSmartMeter_ThenNameIsUpdated()
+    {
+        // Given
+        const string name = "SmartMeter";
+        var smartMeter = SmartMeter.Create(new SmartMeterId(Guid.NewGuid()), name, new UserId(Guid.NewGuid()));
+        const string nameExpected = "Updated name";
+
+        // When
+        smartMeter.Update(nameExpected);
+
+        // Then
+        Assert.That(smartMeter.Name, Is.EqualTo(nameExpected));
+        Assert.That(smartMeter.Name, Is.Not.EqualTo(name));
     }
 }

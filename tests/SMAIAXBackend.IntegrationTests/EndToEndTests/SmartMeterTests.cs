@@ -2,6 +2,8 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
 
+using Microsoft.EntityFrameworkCore;
+
 using Newtonsoft.Json;
 
 using SMAIAXBackend.Application.DTOs;
@@ -32,8 +34,9 @@ public class SmartMeterTests : TestBase
         Assert.That(locationHeader, Is.Not.Null);
 
         var id = locationHeader.Segments[^1];
-        var smartMeterActual =
-            _applicationDbContext.SmartMeters.FirstOrDefault(x =>
+        var smartMeterActual = await _applicationDbContext.SmartMeters
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x =>
                 x.Id.Equals(new SmartMeterId(Guid.Parse(id))));
 
         Assert.That(smartMeterActual, Is.Not.Null);
@@ -140,6 +143,51 @@ public class SmartMeterTests : TestBase
 
         // When
         var response = await _httpClient.GetAsync($"{BaseUrl}/{smartMeterId}");
+
+        // Then
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
+    }
+
+    [Test]
+    public async Task GivenSmartMeterAndAccessToken_WhenUpdateSmartMeter_ThenSmartMeterIsUpdated()
+    {
+        // Given
+        var smartMeterId = Guid.Parse("5e9db066-1b47-46cc-bbde-0b54c30167cd");
+        var smartMeterUpdateDto = new SmartMeterUpdateDto(smartMeterId, "Updated name");
+        var httpContent = new StringContent(JsonConvert.SerializeObject(smartMeterUpdateDto), Encoding.UTF8,
+            "application/json");
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _accessToken);
+
+        // When
+        var response = await _httpClient.PutAsync($"{BaseUrl}/{smartMeterId}", httpContent);
+
+        // Then
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+        var responseContent = await response.Content.ReadAsStringAsync();
+
+        Assert.That(responseContent, Is.Not.Null);
+        var returnedId = Guid.Parse(responseContent.Trim('"'));
+        Assert.That(returnedId, Is.EqualTo(smartMeterId));
+
+        var smartMeterActual = await _applicationDbContext.SmartMeters
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.Id.Equals(new SmartMeterId(returnedId)));
+        Assert.That(smartMeterActual, Is.Not.Null);
+        Assert.That(smartMeterActual.Name, Is.EqualTo(smartMeterUpdateDto.Name));
+    }
+
+    [Test]
+    public async Task GivenSmartMeterAndNoAccessToken_WhenUpdateSmartMeter_ThenUnauthorizedIsReturned()
+    {
+        // Given
+        var smartMeterId = Guid.Parse("5e9db066-1b47-46cc-bbde-0b54c30167cd");
+        var smartMeterUpdateDto = new SmartMeterUpdateDto(smartMeterId, "Updated name");
+        var httpContent = new StringContent(JsonConvert.SerializeObject(smartMeterUpdateDto), Encoding.UTF8,
+            "application/json");
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "");
+
+        // When
+        var response = await _httpClient.PutAsync($"{BaseUrl}/{smartMeterId}", httpContent);
 
         // Then
         Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
