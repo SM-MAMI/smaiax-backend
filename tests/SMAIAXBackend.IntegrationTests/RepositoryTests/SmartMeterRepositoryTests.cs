@@ -79,4 +79,27 @@ public class SmartMeterRepositoryTests : TestBase
             Assert.That(smartMeterActual.UserId, Is.EqualTo(smartMeterExpected.UserId));
         });
     }
+
+    [Test]
+    public async Task GivenSmartMeterInRepository_WhenUpdate_ThenExpectedSmartMeterIsUpdated()
+    {
+        // Given
+        const string name = "Smart Meter 1";
+        var smartMeterExpected = SmartMeter.Create(new SmartMeterId(Guid.Parse("5e9db066-1b47-46cc-bbde-0b54c30167cd")),
+            "Smart Meter 1 Updated", new UserId(Guid.Parse("3c07065a-b964-44a9-9cdf-fbd49d755ea7")));
+
+        // When
+        await _smartMeterRepository.UpdateAsync(smartMeterExpected);
+
+        // Then
+        var smartMeterActual = await _applicationDbContext.SmartMeters
+            .AsNoTracking()
+            .FirstOrDefaultAsync(sm => sm.Id.Equals(smartMeterExpected.Id));
+        Assert.That(smartMeterActual, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(smartMeterActual.Name, Is.EqualTo(smartMeterExpected.Name));
+            Assert.That(smartMeterActual.Name, Is.Not.EqualTo(name));
+        });
+    }
 }

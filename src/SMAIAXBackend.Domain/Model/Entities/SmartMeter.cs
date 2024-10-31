@@ -8,7 +8,7 @@ namespace SMAIAXBackend.Domain.Model.Entities;
 public sealed class SmartMeter : IEquatable<SmartMeter>
 {
     public SmartMeterId Id { get; } = null!;
-    public string Name { get; } = null!;
+    public string Name { get; private set; } = null!;
     public List<Metadata> Metadata { get; }
     public UserId UserId { get; }
     public List<PolicySmartMeter> Policies { get; }
@@ -43,6 +43,11 @@ public sealed class SmartMeter : IEquatable<SmartMeter>
         }
 
         Metadata.Add(metadata);
+    }
+
+    public void Update(string name)
+    {
+        Name = name;
     }
 
     [ExcludeFromCodeCoverage]
