@@ -43,7 +43,7 @@ public class SmartMeterCreateService(
             metadataCreateDto.Location.State, metadataCreateDto.Location.Country, metadataCreateDto.Location.Continent);
         var metadata = Metadata.Create(metadataId, metadataCreateDto.ValidFrom, location, metadataCreateDto.HouseholdSize, smartMeter.Id);
         smartMeter.AddMetadata(metadata);
-        
+
         await smartMeterRepository.UpdateAsync(smartMeter);
 
         return smartMeterId;

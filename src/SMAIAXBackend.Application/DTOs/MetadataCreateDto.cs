@@ -9,7 +9,7 @@ public class MetadataCreateDto(DateTime validFrom, LocationDto location, int hou
 
     [Required]
     public LocationDto Location { get; set; } = location;
-    
+
     [Required]
     public int HouseholdSize { get; set; } = householdSize;
 }

@@ -41,10 +41,10 @@ public sealed class SmartMeter : IEquatable<SmartMeter>
         {
             throw new ArgumentException("Metadata already exists");
         }
-        
+
         Metadata.Add(metadata);
     }
-    
+
     [ExcludeFromCodeCoverage]
     public bool Equals(SmartMeter? other)
     {

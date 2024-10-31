@@ -162,13 +162,13 @@ public class SmartMeterTests : TestBase
 
         // When
         var response = await _httpClient.PostAsync($"{BaseUrl}/{smartMeterId}/metadata", httpContent);
-        
+
         // Then
         Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
-        
+
         var responseContent = await response.Content.ReadAsStringAsync();
         Assert.That(responseContent, Is.Not.Null);
-        
+
         var returnedId = Guid.Parse(responseContent.Trim('"'));
         Assert.That(returnedId, Is.EqualTo(smartMeterId));
 
@@ -176,7 +176,7 @@ public class SmartMeterTests : TestBase
             .AsNoTracking()
             .Include(smartMeter => smartMeter.Metadata)
             .FirstOrDefaultAsync(x => x.Id.Equals(new SmartMeterId(returnedId)));
-        
+
         Assert.That(smartMeter, Is.Not.Null);
         Assert.That(smartMeter.Metadata, Has.Count.EqualTo(metadataCountExpected));
         var metadataActual = smartMeter.Metadata[0];
@@ -191,7 +191,7 @@ public class SmartMeterTests : TestBase
             Assert.That(metadataActual.HouseholdSize, Is.EqualTo(metadataCreateDto.HouseholdSize));
         });
     }
-    
+
     [Test]
     public async Task GivenSmartMeterIdAndMetadataCreateDtoAndNoAccessToken_WhenAddMetadata_ThenUnauthorizedIsReturned()
     {

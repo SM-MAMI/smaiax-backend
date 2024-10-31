@@ -36,7 +36,7 @@ public class SmartMeterTests
         // Given
         var smartMeter = SmartMeter.Create(new SmartMeterId(Guid.NewGuid()), "SmartMeter", new UserId(Guid.NewGuid()));
         var metadata = Metadata.Create(new MetadataId(Guid.NewGuid()), DateTime.UtcNow,
-            new Location("Some street", "Some city", "Some state", "Some country", Continent.Europe), 
+            new Location("Some street", "Some city", "Some state", "Some country", Continent.Europe),
             4, smartMeter.Id);
 
         // When
@@ -53,9 +53,9 @@ public class SmartMeterTests
         // Given
         var smartMeter = SmartMeter.Create(new SmartMeterId(Guid.NewGuid()), "SmartMeter", new UserId(Guid.NewGuid()));
         var metadata = Metadata.Create(new MetadataId(Guid.NewGuid()), DateTime.UtcNow,
-            new Location("Some street", "Some city", "Some state", "Some country", Continent.Europe), 
+            new Location("Some street", "Some city", "Some state", "Some country", Continent.Europe),
             4, smartMeter.Id);
-        
+
         // When ... Then
         smartMeter.AddMetadata(metadata);
         Assert.Throws<ArgumentException>(() => smartMeter.AddMetadata(metadata));
