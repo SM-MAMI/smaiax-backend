@@ -14,6 +14,11 @@ public class SmartMeterRepository(ApplicationDbContext applicationDbContext) : I
         return new SmartMeterId(Guid.NewGuid());
     }
 
+    public MetadataId NextMetadataIdentity()
+    {
+        return new MetadataId(Guid.NewGuid());
+    }
+
     public async Task AddAsync(SmartMeter meter)
     {
         await applicationDbContext.SmartMeters.AddAsync(meter);
@@ -35,5 +40,11 @@ public class SmartMeterRepository(ApplicationDbContext applicationDbContext) : I
             .Include(sm => sm.Metadata)
             .Include(sm => sm.Policies)
             .FirstOrDefaultAsync(sm => sm.Id.Equals(smartMeterId) && sm.UserId.Equals(userId));
+    }
+
+    public async Task UpdateAsync(SmartMeter smartMeter)
+    {
+        applicationDbContext.SmartMeters.Update(smartMeter);
+        await applicationDbContext.SaveChangesAsync();
     }
 }

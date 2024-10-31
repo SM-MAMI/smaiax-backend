@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Http.HttpResults;
+
 using SMAIAXBackend.Application.DTOs;
 
 namespace SMAIAXBackend.API.Endpoints.SmartMeter;
@@ -31,6 +33,16 @@ public static class SmartMeterEndpoints
             .Produces<Guid>(StatusCodes.Status201Created, contentType)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status500InternalServerError);
+        
+        group.MapPost("/{id:guid}/metadata", AddMetadataEndpoint.Handle)
+            .WithName("addMetadata")
+            .Accepts<MetadataCreateDto>(contentType)
+            .Produces<Ok>(StatusCodes.Status200OK, contentType)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .ProducesProblem(StatusCodes.Status409Conflict)
             .ProducesProblem(StatusCodes.Status500InternalServerError);
 
         return app;

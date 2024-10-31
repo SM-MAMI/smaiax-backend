@@ -35,6 +35,16 @@ public sealed class SmartMeter : IEquatable<SmartMeter>
         Policies = policies;
     }
 
+    public void AddMetadata(Metadata metadata)
+    {
+        if (Metadata.Contains(metadata))
+        {
+            throw new ArgumentException("Metadata already exists");
+        }
+        
+        Metadata.Add(metadata);
+    }
+    
     [ExcludeFromCodeCoverage]
     public bool Equals(SmartMeter? other)
     {
