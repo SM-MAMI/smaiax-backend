@@ -24,7 +24,9 @@ public class AuthenticationService(
         var userId = userRepository.NextIdentity();
         IdentityUser identityUser = new IdentityUser
         {
-            Id = userId.Id.ToString(), UserName = registerDto.Email, Email = registerDto.Email
+            Id = userId.Id.ToString(),
+            UserName = registerDto.Email,
+            Email = registerDto.Email
         };
 
         await transactionManager.ReadCommittedTransactionScope(async () =>
