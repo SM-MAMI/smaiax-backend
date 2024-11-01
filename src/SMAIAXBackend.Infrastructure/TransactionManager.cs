@@ -6,10 +6,13 @@ namespace SMAIAXBackend.Infrastructure;
 
 public class TransactionManager : ITransactionManager
 {
-    public async Task TransactionScope(Func<Task> transactionalFunction)
+    public async Task ReadCommittedTransactionScope(Func<Task> transactionalFunction)
     {
+        TransactionOptions transactionOptions =
+            new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted };
         using var scope =
-            new TransactionScope(TransactionScopeOption.Required, TransactionScopeAsyncFlowOption.Enabled);
+            new TransactionScope(TransactionScopeOption.Required, transactionOptions,
+                TransactionScopeAsyncFlowOption.Enabled);
 
         await transactionalFunction();
 

@@ -22,16 +22,13 @@ public class AuthenticationService(
     public async Task<Guid> RegisterAsync(RegisterDto registerDto)
     {
         var userId = userRepository.NextIdentity();
-
-        await transactionManager.TransactionScope(async () =>
+        IdentityUser identityUser = new IdentityUser
         {
-            var identityUser = new IdentityUser
-            {
-                Id = userId.Id.ToString(),
-                UserName = registerDto.Email,
-                Email = registerDto.Email
-            };
+            Id = userId.Id.ToString(), UserName = registerDto.Email, Email = registerDto.Email
+        };
 
+        await transactionManager.ReadCommittedTransactionScope(async () =>
+        {
             var result = await userManager.CreateAsync(identityUser, registerDto.Password);
 
             if (!result.Succeeded)
