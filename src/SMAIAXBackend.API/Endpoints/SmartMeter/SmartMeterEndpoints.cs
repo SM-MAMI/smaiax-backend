@@ -42,6 +42,17 @@ public static class SmartMeterEndpoints
             .ProducesProblem(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status500InternalServerError);
 
+        group.MapPost("/{id:guid}/metadata", AddMetadataEndpoint.Handle)
+            .WithName("addMetadata")
+            .Accepts<MetadataCreateDto>(contentType)
+            .Produces<Guid>(StatusCodes.Status200OK, contentType)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .ProducesProblem(StatusCodes.Status409Conflict)
+            .ProducesProblem(StatusCodes.Status500InternalServerError);
+
+
         return app;
     }
 }

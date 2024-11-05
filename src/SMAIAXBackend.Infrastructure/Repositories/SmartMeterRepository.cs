@@ -14,6 +14,11 @@ public class SmartMeterRepository(ApplicationDbContext applicationDbContext) : I
         return new SmartMeterId(Guid.NewGuid());
     }
 
+    public MetadataId NextMetadataIdentity()
+    {
+        return new MetadataId(Guid.NewGuid());
+    }
+
     public async Task AddAsync(SmartMeter meter)
     {
         await applicationDbContext.SmartMeters.AddAsync(meter);
