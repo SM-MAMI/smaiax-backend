@@ -14,7 +14,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 {
     public DbSet<User> DomainUsers { get; init; }
     public DbSet<RefreshToken> RefreshTokens { get; init; }
-    public DbSet<SmartMeter> SmartMeters { get; init; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -27,13 +26,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         base.OnModelCreating(builder);
         builder.ApplyConfiguration(new ContractConfiguration());
         builder.ApplyConfiguration(new DomainUserConfiguration());
-        builder.ApplyConfiguration(new MeasurementConfiguration());
-        builder.ApplyConfiguration(new MetadataConfiguration());
-        builder.ApplyConfiguration(new PolicyConfiguration());
-        builder.ApplyConfiguration(new PolicyRequestConfiguration());
         builder.ApplyConfiguration(new RefreshTokenConfiguration());
-        builder.ApplyConfiguration(new SmartMeterConfiguration());
-        builder.ApplyConfiguration(new PolicySmartMeterConfiguration());
 
         // Place Identity tables in the "auth" schema
         builder.Entity<IdentityUser>(entity => entity.ToTable(name: "AspNetUsers", schema: "auth"));
@@ -69,8 +62,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 
         await Users.AddAsync(testUser);
         await DomainUsers.AddAsync(domainUser);
-        await SmartMeters.AddAsync(smartMeter1);
-        await SmartMeters.AddAsync(smartMeter2);
         await SaveChangesAsync();
     }
 }

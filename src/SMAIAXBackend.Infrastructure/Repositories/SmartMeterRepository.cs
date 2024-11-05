@@ -7,7 +7,7 @@ using SMAIAXBackend.Infrastructure.DbContexts;
 
 namespace SMAIAXBackend.Infrastructure.Repositories;
 
-public class SmartMeterRepository(ApplicationDbContext applicationDbContext) : ISmartMeterRepository
+public class SmartMeterRepository(TenantDbContext tenantDbContext) : ISmartMeterRepository
 {
     public SmartMeterId NextIdentity()
     {
@@ -16,13 +16,13 @@ public class SmartMeterRepository(ApplicationDbContext applicationDbContext) : I
 
     public async Task AddAsync(SmartMeter meter)
     {
-        await applicationDbContext.SmartMeters.AddAsync(meter);
-        await applicationDbContext.SaveChangesAsync();
+        await tenantDbContext.SmartMeters.AddAsync(meter);
+        await tenantDbContext.SaveChangesAsync();
     }
 
     public Task<List<SmartMeter>> GetSmartMetersByUserIdAsync(UserId userId)
     {
-        return applicationDbContext.SmartMeters
+        return tenantDbContext.SmartMeters
             .Where(sm => sm.UserId.Equals(userId))
             .Include(sm => sm.Metadata)
             .Include(sm => sm.Policies)
@@ -31,7 +31,7 @@ public class SmartMeterRepository(ApplicationDbContext applicationDbContext) : I
 
     public Task<SmartMeter?> GetSmartMeterByIdAndUserIdAsync(SmartMeterId smartMeterId, UserId userId)
     {
-        return applicationDbContext.SmartMeters
+        return tenantDbContext.SmartMeters
             .Include(sm => sm.Metadata)
             .Include(sm => sm.Policies)
             .FirstOrDefaultAsync(sm => sm.Id.Equals(smartMeterId) && sm.UserId.Equals(userId));
@@ -39,7 +39,7 @@ public class SmartMeterRepository(ApplicationDbContext applicationDbContext) : I
 
     public async Task UpdateAsync(SmartMeter smartMeter)
     {
-        applicationDbContext.SmartMeters.Update(smartMeter);
-        await applicationDbContext.SaveChangesAsync();
+        tenantDbContext.SmartMeters.Update(smartMeter);
+        await tenantDbContext.SaveChangesAsync();
     }
 }

@@ -4,11 +4,12 @@ using Microsoft.Extensions.Configuration;
 
 namespace SMAIAXBackend.IntegrationTests;
 
-public class WebAppFactory(string postgresConnectionString) : WebApplicationFactory<Program>
+public class WebAppFactory(int postgresMappedPublicPort) : WebApplicationFactory<Program>
 {
     private readonly Dictionary<string, string> _testAppSettings = new()
     {
-        ["ConnectionStrings:smaiax-db"] = postgresConnectionString,
+        ["ConnectionStrings:smaiax-db"] = $"Host=localhost:{postgresMappedPublicPort};Username=user;Password=password;Database=smaiax-db",
+        ["ConnectionStrings:tenant-db"] = $"Host=localhost:{postgresMappedPublicPort};Username=user;Password=password;Database=tenant-db",
         ["JwtConfiguration:Secret"] = "YourNewStrongSecretKeyOfAtLeast32Characters!",
         ["JwtConfiguration:Issuer"] = "SMAIAX",
         ["JwtConfiguration:Audience"] = "SomeAudience",

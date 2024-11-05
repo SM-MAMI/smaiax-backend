@@ -12,6 +12,7 @@ public class TestBase
 {
     protected readonly HttpClient _httpClient = IntegrationTestSetup.HttpClient;
     protected readonly ApplicationDbContext _applicationDbContext = IntegrationTestSetup.ApplicationDbContext;
+    protected readonly TenantDbContext _tenantDbContext = IntegrationTestSetup.TenantDbContext;
     protected readonly ISmartMeterRepository _smartMeterRepository = IntegrationTestSetup.SmartMeterRepository;
     protected readonly IUserRepository _userRepository = IntegrationTestSetup.UserRepository;
     protected readonly string _accessToken = IntegrationTestSetup.AccessToken;
@@ -20,15 +21,19 @@ public class TestBase
     public async Task Setup()
     {
         await IntegrationTestSetup.ApplicationDbContext.Database.EnsureCreatedAsync();
+        await IntegrationTestSetup.TenantDbContext.Database.EnsureCreatedAsync();
         await InsertTestData();
         IntegrationTestSetup.ApplicationDbContext.ChangeTracker.Clear();
+        IntegrationTestSetup.TenantDbContext.ChangeTracker.Clear();
     }
 
     [TearDown]
     public async Task TearDown()
     {
         IntegrationTestSetup.ApplicationDbContext.ChangeTracker.Clear();
+        IntegrationTestSetup.TenantDbContext.ChangeTracker.Clear();
         await IntegrationTestSetup.ApplicationDbContext.Database.EnsureDeletedAsync();
+        await IntegrationTestSetup.TenantDbContext.Database.EnsureDeletedAsync();
     }
 
     private async Task InsertTestData()
@@ -109,8 +114,10 @@ public class TestBase
         await _applicationDbContext.RefreshTokens.AddAsync(refreshToken2);
         await _applicationDbContext.RefreshTokens.AddAsync(refreshToken3);
         await _applicationDbContext.RefreshTokens.AddAsync(refreshToken4);
-        await _applicationDbContext.SmartMeters.AddAsync(smartMeter1);
-        await _applicationDbContext.SmartMeters.AddAsync(smartMeter2);
+        await _tenantDbContext.SmartMeters.AddAsync(smartMeter1);
+        await _tenantDbContext.SmartMeters.AddAsync(smartMeter2);
+        
         await _applicationDbContext.SaveChangesAsync();
+        await _tenantDbContext.SaveChangesAsync();
     }
 }

@@ -46,10 +46,17 @@ if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("DockerDeve
 
     using var scope = app.Services.CreateScope();
     var services = scope.ServiceProvider;
+    
     var applicationDbContext = services.GetRequiredService<ApplicationDbContext>();
+    var tenantDbContext = services.GetRequiredService<TenantDbContext>();
+    
     await applicationDbContext.Database.EnsureDeletedAsync();
     await applicationDbContext.Database.EnsureCreatedAsync();
     await applicationDbContext.SeedTestData();
+    
+    await tenantDbContext.Database.EnsureDeletedAsync();
+    await tenantDbContext.Database.EnsureCreatedAsync();
+    await tenantDbContext.SeedTestData();
 }
 
 app.UseExceptionHandler();

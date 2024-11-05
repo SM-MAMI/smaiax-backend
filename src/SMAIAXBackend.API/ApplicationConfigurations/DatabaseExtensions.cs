@@ -15,5 +15,10 @@ public static class DatabaseExtensions
         {
             options.UseNpgsql(configuration.GetConnectionString("smaiax-db"));
         });
+        
+        services.AddDbContext<TenantDbContext>(options =>
+        {
+            options.UseNpgsql(configuration.GetConnectionString("tenant-db"));
+        });
     }
 }

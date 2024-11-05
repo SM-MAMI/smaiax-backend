@@ -16,7 +16,7 @@ public class SmartMeterRepositoryTests : TestBase
 
         // When
         await _smartMeterRepository.AddAsync(smartMeterExpected);
-        var smartMeterActual = await _applicationDbContext.SmartMeters
+        var smartMeterActual = await _tenantDbContext.SmartMeters
             .AsNoTracking()
             .FirstOrDefaultAsync(sm => sm.Id.Equals(smartMeterExpected.Id));
 
@@ -92,7 +92,7 @@ public class SmartMeterRepositoryTests : TestBase
         await _smartMeterRepository.UpdateAsync(smartMeterExpected);
 
         // Then
-        var smartMeterActual = await _applicationDbContext.SmartMeters
+        var smartMeterActual = await _tenantDbContext.SmartMeters
             .AsNoTracking()
             .FirstOrDefaultAsync(sm => sm.Id.Equals(smartMeterExpected.Id));
         Assert.That(smartMeterActual, Is.Not.Null);
