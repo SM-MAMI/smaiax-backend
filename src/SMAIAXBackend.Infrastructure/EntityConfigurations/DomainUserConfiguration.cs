@@ -27,5 +27,11 @@ public class DomainUserConfiguration : IEntityTypeConfiguration<User>
 
         builder.Property(u => u.Email)
             .IsRequired();
+
+        builder.Property(u => u.TenantId)
+            .HasConversion(
+                v => v.Id,
+                v => new TenantId(v))
+            .IsRequired();
     }
 }

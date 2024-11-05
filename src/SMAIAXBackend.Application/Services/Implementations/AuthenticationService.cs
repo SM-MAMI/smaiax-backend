@@ -13,6 +13,7 @@ using SMAIAXBackend.Domain.Repositories.Transactions;
 namespace SMAIAXBackend.Application.Services.Implementations;
 
 public class AuthenticationService(
+    ITenantRepository tenantRepository,
     IUserRepository userRepository,
     ITokenRepository tokenRepository,
     UserManager<IdentityUser> userManager,
@@ -41,8 +42,15 @@ public class AuthenticationService(
                 throw new RegistrationException(errorMessages);
             }
 
+            // TODO: Create new database for tenant
+            // TODO: Create user for tenant database
+            // TODO: Create schema for tenant database
+            var tenantId = tenantRepository.NextIdentity();
+            var tenant = Tenant.Create(tenantId, "Default", "Default");
+            await tenantRepository.AddAsync(tenant);
+            
             var name = new Name(registerDto.Name.FirstName, registerDto.Name.LastName);
-            var domainUser = User.Create(userId, name, registerDto.Email);
+            var domainUser = User.Create(userId, name, registerDto.Email, tenantId);
             await userRepository.AddAsync(domainUser);
         });
 

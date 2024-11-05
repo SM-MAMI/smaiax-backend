@@ -16,6 +16,7 @@ namespace SMAIAXBackend.Application.UnitTests;
 [TestFixture]
 public class AuthenticationServiceTests
 {
+    private Mock<ITenantRepository> _tenantRepositoryMock;
     private Mock<IUserRepository> _userRepositoryMock;
     private Mock<ITokenRepository> _tokenRepositoryMock;
     private Mock<UserManager<IdentityUser>> _userManagerMock;
@@ -26,6 +27,7 @@ public class AuthenticationServiceTests
     [SetUp]
     public void Setup()
     {
+        _tenantRepositoryMock = new Mock<ITenantRepository>();
         _userRepositoryMock = new Mock<IUserRepository>();
         _tokenRepositoryMock = new Mock<ITokenRepository>();
         _userManagerMock = new Mock<UserManager<IdentityUser>>(
@@ -36,7 +38,8 @@ public class AuthenticationServiceTests
             .Setup(mgr => mgr.TransactionScope(It.IsAny<Func<Task>>()))
             .Returns((Func<Task> transactionalOperation) => transactionalOperation());
         _loggerMock = new Mock<ILogger<AuthenticationService>>();
-        _authenticationService = new AuthenticationService(_userRepositoryMock.Object, _tokenRepositoryMock.Object,
+        _authenticationService = new AuthenticationService(_tenantRepositoryMock.Object, _userRepositoryMock.Object,
+            _tokenRepositoryMock.Object,
             _userManagerMock.Object, _transactionManagerMock.Object, _loggerMock.Object);
     }
 
@@ -44,8 +47,13 @@ public class AuthenticationServiceTests
     public async Task GivenValidRegisterDto_WhenRegistrationSucceeds_ThenUserIsAddedToRepository()
     {
         // Given
+        var tenantId = new TenantId(Guid.NewGuid());
         var registerDto = new RegisterDto("test@example.com", "Password123!", new NameDto("John", "Doe"));
 
+        _tenantRepositoryMock
+            .Setup(repo => repo.NextIdentity())
+            .Returns(tenantId);
+        
         _userManagerMock
             .Setup(um => um.CreateAsync(It.IsAny<IdentityUser>(), It.IsAny<string>()))
             .ReturnsAsync(IdentityResult.Success);
@@ -68,11 +76,16 @@ public class AuthenticationServiceTests
     public void GivenInvalidRegisterDto_WhenUserCreationFails_ThenRegistrationExceptionIsThrown()
     {
         // Given
+        var tenantId = new TenantId(Guid.NewGuid());
         var registerDto = new RegisterDto("test@example.com", "WeakPassword123!", new NameDto("John", "Doe"));
 
         var identityErrors = new List<IdentityError> { new() { Description = "Password is too weak" } };
         var identityResult = IdentityResult.Failed(identityErrors.ToArray());
 
+        _tenantRepositoryMock
+            .Setup(repo => repo.NextIdentity())
+            .Returns(tenantId);
+        
         _userManagerMock
             .Setup(um => um.CreateAsync(It.IsAny<IdentityUser>(), It.IsAny<string>()))
             .ReturnsAsync(identityResult);

@@ -14,6 +14,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 {
     public DbSet<User> DomainUsers { get; init; }
     public DbSet<RefreshToken> RefreshTokens { get; init; }
+    public DbSet<Tenant> Tenants { get; init; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -27,6 +28,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         builder.ApplyConfiguration(new ContractConfiguration());
         builder.ApplyConfiguration(new DomainUserConfiguration());
         builder.ApplyConfiguration(new RefreshTokenConfiguration());
+        builder.ApplyConfiguration(new TenantConfiguration());
 
         // Place Identity tables in the "auth" schema
         builder.Entity<IdentityUser>(entity => entity.ToTable(name: "AspNetUsers", schema: "auth"));
@@ -55,12 +57,11 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         var passwordHash = hasher.HashPassword(testUser, "P@ssw0rd");
         testUser.PasswordHash = passwordHash;
 
-        var domainUser = User.Create(userId, new Name("John", "Doe"), userName);
-
-        var smartMeter1 = SmartMeter.Create(new SmartMeterId(Guid.NewGuid()), "Smart Meter 1", domainUser.Id);
-        var smartMeter2 = SmartMeter.Create(new SmartMeterId(Guid.NewGuid()), "Smart Meter 2", domainUser.Id);
+        var tenant = Tenant.Create(new TenantId(Guid.NewGuid()), "Test Tenant", "");
+        var domainUser = User.Create(userId, new Name("John", "Doe"), userName, tenant.Id);
 
         await Users.AddAsync(testUser);
+        await Tenants.AddAsync(tenant);
         await DomainUsers.AddAsync(domainUser);
         await SaveChangesAsync();
     }

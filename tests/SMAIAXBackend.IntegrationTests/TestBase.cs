@@ -52,7 +52,10 @@ public class TestBase
         };
         var passwordHash = hasher.HashPassword(testUser, "P@ssw0rd");
         testUser.PasswordHash = passwordHash;
-        var domainUser = User.Create(userId, new Name("John", "Doe"), userName);
+        
+        var tenantId = new TenantId(Guid.Parse("f4c70232-6715-4c15-966f-bf4bcef46d39"));
+        var tenant = Tenant.Create(tenantId, "Tenant 1", "");
+        var domainUser = User.Create(userId, new Name("John", "Doe"), userName, tenantId);
 
         // Valid refresh token
         const string jwtId = "19f77b2e-e485-4031-8506-62f6d3b69e4d";
@@ -108,6 +111,7 @@ public class TestBase
         var smartMeter2 = SmartMeter.Create(new SmartMeterId(Guid.Parse("f4c70232-6715-4c15-966f-bf4bcef46d39")),
             "Smart Meter 2", domainUser.Id);
 
+        await _applicationDbContext.Tenants.AddAsync(tenant);
         await _applicationDbContext.Users.AddAsync(testUser);
         await _applicationDbContext.DomainUsers.AddAsync(domainUser);
         await _applicationDbContext.RefreshTokens.AddAsync(refreshToken1);
