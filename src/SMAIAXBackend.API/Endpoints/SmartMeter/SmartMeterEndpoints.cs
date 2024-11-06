@@ -52,6 +52,13 @@ public static class SmartMeterEndpoints
             .ProducesProblem(StatusCodes.Status409Conflict)
             .ProducesProblem(StatusCodes.Status500InternalServerError);
 
+        group.MapDelete("/{smartMeterId:guid}/metadata/{metadataId:guid}", RemoveMetadataEndpoint.Handle)
+            .WithName("removeMetadata")
+            .Produces(StatusCodes.Status204NoContent)
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .ProducesProblem(StatusCodes.Status500InternalServerError);
+
 
         return app;
     }
