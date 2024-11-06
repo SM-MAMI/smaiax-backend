@@ -1,5 +1,3 @@
-using Microsoft.AspNetCore.Http.HttpResults;
-
 using SMAIAXBackend.Application.DTOs;
 
 namespace SMAIAXBackend.API.Endpoints.Authentication;
@@ -38,7 +36,7 @@ public static class AuthenticationEndpoints
         group.MapPost("logout", LogoutEndpoint.Handle)
             .WithName("logout")
             .Accepts<TokenDto>(contentType)
-            .Produces<Ok>(StatusCodes.Status200OK, contentType)
+            .Produces(StatusCodes.Status204NoContent)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status500InternalServerError);
 

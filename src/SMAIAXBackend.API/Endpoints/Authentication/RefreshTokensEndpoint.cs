@@ -8,7 +8,7 @@ namespace SMAIAXBackend.API.Endpoints.Authentication;
 
 public static class RefreshTokensEndpoint
 {
-    public static async Task<Results<Ok<TokenDto>, ProblemHttpResult>> Handle(
+    public static async Task<Ok<TokenDto>> Handle(
         IAuthenticationService authenticationService,
         [FromBody] TokenDto tokenDto)
     {
