@@ -8,7 +8,7 @@ namespace SMAIAXBackend.API.Endpoints.Authentication;
 
 public static class RegisterEndpoint
 {
-    public static async Task<Results<Ok<Guid>, ProblemHttpResult>> Handle(
+    public static async Task<Ok<Guid>> Handle(
         IAuthenticationService authenticationService,
         [FromBody] RegisterDto registerDto)
     {

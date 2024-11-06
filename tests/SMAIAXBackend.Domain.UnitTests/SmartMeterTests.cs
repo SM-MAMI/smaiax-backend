@@ -76,4 +76,31 @@ public class SmartMeterTests
         smartMeter.AddMetadata(metadata);
         Assert.Throws<ArgumentException>(() => smartMeter.AddMetadata(metadata));
     }
+
+    [Test]
+    public void GivenSmartMeterAndMetadataId_WhenRemoveMetadata_ThenMetadataIsRemoved()
+    {
+        // Given
+        var smartMeter = SmartMeter.Create(new SmartMeterId(Guid.NewGuid()), "SmartMeter", new UserId(Guid.NewGuid()));
+        var metadata = Metadata.Create(new MetadataId(Guid.NewGuid()), DateTime.UtcNow,
+            new Location("Some street", "Some city", "Some state", "Some country", Continent.Europe),
+            4, smartMeter.Id);
+        smartMeter.AddMetadata(metadata);
+
+        // When
+        smartMeter.RemoveMetadata(metadata.Id);
+
+        // Then
+        Assert.That(smartMeter.Metadata, Is.Empty);
+    }
+
+    [Test]
+    public void GivenSmartMeterAndNonExistentMetadataId_WhenRemoveMetadata_ThenArgumentExceptionIsThrown()
+    {
+        // Given
+        var smartMeter = SmartMeter.Create(new SmartMeterId(Guid.NewGuid()), "SmartMeter", new UserId(Guid.NewGuid()));
+
+        // When ... Then
+        Assert.Throws<ArgumentException>(() => smartMeter.RemoveMetadata(new MetadataId(Guid.NewGuid())));
+    }
 }

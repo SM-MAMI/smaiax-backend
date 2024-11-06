@@ -45,6 +45,17 @@ public sealed class SmartMeter : IEquatable<SmartMeter>
         Metadata.Add(metadata);
     }
 
+    public void RemoveMetadata(MetadataId metadataId)
+    {
+        var metadata = Metadata.FirstOrDefault(m => m.Id.Equals(metadataId));
+        if (metadata == null)
+        {
+            throw new ArgumentException("Metadata not found");
+        }
+
+        Metadata.Remove(metadata);
+    }
+
     public void Update(string name)
     {
         Name = name;

@@ -10,7 +10,7 @@ namespace SMAIAXBackend.API.Endpoints.SmartMeter;
 
 public static class AddMetadataEndpoint
 {
-    public static async Task<Results<Ok<Guid>, ProblemHttpResult>> Handle(
+    public static async Task<Ok<Guid>> Handle(
         ISmartMeterCreateService smartMeterCreateService,
         [FromRoute] Guid id,
         [FromBody] MetadataCreateDto metadataCreateDto,

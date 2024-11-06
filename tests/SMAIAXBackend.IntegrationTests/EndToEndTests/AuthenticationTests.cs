@@ -243,7 +243,7 @@ public class AuthenticationTests : TestBase
         var response = await _httpClient.PostAsync($"{BaseUrl}/logout", httpContent);
 
         // Then
-        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NoContent));
 
         var invalidatedRefreshToken = await _applicationDbContext.RefreshTokens
             .AsNoTracking()

@@ -8,11 +8,11 @@ namespace SMAIAXBackend.API.Endpoints.Authentication;
 
 public static class LogoutEndpoint
 {
-    public static async Task<Results<Ok, ProblemHttpResult>> Handle(
+    public static async Task<NoContent> Handle(
         IAuthenticationService authenticationService,
         [FromBody] TokenDto tokenDto)
     {
         await authenticationService.LogoutAsync(tokenDto.RefreshToken);
-        return TypedResults.Ok();
+        return TypedResults.NoContent();
     }
 }
