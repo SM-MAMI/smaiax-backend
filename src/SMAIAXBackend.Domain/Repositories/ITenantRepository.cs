@@ -7,4 +7,5 @@ public interface ITenantRepository
 {
     TenantId NextIdentity();
     Task AddAsync(Tenant tenant);
+    Task CreateDatabaseForTenantAsync(string databaseName, string databaseUserName, string databasePassword);
 }

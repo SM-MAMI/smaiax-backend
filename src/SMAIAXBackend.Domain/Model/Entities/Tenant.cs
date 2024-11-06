@@ -5,12 +5,14 @@ namespace SMAIAXBackend.Domain.Model.Entities;
 public sealed class Tenant : IEquatable<Tenant>
 {
     public TenantId Id { get; }
-    public string Name { get; }
-    public string DatabaseConnectionString { get; }
+    // TODO: Move credentials to a secure store e.g. HashiCorp Vault
+    public string DatabaseUsername { get; }
+    public string DatabasePassword { get; }
+    public string DatabaseName { get; }
 
-    public static Tenant Create(TenantId id, string name, string databaseConnectionString)
+    public static Tenant Create(TenantId id, string databaseUsername, string databasePassword, string databaseName)
     {
-        return new Tenant(id, name, databaseConnectionString);
+        return new Tenant(id, databaseUsername, databasePassword, databaseName);
     }
     
     // Needed by EF Core
@@ -18,13 +20,13 @@ public sealed class Tenant : IEquatable<Tenant>
     {
     }
     
-    private Tenant(TenantId id, string name, string databaseConnectionString)
+    private Tenant(TenantId id, string databaseUsername, string databasePassword, string databaseName)
     {
         Id = id;
-        Name = name;
-        DatabaseConnectionString = databaseConnectionString;
+        DatabaseUsername = databaseUsername;
+        DatabasePassword = databasePassword;
+        DatabaseName = databaseName;
     }
-    
     
     public bool Equals(Tenant? other)
     {

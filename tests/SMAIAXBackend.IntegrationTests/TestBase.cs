@@ -54,7 +54,7 @@ public class TestBase
         testUser.PasswordHash = passwordHash;
         
         var tenantId = new TenantId(Guid.Parse("f4c70232-6715-4c15-966f-bf4bcef46d39"));
-        var tenant = Tenant.Create(tenantId, "Tenant 1", "");
+        var tenant = Tenant.Create(tenantId, "test", "test", "test");
         var domainUser = User.Create(userId, new Name("John", "Doe"), userName, tenantId);
 
         // Valid refresh token

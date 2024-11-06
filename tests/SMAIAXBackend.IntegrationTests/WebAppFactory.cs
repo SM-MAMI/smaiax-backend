@@ -10,6 +10,11 @@ public class WebAppFactory(int postgresMappedPublicPort) : WebApplicationFactory
     {
         ["ConnectionStrings:smaiax-db"] = $"Host=localhost:{postgresMappedPublicPort};Username=user;Password=password;Database=smaiax-db",
         ["ConnectionStrings:tenant-db"] = $"Host=localhost:{postgresMappedPublicPort};Username=user;Password=password;Database=tenant-db",
+        ["DatabaseConfiguration:Host"] = "localhost",
+        ["DatabaseConfiguration:Port"] = $"{postgresMappedPublicPort}",
+        ["DatabaseConfiguration:SuperUsername"] = "user",
+        ["DatabaseConfiguration:SuperUserPassword"] = "password",
+        ["DatabaseConfiguration:MainDatabase"] = "smaiax-db",
         ["JwtConfiguration:Secret"] = "YourNewStrongSecretKeyOfAtLeast32Characters!",
         ["JwtConfiguration:Issuer"] = "SMAIAX",
         ["JwtConfiguration:Audience"] = "SomeAudience",
