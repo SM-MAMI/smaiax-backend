@@ -4,6 +4,7 @@ using SMAIAXBackend.API;
 using SMAIAXBackend.API.ApplicationConfigurations;
 using SMAIAXBackend.API.Endpoints.Authentication;
 using SMAIAXBackend.API.Endpoints.Policy;
+using SMAIAXBackend.API.Endpoints.PolicyRequest;
 using SMAIAXBackend.API.Endpoints.SmartMeter;
 using SMAIAXBackend.Infrastructure.DbContexts;
 
@@ -58,7 +59,8 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapAuthenticationEndpoints()
     .MapSmartMeterEndpoints()
-    .MapPolicyEndpoints();
+    .MapPolicyEndpoints()
+    .MapPolicyRequestEndpoints();
 
 await app.RunAsync();
 

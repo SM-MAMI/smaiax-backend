@@ -25,7 +25,7 @@ public class PolicyConfiguration : IEntityTypeConfiguration<Policy>
         builder.Property(p => p.LocationResolution).HasConversion<string>().IsRequired();
 
         builder.Property(p => p.Price).IsRequired();
-        
+
         builder.Property(p => p.State).HasConversion<string>().IsRequired();
 
         builder.Property(p => p.UserId)
@@ -33,7 +33,7 @@ public class PolicyConfiguration : IEntityTypeConfiguration<Policy>
                 v => v.Id,
                 v => new UserId(v))
             .IsRequired();
-        
+
         builder.Property(p => p.SmartMeterId)
             .HasConversion(
                 v => v.Id,

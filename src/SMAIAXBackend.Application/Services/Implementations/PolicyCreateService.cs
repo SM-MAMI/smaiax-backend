@@ -40,7 +40,7 @@ public class PolicyCreateService(
         }
 
         var latestMetadata = smartMeter.Metadata.OrderByDescending(m => m.ValidFrom).FirstOrDefault();
-        
+
         if (!IsLocationValidForResolution(latestMetadata, policyCreateDto.LocationResolution))
         {
             logger.LogWarning(
@@ -57,7 +57,7 @@ public class PolicyCreateService(
 
         return policyId.Id;
     }
-    
+
     /// <summary>
     /// Checks if the location data of the smart meter is sufficient for the given resolution.
     /// If there is no metadata for the smart meter, the location resolution needs to be None.
@@ -73,13 +73,13 @@ public class PolicyCreateService(
         {
             return resolution == LocationResolution.None;
         }
-        
+
         return resolution switch
         {
             LocationResolution.StreetName => metadata.Location is
-                { StreetName: not null, City: not null, State: not null, Country: not null, Continent: not null },
+            { StreetName: not null, City: not null, State: not null, Country: not null, Continent: not null },
             LocationResolution.City => metadata.Location is
-                { City: not null, State: not null, Country: not null, Continent: not null },
+            { City: not null, State: not null, Country: not null, Continent: not null },
             LocationResolution.State => metadata.Location is { State: not null, Country: not null, Continent: not null },
             LocationResolution.Country => metadata.Location is { Country: not null, Continent: not null },
             LocationResolution.Continent => metadata.Location.Continent != null,

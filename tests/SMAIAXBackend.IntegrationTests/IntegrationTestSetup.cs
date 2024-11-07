@@ -17,6 +17,7 @@ internal static class IntegrationTestSetup
     public static ApplicationDbContext ApplicationDbContext { get; private set; } = null!;
     public static ISmartMeterRepository SmartMeterRepository { get; private set; } = null!;
     public static IPolicyRepository PolicyRepository { get; private set; } = null!;
+    public static IPolicyRequestRepository PolicyRequestRepository { get; private set; } = null!;
     public static IUserRepository UserRepository { get; private set; } = null!;
     public static HttpClient HttpClient { get; private set; } = null!;
     public static string AccessToken { get; private set; } = null!;
@@ -43,6 +44,7 @@ internal static class IntegrationTestSetup
         ApplicationDbContext = _webAppFactory.Services.GetRequiredService<ApplicationDbContext>();
         SmartMeterRepository = _webAppFactory.Services.GetRequiredService<ISmartMeterRepository>();
         PolicyRepository = _webAppFactory.Services.GetRequiredService<IPolicyRepository>();
+        PolicyRequestRepository = _webAppFactory.Services.GetRequiredService<IPolicyRequestRepository>();
         UserRepository = _webAppFactory.Services.GetRequiredService<IUserRepository>();
 
         var tokenRepository = _webAppFactory.Services.GetRequiredService<ITokenRepository>();
