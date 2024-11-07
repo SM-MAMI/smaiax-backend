@@ -26,22 +26,22 @@ public class PolicyRequestConfiguration : IEntityTypeConfiguration<PolicyRequest
 
         builder.OwnsOne(p => p.PolicyFilter, policyFilter =>
         {
-            policyFilter.Property(pf => pf.MeasurementResolution).HasColumnName("MeasurementResolution")
+            policyFilter.Property(pf => pf.MeasurementResolution).HasColumnName("measurementResolution")
                 .HasConversion<string>().IsRequired();
 
-            policyFilter.Property(pf => pf.MinHouseHoldSize).HasColumnName("MinHouseHoldSize").IsRequired();
+            policyFilter.Property(pf => pf.MinHouseHoldSize).HasColumnName("minHouseHoldSize").IsRequired();
 
-            policyFilter.Property(pf => pf.MaxHouseHoldSize).HasColumnName("MaxHouseHoldSize").IsRequired();
+            policyFilter.Property(pf => pf.MaxHouseHoldSize).HasColumnName("maxHouseHoldSize").IsRequired();
 
-            policyFilter.Property(pf => pf.Locations).HasConversion<string>(
+            policyFilter.Property(pf => pf.Locations).HasColumnName("locations").HasConversion<string>(
                 v => JsonConvert.SerializeObject(v),
                 v => JsonConvert.DeserializeObject<List<Location>>(v)!
             );
 
-            policyFilter.Property(pf => pf.LocationResolution).HasColumnName("LocationResolution")
+            policyFilter.Property(pf => pf.LocationResolution).HasColumnName("locationResolution")
                 .HasConversion<string>().IsRequired();
 
-            policyFilter.Property(pf => pf.MaxPrice).HasColumnName("MaxPrice").IsRequired();
+            policyFilter.Property(pf => pf.MaxPrice).HasColumnName("maxPrice").IsRequired();
         });
 
         builder.Property(p => p.State).HasConversion<string>().IsRequired();
