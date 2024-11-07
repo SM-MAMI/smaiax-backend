@@ -16,18 +16,14 @@ public class SmartMeterRepository(ITenantDbContextFactory tenantDbContextFactory
 
     public async Task AddAsync(SmartMeter meter, Tenant tenant)
     {
-        var tenantDbContext =
-            tenantDbContextFactory.CreateDbContext(tenant.DatabaseName, tenant.DatabaseUsername,
-                tenant.DatabasePassword);
+        var tenantDbContext = tenantDbContextFactory.CreateDbContext(tenant);
         await tenantDbContext.SmartMeters.AddAsync(meter);
         await tenantDbContext.SaveChangesAsync();
     }
 
     public Task<List<SmartMeter>> GetSmartMetersAsync(Tenant tenant)
     {
-        var tenantDbContext =
-            tenantDbContextFactory.CreateDbContext(tenant.DatabaseName, tenant.DatabaseUsername,
-                tenant.DatabasePassword);
+        var tenantDbContext = tenantDbContextFactory.CreateDbContext(tenant);
         return tenantDbContext.SmartMeters
             .Include(sm => sm.Metadata)
             .Include(sm => sm.Policies)
@@ -36,9 +32,7 @@ public class SmartMeterRepository(ITenantDbContextFactory tenantDbContextFactory
 
     public Task<SmartMeter?> GetSmartMeterByIdAsync(SmartMeterId smartMeterId, Tenant tenant)
     {
-        var tenantDbContext =
-            tenantDbContextFactory.CreateDbContext(tenant.DatabaseName, tenant.DatabaseUsername,
-                tenant.DatabasePassword);
+        var tenantDbContext = tenantDbContextFactory.CreateDbContext(tenant);
         return tenantDbContext.SmartMeters
             .Include(sm => sm.Metadata)
             .Include(sm => sm.Policies)
