@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
 using Moq;
@@ -7,7 +6,6 @@ using SMAIAXBackend.Application.Exceptions;
 using SMAIAXBackend.Application.Services.Implementations;
 using SMAIAXBackend.Application.Services.Interfaces;
 using SMAIAXBackend.Domain.Model.Entities;
-using SMAIAXBackend.Domain.Model.ValueObjects;
 using SMAIAXBackend.Domain.Model.ValueObjects.Ids;
 using SMAIAXBackend.Domain.Repositories;
 
@@ -17,9 +15,7 @@ namespace SMAIAXBackend.Application.UnitTests;
 public class SmartMeterListServiceTests
 {
     private Mock<ISmartMeterRepository> _smartMeterRepositoryMock;
-    private Mock<ITenantRepository> _tenantRepositoryMock;
-    private Mock<IUserValidationService> _userValidationServiceMock;
-    private Mock<IHttpContextAccessor> _httpContextAccessorMock;
+    private Mock<ITenantContextService> _tenantContextServiceMock;
     private Mock<ILogger<SmartMeterListService>> _loggerMock;
     private SmartMeterListService _smartMeterListService;
 
@@ -27,13 +23,11 @@ public class SmartMeterListServiceTests
     public void Setup()
     {
         _smartMeterRepositoryMock = new Mock<ISmartMeterRepository>();
-        _tenantRepositoryMock = new Mock<ITenantRepository>();
-        _userValidationServiceMock = new Mock<IUserValidationService>();
-        _httpContextAccessorMock = new Mock<IHttpContextAccessor>();
+        _tenantContextServiceMock = new Mock<ITenantContextService>();
         _loggerMock = new Mock<ILogger<SmartMeterListService>>();
         _smartMeterListService =
-            new SmartMeterListService(_smartMeterRepositoryMock.Object, _tenantRepositoryMock.Object,
-                _userValidationServiceMock.Object, _httpContextAccessorMock.Object, _loggerMock.Object);
+            new SmartMeterListService(_smartMeterRepositoryMock.Object, _tenantContextServiceMock.Object,
+                _loggerMock.Object);
     }
 
     [Test]
@@ -41,18 +35,13 @@ public class SmartMeterListServiceTests
     {
         // Given
         var tenant = Tenant.Create(new TenantId(Guid.NewGuid()), "test", "test", "test");
-        var user = User.Create(new UserId(Guid.NewGuid()), new Name("Test", "Test"), "test", "test@example.com",
-            tenant.Id);
-        var smartMetersExpected = new List<SmartMeter>()
+        var smartMetersExpected = new List<SmartMeter>
         {
-            SmartMeter.Create(new SmartMeterId(Guid.NewGuid()), "Smart Meter 1", user.Id),
-            SmartMeter.Create(new SmartMeterId(Guid.NewGuid()), "Smart Meter 2", user.Id)
+            SmartMeter.Create(new SmartMeterId(Guid.NewGuid()), "Smart Meter 1"),
+            SmartMeter.Create(new SmartMeterId(Guid.NewGuid()), "Smart Meter 2")
         };
 
-        _httpContextAccessorMock.Setup(accessor => accessor.HttpContext!.Items["UserId"]).Returns(user.Id.ToString());
-        _userValidationServiceMock.Setup(service => service.ValidateUserAsync(user.Id.ToString()))
-            .ReturnsAsync(user);
-        _tenantRepositoryMock.Setup(repo => repo.GetByIdAsync(tenant.Id)).ReturnsAsync(tenant);
+        _tenantContextServiceMock.Setup(service => service.GetCurrentTenantAsync()).ReturnsAsync(tenant);
         _smartMeterRepositoryMock.Setup(repo => repo.GetSmartMetersAsync(tenant))
             .ReturnsAsync(smartMetersExpected);
 
@@ -82,14 +71,9 @@ public class SmartMeterListServiceTests
         // Given
         var smartMeterId = Guid.NewGuid();
         var tenant = Tenant.Create(new TenantId(Guid.NewGuid()), "test", "test", "test");
-        var user = User.Create(new UserId(Guid.NewGuid()), new Name("Test", "Test"), "test", "test@example.com",
-            tenant.Id);
-        var smartMeterExpected = SmartMeter.Create(new SmartMeterId(smartMeterId), "Smart Meter 1", user.Id);
+        var smartMeterExpected = SmartMeter.Create(new SmartMeterId(smartMeterId), "Smart Meter 1");
 
-        _httpContextAccessorMock.Setup(accessor => accessor.HttpContext!.Items["UserId"]).Returns(user.Id.ToString());
-        _userValidationServiceMock.Setup(service => service.ValidateUserAsync(user.Id.ToString()))
-            .ReturnsAsync(user);
-        _tenantRepositoryMock.Setup(repo => repo.GetByIdAsync(tenant.Id)).ReturnsAsync(tenant);
+        _tenantContextServiceMock.Setup(service => service.GetCurrentTenantAsync()).ReturnsAsync(tenant);
         _smartMeterRepositoryMock.Setup(repo => repo.GetSmartMeterByIdAsync(smartMeterExpected.Id, tenant))
             .ReturnsAsync(smartMeterExpected);
 
@@ -115,13 +99,8 @@ public class SmartMeterListServiceTests
         // Given
         var smartMeterId = new SmartMeterId(Guid.NewGuid());
         var tenant = Tenant.Create(new TenantId(Guid.NewGuid()), "test", "test", "test");
-        var user = User.Create(new UserId(Guid.NewGuid()), new Name("Test", "Test"), "test", "test@example.com",
-            tenant.Id);
 
-        _httpContextAccessorMock.Setup(accessor => accessor.HttpContext!.Items["UserId"]).Returns(user.Id.ToString());
-        _userValidationServiceMock.Setup(service => service.ValidateUserAsync(user.Id.ToString()))
-            .ReturnsAsync(user);
-        _tenantRepositoryMock.Setup(repo => repo.GetByIdAsync(tenant.Id)).ReturnsAsync(tenant);
+        _tenantContextServiceMock.Setup(service => service.GetCurrentTenantAsync()).ReturnsAsync(tenant);
         _smartMeterRepositoryMock.Setup(repo => repo.GetSmartMeterByIdAsync(smartMeterId, tenant))
             .ReturnsAsync((SmartMeter)null!);
 

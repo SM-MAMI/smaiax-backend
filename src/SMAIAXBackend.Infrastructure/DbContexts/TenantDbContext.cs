@@ -29,9 +29,8 @@ public class TenantDbContext(DbContextOptions<TenantDbContext> options) : DbCont
     
     public async Task SeedTestData()
     {
-        var userId = new UserId(Guid.Parse("3c07065a-b964-44a9-9cdf-fbd49d755ea7"));
-        var smartMeter1 = SmartMeter.Create(new SmartMeterId(Guid.NewGuid()), "Smart Meter 1", userId);
-        var smartMeter2 = SmartMeter.Create(new SmartMeterId(Guid.NewGuid()), "Smart Meter 2", userId);
+        var smartMeter1 = SmartMeter.Create(new SmartMeterId(Guid.NewGuid()), "Smart Meter 1");
+        var smartMeter2 = SmartMeter.Create(new SmartMeterId(Guid.NewGuid()), "Smart Meter 2");
         
         await SmartMeters.AddAsync(smartMeter1);
         await SmartMeters.AddAsync(smartMeter2);

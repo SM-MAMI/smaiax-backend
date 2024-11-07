@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
 using SMAIAXBackend.Application.DTOs;
@@ -11,9 +10,7 @@ namespace SMAIAXBackend.Application.Services.Implementations;
 
 public class SmartMeterUpdateService(
     ISmartMeterRepository smartMeterRepository,
-    ITenantRepository tenantRepository,
-    IUserValidationService userValidationService,
-    IHttpContextAccessor httpContextAccessor,
+    ITenantContextService tenantContextService,
     ILogger<SmartMeterUpdateService> logger) : ISmartMeterUpdateService
 {
     public async Task<Guid> UpdateSmartMeterAsync(
@@ -28,25 +25,16 @@ public class SmartMeterUpdateService(
             throw new SmartMeterIdMismatchException(smartMeterIdExpected, smartMeterUpdateDto.Id);
         }
 
-        var userId = httpContextAccessor.HttpContext?.Items["UserId"]?.ToString();
-        var user = await userValidationService.ValidateUserAsync(userId);
-        var tenant = await tenantRepository.GetByIdAsync(user.TenantId);
-
-        if (tenant == null)
-        {
-            logger.LogWarning("Tenant with id '{TenantId}' not found for user with id '{UserId}'.", user.TenantId.Id, user.Id.Id);
-            throw new TenantNotFoundException(user.TenantId.Id, user.Id.Id);
-        }
-
+        var tenant = await tenantContextService.GetCurrentTenantAsync();
         var smartMeter =
             await smartMeterRepository.GetSmartMeterByIdAsync(new SmartMeterId(smartMeterIdExpected),
                 tenant);
 
         if (smartMeter == null)
         {
-            logger.LogWarning("SmartMeter not found for id `{SmartMeterId}` and userId `{validatedUserId}`",
-                smartMeterIdExpected, user.Id);
-            throw new SmartMeterNotFoundException(smartMeterIdExpected, user.Id.Id);
+            logger.LogError("Smart meter with id '{SmartMeterId} not found for tenant with id '{TenantId}'.", smartMeterIdExpected,
+                tenant.Id);
+            throw new SmartMeterNotFoundException(smartMeterIdExpected, tenant.Id.Id);
         }
 
         smartMeter.Update(smartMeterUpdateDto.Name);

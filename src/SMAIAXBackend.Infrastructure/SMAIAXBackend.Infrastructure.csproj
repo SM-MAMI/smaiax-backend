@@ -25,5 +25,9 @@
       <ProjectReference Include="..\SMAIAXBackend.Application\SMAIAXBackend.Application.csproj" />
       <ProjectReference Include="..\SMAIAXBackend.Domain\SMAIAXBackend.Domain.csproj" />
     </ItemGroup>
+    
+    <ItemGroup>
+      <Folder Include="Migrations\TenantDb\" />
+    </ItemGroup>
 
 </Project>

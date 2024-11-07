@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
 using SMAIAXBackend.Application.Exceptions;
@@ -8,10 +9,15 @@ using SMAIAXBackend.Domain.Repositories;
 
 namespace SMAIAXBackend.Application.Services.Implementations;
 
-public class UserValidationService(IUserRepository userRepository, ILogger<UserValidationService> logger) : IUserValidationService
+public class TenantContextService(
+    ITenantRepository tenantRepository,
+    IUserRepository userRepository,
+    IHttpContextAccessor httpContextAccessor,
+    ILogger<TenantContextService> logger) : ITenantContextService
 {
-    public async Task<User> ValidateUserAsync(string? userId)
+    public async Task<Tenant> GetCurrentTenantAsync()
     {
+        var userId = httpContextAccessor.HttpContext?.Items["UserId"]?.ToString();
         if (string.IsNullOrEmpty(userId))
         {
             logger.LogWarning("No user claim found in claims principal.");
@@ -32,6 +38,15 @@ public class UserValidationService(IUserRepository userRepository, ILogger<UserV
             throw new UserNotFoundException(userIdGuid);
         }
 
-        return user;
+        var tenant = await tenantRepository.GetByIdAsync(user.TenantId);
+
+        if (tenant == null)
+        {
+            logger.LogWarning("Tenant with id '{TenantId}' not found for user with id '{UserId}'.", user.TenantId.Id,
+                user.Id.Id);
+            throw new TenantNotFoundException(user.TenantId.Id, user.Id.Id);
+        }
+
+        return tenant;
     }
 }

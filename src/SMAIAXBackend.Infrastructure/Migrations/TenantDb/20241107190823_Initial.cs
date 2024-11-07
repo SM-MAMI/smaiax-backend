@@ -92,8 +92,7 @@ namespace SMAIAXBackend.Infrastructure.Migrations.TenantDb
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
-                    name = table.Column<string>(type: "text", nullable: false),
-                    userId = table.Column<Guid>(type: "uuid", nullable: false)
+                    name = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {

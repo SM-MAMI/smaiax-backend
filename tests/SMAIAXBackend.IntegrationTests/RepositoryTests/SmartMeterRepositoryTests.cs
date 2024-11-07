@@ -12,8 +12,7 @@ public class SmartMeterRepositoryTests : TestBase
     public async Task GivenSmartMeter_WhenAdd_ThenExpectedSmartMeterIsPersisted()
     {
         // Given
-        var smartMeterExpected = SmartMeter.Create(new SmartMeterId(Guid.NewGuid()), "Test",
-            new UserId(Guid.Parse("3c07065a-b964-44a9-9cdf-fbd49d755ea7")));
+        var smartMeterExpected = SmartMeter.Create(new SmartMeterId(Guid.NewGuid()), "Test");
         var tenant = Tenant.Create(new TenantId(Guid.Parse("f4c70232-6715-4c15-966f-bf4bcef46d39")), "johndoe",
             "P@ssw0rd", "tenant_1_db");
 
@@ -29,7 +28,6 @@ public class SmartMeterRepositoryTests : TestBase
         {
             Assert.That(smartMeterActual.Id, Is.EqualTo(smartMeterExpected.Id));
             Assert.That(smartMeterActual.Name, Is.EqualTo(smartMeterExpected.Name));
-            Assert.That(smartMeterActual.UserId, Is.EqualTo(smartMeterExpected.UserId));
         });
     }
 
@@ -39,13 +37,10 @@ public class SmartMeterRepositoryTests : TestBase
         // Given
         var tenant = Tenant.Create(new TenantId(Guid.Parse("f4c70232-6715-4c15-966f-bf4bcef46d39")), "johndoe",
             "P@ssw0rd", "tenant_1_db");
-        var userId = new UserId(Guid.Parse("3c07065a-b964-44a9-9cdf-fbd49d755ea7"));
         var smartMetersExpected = new List<SmartMeter>()
         {
-            SmartMeter.Create(new SmartMeterId(Guid.Parse("5e9db066-1b47-46cc-bbde-0b54c30167cd")), "Smart Meter 1",
-                userId),
-            SmartMeter.Create(new SmartMeterId(Guid.Parse("f4c70232-6715-4c15-966f-bf4bcef46d39")), "Smart Meter 2",
-                userId)
+            SmartMeter.Create(new SmartMeterId(Guid.Parse("5e9db066-1b47-46cc-bbde-0b54c30167cd")), "Smart Meter 1"),
+            SmartMeter.Create(new SmartMeterId(Guid.Parse("f4c70232-6715-4c15-966f-bf4bcef46d39")), "Smart Meter 2")
         };
 
         // When
@@ -61,7 +56,6 @@ public class SmartMeterRepositoryTests : TestBase
             {
                 Assert.That(smartMetersActual[i].Id, Is.EqualTo(smartMetersExpected[i].Id));
                 Assert.That(smartMetersActual[i].Name, Is.EqualTo(smartMetersExpected[i].Name));
-                Assert.That(smartMetersActual[i].UserId, Is.EqualTo(smartMetersExpected[i].UserId));
             });
         }
     }
@@ -72,9 +66,8 @@ public class SmartMeterRepositoryTests : TestBase
         // Given
         var tenant = Tenant.Create(new TenantId(Guid.Parse("f4c70232-6715-4c15-966f-bf4bcef46d39")), "johndoe",
             "P@ssw0rd", "tenant_1_db");
-        var userId = new UserId(Guid.Parse("3c07065a-b964-44a9-9cdf-fbd49d755ea7"));
         var smartMeterExpected = SmartMeter.Create(new SmartMeterId(Guid.Parse("5e9db066-1b47-46cc-bbde-0b54c30167cd")),
-            "Smart Meter 1", userId);
+            "Smart Meter 1");
 
         // When
         var smartMeterActual = await _smartMeterRepository.GetSmartMeterByIdAsync(smartMeterExpected.Id, tenant);
@@ -85,7 +78,6 @@ public class SmartMeterRepositoryTests : TestBase
         {
             Assert.That(smartMeterActual.Id, Is.EqualTo(smartMeterExpected.Id));
             Assert.That(smartMeterActual.Name, Is.EqualTo(smartMeterExpected.Name));
-            Assert.That(smartMeterActual.UserId, Is.EqualTo(smartMeterExpected.UserId));
         });
     }
 
@@ -97,7 +89,7 @@ public class SmartMeterRepositoryTests : TestBase
             "P@ssw0rd", "tenant_1_db");
         const string name = "Smart Meter 1";
         var smartMeterExpected = SmartMeter.Create(new SmartMeterId(Guid.Parse("5e9db066-1b47-46cc-bbde-0b54c30167cd")),
-            "Smart Meter 1 Updated", new UserId(Guid.Parse("3c07065a-b964-44a9-9cdf-fbd49d755ea7")));
+            "Smart Meter 1 Updated");
 
         // When
         await _smartMeterRepository.UpdateAsync(smartMeterExpected, tenant);

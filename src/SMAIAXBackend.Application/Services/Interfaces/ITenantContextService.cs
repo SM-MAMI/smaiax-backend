@@ -2,7 +2,7 @@ using SMAIAXBackend.Domain.Model.Entities;
 
 namespace SMAIAXBackend.Application.Services.Interfaces;
 
-public interface IUserValidationService
+public interface ITenantContextService
 {
-    Task<User> ValidateUserAsync(string? userId);
+    Task<Tenant> GetCurrentTenantAsync();
 }

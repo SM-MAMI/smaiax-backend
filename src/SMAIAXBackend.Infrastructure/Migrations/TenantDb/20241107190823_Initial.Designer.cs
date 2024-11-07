@@ -12,7 +12,7 @@ using SMAIAXBackend.Infrastructure.DbContexts;
 namespace SMAIAXBackend.Infrastructure.Migrations.TenantDb
 {
     [DbContext(typeof(TenantDbContext))]
-    [Migration("20241105210332_Initial")]
+    [Migration("20241107190823_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -150,10 +150,6 @@ namespace SMAIAXBackend.Infrastructure.Migrations.TenantDb
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("name");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("userId");
 
                     b.HasKey("Id")
                         .HasName("pK_SmartMeter");

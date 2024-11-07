@@ -30,6 +30,21 @@ public static class DatabaseExtensions
             options.UseNpgsql(connectionStringBuilder.ConnectionString);
         });
         
+        // This is needed to create migrations for the TenantDbContext
+        services.AddDbContext<TenantDbContext>(options =>
+        {
+            var dbConfig = configuration.GetSection("DatabaseConfiguration").Get<DatabaseConfiguration>();
+            var connectionStringBuilder = new NpgsqlConnectionStringBuilder
+            {
+                Host = dbConfig!.Host,
+                Port = dbConfig.Port,
+                Username = dbConfig.SuperUsername,
+                Password = dbConfig.SuperUserPassword,
+                Database = "tenant_template_db"
+            };
+            options.UseNpgsql(connectionStringBuilder.ConnectionString);
+        });
+        
         services.AddScoped<ITenantDbContextFactory, TenantDbContextFactory>();
     }
 }

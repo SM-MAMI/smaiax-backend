@@ -120,9 +120,9 @@ public class TestBase
         );
 
         var smartMeter1 = SmartMeter.Create(new SmartMeterId(Guid.Parse("5e9db066-1b47-46cc-bbde-0b54c30167cd")),
-            "Smart Meter 1", domainUser.Id);
+            "Smart Meter 1");
         var smartMeter2 = SmartMeter.Create(new SmartMeterId(Guid.Parse("f4c70232-6715-4c15-966f-bf4bcef46d39")),
-            "Smart Meter 2", domainUser.Id);
+            "Smart Meter 2");
 
         await _applicationDbContext.Tenants.AddAsync(tenant);
         await _applicationDbContext.Users.AddAsync(testUser);

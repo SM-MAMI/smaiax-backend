@@ -148,10 +148,6 @@ namespace SMAIAXBackend.Infrastructure.Migrations.TenantDb
                         .HasColumnType("text")
                         .HasColumnName("name");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("userId");
-
                     b.HasKey("Id")
                         .HasName("pK_SmartMeter");
 
