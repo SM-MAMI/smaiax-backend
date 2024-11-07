@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
 using SMAIAXBackend.Application.DTOs;
@@ -12,12 +13,12 @@ public class SmartMeterUpdateService(
     ISmartMeterRepository smartMeterRepository,
     ITenantRepository tenantRepository,
     IUserValidationService userValidationService,
+    IHttpContextAccessor httpContextAccessor,
     ILogger<SmartMeterUpdateService> logger) : ISmartMeterUpdateService
 {
     public async Task<Guid> UpdateSmartMeterAsync(
         Guid smartMeterIdExpected,
-        SmartMeterUpdateDto smartMeterUpdateDto,
-        string? userId)
+        SmartMeterUpdateDto smartMeterUpdateDto)
     {
         if (smartMeterIdExpected != smartMeterUpdateDto.Id)
         {
@@ -27,6 +28,7 @@ public class SmartMeterUpdateService(
             throw new SmartMeterIdMismatchException(smartMeterIdExpected, smartMeterUpdateDto.Id);
         }
 
+        var userId = httpContextAccessor.HttpContext?.Items["UserId"]?.ToString();
         var user = await userValidationService.ValidateUserAsync(userId);
         var tenant = await tenantRepository.GetByIdAsync(user.TenantId);
 

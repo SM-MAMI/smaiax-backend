@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
 using SMAIAXBackend.Application.DTOs;
@@ -12,10 +13,12 @@ public class SmartMeterCreateService(
     ISmartMeterRepository smartMeterRepository,
     ITenantRepository tenantRepository,
     IUserValidationService userValidationService,
+    IHttpContextAccessor httpContextAccessor,
     ILogger<SmartMeterCreateService> logger) : ISmartMeterCreateService
 {
-    public async Task<Guid> AddSmartMeterAsync(SmartMeterCreateDto smartMeterCreateDto, string? userId)
+    public async Task<Guid> AddSmartMeterAsync(SmartMeterCreateDto smartMeterCreateDto)
     {
+        var userId = httpContextAccessor.HttpContext?.Items["UserId"]?.ToString();
         var user = await userValidationService.ValidateUserAsync(userId);
         var tenant = await tenantRepository.GetByIdAsync(user.TenantId);
 

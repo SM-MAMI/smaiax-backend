@@ -1,5 +1,3 @@
-using System.Security.Claims;
-
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,11 +11,9 @@ public static class UpdateSmartMeterEndpoint
     public static async Task<Results<Ok<Guid>, ProblemHttpResult>> Handle(
         ISmartMeterUpdateService smartMeterUpdateService,
         [FromRoute] Guid id,
-        [FromBody] SmartMeterUpdateDto smartMeterUpdateDto,
-        ClaimsPrincipal user)
+        [FromBody] SmartMeterUpdateDto smartMeterUpdateDto)
     {
-        var userIdClaim = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-        var smartMeterId = await smartMeterUpdateService.UpdateSmartMeterAsync(id, smartMeterUpdateDto, userIdClaim);
+        var smartMeterId = await smartMeterUpdateService.UpdateSmartMeterAsync(id, smartMeterUpdateDto);
 
         return TypedResults.Ok(smartMeterId);
     }

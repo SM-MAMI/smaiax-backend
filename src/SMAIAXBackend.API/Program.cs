@@ -2,10 +2,10 @@ using System.Diagnostics.CodeAnalysis;
 
 using Microsoft.EntityFrameworkCore;
 
-using SMAIAXBackend.API;
 using SMAIAXBackend.API.ApplicationConfigurations;
 using SMAIAXBackend.API.Endpoints.Authentication;
 using SMAIAXBackend.API.Endpoints.SmartMeter;
+using SMAIAXBackend.API.Middlewares;
 using SMAIAXBackend.Domain.Repositories;
 using SMAIAXBackend.Infrastructure.Configurations;
 using SMAIAXBackend.Infrastructure.DbContexts;
@@ -20,7 +20,8 @@ builder.Services.AddJwtAuthentication(builder.Configuration);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddProblemDetails();
-builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddExceptionHandler<ExceptionHandlerMiddleware>();
+builder.Services.AddHttpContextAccessor();
 
 // Add Swagger if in development environment
 if (builder.Environment.IsDevelopment() || builder.Environment.IsEnvironment("DockerDevelopment"))
@@ -75,9 +76,10 @@ if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("DockerDeve
     await tenantDbContext.SeedTestData();
 }
 
-app.UseExceptionHandler();
-app.UseHttpsRedirection();
 app.UseAuthorization();
+app.UseMiddleware<JwtClaimMiddleware>();
+app.UseHttpsRedirection();
+app.UseExceptionHandler();
 app.MapAuthenticationEndpoints()
     .MapSmartMeterEndpoints();
 

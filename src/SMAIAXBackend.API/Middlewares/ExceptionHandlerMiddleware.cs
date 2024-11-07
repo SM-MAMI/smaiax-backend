@@ -3,9 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 
 using SMAIAXBackend.Application.Exceptions;
 
-namespace SMAIAXBackend.API;
+namespace SMAIAXBackend.API.Middlewares;
 
-public class GlobalExceptionHandler : IExceptionHandler
+public class ExceptionHandlerMiddleware : IExceptionHandler
 {
     public async ValueTask<bool> TryHandleAsync(
         HttpContext httpContext,

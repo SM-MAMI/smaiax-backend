@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
 using Moq;
@@ -19,6 +20,7 @@ public class SmartMeterUpdateTests
     private Mock<ISmartMeterRepository> _smartMeterRepositoryMock;
     private Mock<ITenantRepository> _tenantRepositoryMock;
     private Mock<IUserValidationService> _userValidationServiceMock;
+    private Mock<IHttpContextAccessor> _httpContextAccessorMock;
     private Mock<ILogger<SmartMeterUpdateService>> _loggerMock;
     private SmartMeterUpdateService _smartMeterUpdateService;
 
@@ -28,9 +30,11 @@ public class SmartMeterUpdateTests
         _smartMeterRepositoryMock = new Mock<ISmartMeterRepository>();
         _tenantRepositoryMock = new Mock<ITenantRepository>();
         _userValidationServiceMock = new Mock<IUserValidationService>();
+        _httpContextAccessorMock = new Mock<IHttpContextAccessor>();
         _loggerMock = new Mock<ILogger<SmartMeterUpdateService>>();
-        _smartMeterUpdateService = new SmartMeterUpdateService(_smartMeterRepositoryMock.Object, 
-            _tenantRepositoryMock.Object, _userValidationServiceMock.Object, _loggerMock.Object);
+        _smartMeterUpdateService = new SmartMeterUpdateService(_smartMeterRepositoryMock.Object,
+            _tenantRepositoryMock.Object, _userValidationServiceMock.Object, _httpContextAccessorMock.Object,
+            _loggerMock.Object);
     }
 
     [Test]
@@ -44,6 +48,7 @@ public class SmartMeterUpdateTests
             tenant.Id);
         var smartMeter = SmartMeter.Create(new SmartMeterId(smartMeterIdExpected), "Name", user.Id);
 
+        _httpContextAccessorMock.Setup(accessor => accessor.HttpContext!.Items["UserId"]).Returns(user.Id.ToString());
         _userValidationServiceMock.Setup(service => service.ValidateUserAsync(user.Id.ToString()))
             .ReturnsAsync(user);
         _tenantRepositoryMock.Setup(repo => repo.GetByIdAsync(tenant.Id)).ReturnsAsync(tenant);
@@ -53,8 +58,7 @@ public class SmartMeterUpdateTests
 
         // When
         Guid smartMeterIdActual =
-            await _smartMeterUpdateService.UpdateSmartMeterAsync(smartMeterIdExpected, smartMeterUpdateDto,
-                user.Id.ToString());
+            await _smartMeterUpdateService.UpdateSmartMeterAsync(smartMeterIdExpected, smartMeterUpdateDto);
 
         // Then
         Assert.That(smartMeterIdActual, Is.EqualTo(smartMeterIdExpected));
@@ -70,16 +74,18 @@ public class SmartMeterUpdateTests
         var user = User.Create(new UserId(Guid.NewGuid()), new Name("Test", "Test"), "test", "test@example.com",
             tenant.Id);
 
+        _httpContextAccessorMock.Setup(accessor => accessor.HttpContext!.Items["UserId"]).Returns(user.Id.ToString());
         _userValidationServiceMock.Setup(service => service.ValidateUserAsync(user.Id.ToString()))
             .ReturnsAsync(user);
 
         // When ... Then
         Assert.ThrowsAsync<SmartMeterIdMismatchException>(async () =>
-            await _smartMeterUpdateService.UpdateSmartMeterAsync(smartMeterIdExpected, smartMeterUpdateDto, user.Id.ToString()));
+            await _smartMeterUpdateService.UpdateSmartMeterAsync(smartMeterIdExpected, smartMeterUpdateDto));
     }
 
     [Test]
-    public void GivenNonExistentSmartMeterIdAndSmartMeterUpdateDtoAndUserId_WhenUpdateSmartMeter_ThenSmartMeterNotFoundExceptionIsThrown()
+    public void
+        GivenNonExistentSmartMeterIdAndSmartMeterUpdateDtoAndUserId_WhenUpdateSmartMeter_ThenSmartMeterNotFoundExceptionIsThrown()
     {
         // Given
         var smartMeterIdExpected = Guid.NewGuid();
@@ -88,6 +94,7 @@ public class SmartMeterUpdateTests
         var user = User.Create(new UserId(Guid.NewGuid()), new Name("Test", "Test"), "test", "test@example.com",
             tenant.Id);
 
+        _httpContextAccessorMock.Setup(accessor => accessor.HttpContext!.Items["UserId"]).Returns(user.Id.ToString());
         _userValidationServiceMock.Setup(service => service.ValidateUserAsync(user.Id.ToString()))
             .ReturnsAsync(user);
         _tenantRepositoryMock.Setup(repo => repo.GetByIdAsync(tenant.Id)).ReturnsAsync(tenant);
@@ -97,6 +104,6 @@ public class SmartMeterUpdateTests
 
         // When ... Then
         Assert.ThrowsAsync<SmartMeterNotFoundException>(async () =>
-            await _smartMeterUpdateService.UpdateSmartMeterAsync(smartMeterIdExpected, smartMeterUpdateDto, user.Id.ToString()));
+            await _smartMeterUpdateService.UpdateSmartMeterAsync(smartMeterIdExpected, smartMeterUpdateDto));
     }
 }

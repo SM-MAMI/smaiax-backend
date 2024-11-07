@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
 using Moq;
@@ -18,6 +19,7 @@ public class SmartMeterCreateServiceTests
     private Mock<ISmartMeterRepository> _smartMeterRepositoryMock;
     private Mock<ITenantRepository> _tenantRepositoryMock;
     private Mock<IUserValidationService> _userValidationServiceMock;
+    private Mock<IHttpContextAccessor> _httpContextAccessorMock;
     private Mock<ILogger<SmartMeterCreateService>> _loggerMock;
     private SmartMeterCreateService _smartMeterCreateService;
 
@@ -27,9 +29,11 @@ public class SmartMeterCreateServiceTests
         _smartMeterRepositoryMock = new Mock<ISmartMeterRepository>();
         _tenantRepositoryMock = new Mock<ITenantRepository>();
         _userValidationServiceMock = new Mock<IUserValidationService>();
+        _httpContextAccessorMock = new Mock<IHttpContextAccessor>();
         _loggerMock = new Mock<ILogger<SmartMeterCreateService>>();
         _smartMeterCreateService = new SmartMeterCreateService(_smartMeterRepositoryMock.Object,
-            _tenantRepositoryMock.Object, _userValidationServiceMock.Object, _loggerMock.Object);
+            _tenantRepositoryMock.Object, _userValidationServiceMock.Object, _httpContextAccessorMock.Object,
+            _loggerMock.Object);
     }
 
     [Test]
@@ -42,6 +46,7 @@ public class SmartMeterCreateServiceTests
         var user = User.Create(new UserId(Guid.NewGuid()), new Name("Test", "Test"), "test", "test@example.com",
             tenant.Id);
 
+        _httpContextAccessorMock.Setup(accessor => accessor.HttpContext!.Items["UserId"]).Returns(user.Id.ToString());
         _userValidationServiceMock.Setup(service => service.ValidateUserAsync(user.Id.ToString()))
             .ReturnsAsync(user);
         _tenantRepositoryMock.Setup(repo => repo.GetByIdAsync(tenant.Id)).ReturnsAsync(tenant);
@@ -49,7 +54,7 @@ public class SmartMeterCreateServiceTests
 
         // When
         var smartMeterIdActual =
-            await _smartMeterCreateService.AddSmartMeterAsync(smartMeterCreateDto, user.Id.ToString());
+            await _smartMeterCreateService.AddSmartMeterAsync(smartMeterCreateDto);
 
         // Then
         Assert.That(smartMeterIdActual, Is.EqualTo(smartMeterIdExpected.Id));

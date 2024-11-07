@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
 using Moq;
@@ -18,6 +19,7 @@ public class SmartMeterListServiceTests
     private Mock<ISmartMeterRepository> _smartMeterRepositoryMock;
     private Mock<ITenantRepository> _tenantRepositoryMock;
     private Mock<IUserValidationService> _userValidationServiceMock;
+    private Mock<IHttpContextAccessor> _httpContextAccessorMock;
     private Mock<ILogger<SmartMeterListService>> _loggerMock;
     private SmartMeterListService _smartMeterListService;
 
@@ -27,10 +29,11 @@ public class SmartMeterListServiceTests
         _smartMeterRepositoryMock = new Mock<ISmartMeterRepository>();
         _tenantRepositoryMock = new Mock<ITenantRepository>();
         _userValidationServiceMock = new Mock<IUserValidationService>();
+        _httpContextAccessorMock = new Mock<IHttpContextAccessor>();
         _loggerMock = new Mock<ILogger<SmartMeterListService>>();
         _smartMeterListService =
-            new SmartMeterListService(_smartMeterRepositoryMock.Object, _tenantRepositoryMock.Object, _userValidationServiceMock.Object,
-                _loggerMock.Object);
+            new SmartMeterListService(_smartMeterRepositoryMock.Object, _tenantRepositoryMock.Object,
+                _userValidationServiceMock.Object, _httpContextAccessorMock.Object, _loggerMock.Object);
     }
 
     [Test]
@@ -45,7 +48,8 @@ public class SmartMeterListServiceTests
             SmartMeter.Create(new SmartMeterId(Guid.NewGuid()), "Smart Meter 1", user.Id),
             SmartMeter.Create(new SmartMeterId(Guid.NewGuid()), "Smart Meter 2", user.Id)
         };
-        
+
+        _httpContextAccessorMock.Setup(accessor => accessor.HttpContext!.Items["UserId"]).Returns(user.Id.ToString());
         _userValidationServiceMock.Setup(service => service.ValidateUserAsync(user.Id.ToString()))
             .ReturnsAsync(user);
         _tenantRepositoryMock.Setup(repo => repo.GetByIdAsync(tenant.Id)).ReturnsAsync(tenant);
@@ -53,7 +57,7 @@ public class SmartMeterListServiceTests
             .ReturnsAsync(smartMetersExpected);
 
         // When
-        var smartMetersActual = await _smartMeterListService.GetSmartMetersByUserIdAsync(user.Id.ToString());
+        var smartMetersActual = await _smartMeterListService.GetSmartMetersAsync();
 
         // Then
         Assert.That(smartMetersActual, Is.Not.Null);
@@ -82,6 +86,7 @@ public class SmartMeterListServiceTests
             tenant.Id);
         var smartMeterExpected = SmartMeter.Create(new SmartMeterId(smartMeterId), "Smart Meter 1", user.Id);
 
+        _httpContextAccessorMock.Setup(accessor => accessor.HttpContext!.Items["UserId"]).Returns(user.Id.ToString());
         _userValidationServiceMock.Setup(service => service.ValidateUserAsync(user.Id.ToString()))
             .ReturnsAsync(user);
         _tenantRepositoryMock.Setup(repo => repo.GetByIdAsync(tenant.Id)).ReturnsAsync(tenant);
@@ -90,7 +95,7 @@ public class SmartMeterListServiceTests
 
         // When
         var smartMeterActual =
-            await _smartMeterListService.GetSmartMeterByIdAndUserIdAsync(smartMeterId, user.Id.ToString());
+            await _smartMeterListService.GetSmartMeterByIdAsync(smartMeterId);
 
         // Then
         Assert.That(smartMeterActual, Is.Not.Null);
@@ -113,6 +118,7 @@ public class SmartMeterListServiceTests
         var user = User.Create(new UserId(Guid.NewGuid()), new Name("Test", "Test"), "test", "test@example.com",
             tenant.Id);
 
+        _httpContextAccessorMock.Setup(accessor => accessor.HttpContext!.Items["UserId"]).Returns(user.Id.ToString());
         _userValidationServiceMock.Setup(service => service.ValidateUserAsync(user.Id.ToString()))
             .ReturnsAsync(user);
         _tenantRepositoryMock.Setup(repo => repo.GetByIdAsync(tenant.Id)).ReturnsAsync(tenant);
@@ -121,7 +127,7 @@ public class SmartMeterListServiceTests
 
         // When ... Then
         Assert.ThrowsAsync<SmartMeterNotFoundException>(async () =>
-            await _smartMeterListService.GetSmartMeterByIdAndUserIdAsync(smartMeterId.Id, user.Id.ToString())
+            await _smartMeterListService.GetSmartMeterByIdAsync(smartMeterId.Id)
         );
     }
 }
