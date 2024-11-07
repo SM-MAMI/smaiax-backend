@@ -40,7 +40,7 @@ public class UserValidationServiceTests
         var userIdActual = await _userValidationService.ValidateUserAsync(userIdExpected.Id.ToString());
 
         // Then
-        Assert.That(userIdActual, Is.EqualTo(userIdExpected));
+        Assert.That(userIdActual, Is.EqualTo(user));
     }
 
     [Test]
