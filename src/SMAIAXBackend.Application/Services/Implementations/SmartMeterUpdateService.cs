@@ -32,9 +32,8 @@ public class SmartMeterUpdateService(
 
         if (tenant == null)
         {
-            // TODO: Throw custom exception
-            logger.LogWarning("Tenant not found for user {userId}", userId);
-            throw new Exception("Tenant not found");
+            logger.LogWarning("Tenant with id '{TenantId}' not found for user with id '{UserId}'.", user.TenantId.Id, user.Id.Id);
+            throw new TenantNotFoundException(user.TenantId.Id, user.Id.Id);
         }
 
         var smartMeter =

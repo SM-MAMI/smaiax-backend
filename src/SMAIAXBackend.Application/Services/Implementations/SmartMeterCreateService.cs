@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
 
 using SMAIAXBackend.Application.DTOs;
+using SMAIAXBackend.Application.Exceptions;
 using SMAIAXBackend.Application.Services.Interfaces;
 using SMAIAXBackend.Domain.Model.Entities;
 using SMAIAXBackend.Domain.Repositories;
@@ -20,9 +21,8 @@ public class SmartMeterCreateService(
 
         if (tenant == null)
         {
-            // TODO: Throw custom exception
-            logger.LogWarning("Tenant not found for user {userId}", userId);
-            throw new Exception("Tenant not found");
+            logger.LogWarning("Tenant with id '{TenantId}' not found for user with id '{UserId}'.", user.TenantId.Id, user.Id.Id);
+            throw new TenantNotFoundException(user.TenantId.Id, user.Id.Id);
         }
         
         var smartMeterId = smartMeterRepository.NextIdentity();

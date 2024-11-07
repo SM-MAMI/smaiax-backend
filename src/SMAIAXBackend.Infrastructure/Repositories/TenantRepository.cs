@@ -10,7 +10,7 @@ using SMAIAXBackend.Infrastructure.DbContexts;
 namespace SMAIAXBackend.Infrastructure.Repositories;
 
 public class TenantRepository(
-    ApplicationDbContext applicationDbContext, 
+    ApplicationDbContext applicationDbContext,
     ITenantDbContextFactory tenantDbContextFactory,
     IOptions<DatabaseConfiguration> databaseConfigOptions) : ITenantRepository
 {
@@ -36,56 +36,74 @@ public class TenantRepository(
         return await applicationDbContext.Tenants.FindAsync(tenantId);
     }
 
-    public async Task CreateDatabaseForTenantAsync(string databaseName, string databaseUserName, string databasePassword)
+    public async Task CreateDatabaseForTenantAsync(
+        string databaseName,
+        string databaseUserName,
+        string databasePassword)
     {
-        await applicationDbContext.Database.OpenConnectionAsync();
+        await OpenDatabaseConnectionAsync(applicationDbContext);
+        await CreateDatabaseAsync(databaseName);
+        await CreateUserAsync(databaseUserName, databasePassword);
+        await GrantDatabasePrivilegesAsync(databaseName, databaseUserName);
+        await CloseDatabaseConnectionAsync(applicationDbContext);
         
+        var tenantDbContext = tenantDbContextFactory.CreateDbContext(databaseName,
+            databaseConfigOptions.Value.SuperUsername, databaseConfigOptions.Value.SuperUserPassword);
+        await tenantDbContext.Database.MigrateAsync();
+        
+        await OpenDatabaseConnectionAsync(tenantDbContext);
+        await SetSchemaPrivilegesAsync(tenantDbContext, databaseUserName);
+        await CloseDatabaseConnectionAsync(tenantDbContext);
+    }
+
+    private static async Task OpenDatabaseConnectionAsync(DbContext dbContext)
+    {
+        await dbContext.Database.OpenConnectionAsync();
+    }
+
+    private async Task CreateDatabaseAsync(string databaseName)
+    {
         await using var createDbCommand = applicationDbContext.Database.GetDbConnection().CreateCommand();
         createDbCommand.CommandText = $"CREATE DATABASE {databaseName};";
         await createDbCommand.ExecuteNonQueryAsync();
+    }
 
+    private async Task CreateUserAsync(string databaseUserName, string databasePassword)
+    {
         await using var createUserCommand = applicationDbContext.Database.GetDbConnection().CreateCommand();
-        createDbCommand.CommandText = $"CREATE USER {databaseUserName} WITH PASSWORD '{databasePassword}';";
-        await createDbCommand.ExecuteNonQueryAsync();
-        
-        await using var grantPrivilegesCommand = applicationDbContext.Database.GetDbConnection().CreateCommand();
-        createDbCommand.CommandText = $"GRANT CONNECT ON DATABASE {databaseName} TO {databaseUserName};";
-        await createDbCommand.ExecuteNonQueryAsync();
+        createUserCommand.CommandText = $"CREATE USER {databaseUserName} WITH PASSWORD '{databasePassword}';";
+        await createUserCommand.ExecuteNonQueryAsync();
+    }
 
-        await applicationDbContext.Database.CloseConnectionAsync();
-        
-        var superUsername = databaseConfigOptions.Value.SuperUsername;
-        var superPassword = databaseConfigOptions.Value.SuperUserPassword;
-        
-        if (string.IsNullOrEmpty(superUsername) || string.IsNullOrEmpty(superPassword))
-        {
-            // TODO: Throw better exception
-            throw new ApplicationException("Super username or password is not set in the configuration.");
-        }
-        
-        var tenantDbContext = tenantDbContextFactory.CreateDbContext(databaseName, superUsername, superPassword);
-        
-        // Creates also the schema 'domain'
-        await tenantDbContext.Database.MigrateAsync();
-        
-        await tenantDbContext.Database.OpenConnectionAsync();
+    private async Task GrantDatabasePrivilegesAsync(string databaseName, string databaseUserName)
+    {
+        await using var grantPrivilegesCommand = applicationDbContext.Database.GetDbConnection().CreateCommand();
+        grantPrivilegesCommand.CommandText = $"GRANT CONNECT ON DATABASE {databaseName} TO {databaseUserName};";
+        await grantPrivilegesCommand.ExecuteNonQueryAsync();
+    }
+
+    private static async Task CloseDatabaseConnectionAsync(DbContext dbContext)
+    {
+        await dbContext.Database.CloseConnectionAsync();
+    }
+
+    private static async Task SetSchemaPrivilegesAsync(DbContext tenantDbContext, string databaseUserName)
+    {
         await using var setSchemaPrivilegesCommand = tenantDbContext.Database.GetDbConnection().CreateCommand();
-        
+
         setSchemaPrivilegesCommand.CommandText = $@"
-        GRANT USAGE ON SCHEMA domain TO {databaseUserName};
-        GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA domain TO {databaseUserName};
-        ";
+    GRANT USAGE ON SCHEMA domain TO {databaseUserName};
+    GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA domain TO {databaseUserName};
+    ";
         await setSchemaPrivilegesCommand.ExecuteNonQueryAsync();
-        
+
         setSchemaPrivilegesCommand.CommandText = $@"
-        ALTER DEFAULT PRIVILEGES IN SCHEMA domain 
-        GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO {databaseUserName};
-        ";
+    ALTER DEFAULT PRIVILEGES IN SCHEMA domain 
+    GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO {databaseUserName};
+    ";
         await setSchemaPrivilegesCommand.ExecuteNonQueryAsync();
-        
+
         setSchemaPrivilegesCommand.CommandText = $"REVOKE ALL ON SCHEMA public FROM {databaseUserName};";
         await setSchemaPrivilegesCommand.ExecuteNonQueryAsync();
-        
-        await tenantDbContext.Database.CloseConnectionAsync();
     }
 }
