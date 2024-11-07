@@ -41,21 +41,22 @@ public class TestBase
         var hasher = new PasswordHasher<IdentityUser>();
 
         var userId = new UserId(Guid.Parse("3c07065a-b964-44a9-9cdf-fbd49d755ea7"));
-        const string userName = "john.doe@example.com";
+        const string userName = "johndoe";
+        const string email = "john.doe@example.com";
         var testUser = new IdentityUser
         {
             Id = userId.Id.ToString(),
             UserName = userName,
             NormalizedUserName = userName.ToUpper(),
-            Email = userName,
-            NormalizedEmail = userName.ToUpper(),
+            Email = email,
+            NormalizedEmail = email.ToUpper(),
         };
         var passwordHash = hasher.HashPassword(testUser, "P@ssw0rd");
         testUser.PasswordHash = passwordHash;
         
         var tenantId = new TenantId(Guid.Parse("f4c70232-6715-4c15-966f-bf4bcef46d39"));
         var tenant = Tenant.Create(tenantId, "test", "test", "test");
-        var domainUser = User.Create(userId, new Name("John", "Doe"), userName, tenantId);
+        var domainUser = User.Create(userId, new Name("John", "Doe"), userName, email, tenantId);
 
         // Valid refresh token
         const string jwtId = "19f77b2e-e485-4031-8506-62f6d3b69e4d";

@@ -45,20 +45,21 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         var hasher = new PasswordHasher<IdentityUser>();
 
         var userId = new UserId(Guid.Parse("3c07065a-b964-44a9-9cdf-fbd49d755ea7"));
-        const string userName = "john.doe@example.com";
+        const string userName = "johndoe";
+        const string email = "john.doe@example.com";
         var testUser = new IdentityUser
         {
             Id = userId.Id.ToString(),
             UserName = userName,
             NormalizedUserName = userName.ToUpper(),
-            Email = userName,
-            NormalizedEmail = userName.ToUpper(),
+            Email = email,
+            NormalizedEmail = email.ToUpper(),
         };
         var passwordHash = hasher.HashPassword(testUser, "P@ssw0rd");
         testUser.PasswordHash = passwordHash;
 
         var tenant = Tenant.Create(new TenantId(Guid.NewGuid()), "test", "test", "test");
-        var domainUser = User.Create(userId, new Name("John", "Doe"), userName, tenant.Id);
+        var domainUser = User.Create(userId, new Name("John", "Doe"),userName, email, tenant.Id);
 
         await Users.AddAsync(testUser);
         await Tenants.AddAsync(tenant);

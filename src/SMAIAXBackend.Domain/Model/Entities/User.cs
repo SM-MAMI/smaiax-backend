@@ -9,12 +9,13 @@ public sealed class User : IEquatable<User>
 {
     public UserId Id { get; } = null!;
     public Name Name { get; } = null!;
+    public string UserName { get; } = null!;
     public string Email { get; } = null!;
     public TenantId TenantId { get; } = null!;
 
-    public static User Create(UserId id, Name name, string email, TenantId tenantId)
+    public static User Create(UserId id, Name name, string userName, string email, TenantId tenantId)
     {
-        return new User(id, name, email, tenantId);
+        return new User(id, name, userName, email, tenantId);
     }
 
     // Needed by EF Core
@@ -23,10 +24,11 @@ public sealed class User : IEquatable<User>
     {
     }
 
-    private User(UserId id, Name name, string email, TenantId tenantId)
+    private User(UserId id, Name name, string userName, string email, TenantId tenantId)
     {
         Id = id;
         Name = name;
+        UserName = userName;
         Email = email;
         TenantId = tenantId;
     }

@@ -32,7 +32,7 @@ public class UserValidationServiceTests
         // Given
         var tenantId = new TenantId(Guid.NewGuid());
         var userIdExpected = new UserId(Guid.NewGuid());
-        var user = User.Create(userIdExpected, new Name("John", "Doe"), "john.doe@example.com", tenantId);
+        var user = User.Create(userIdExpected, new Name("John", "Doe"), "johndoe", "john.doe@example.com", tenantId);
 
         _userRepositoryMock.Setup(repo => repo.GetUserByIdAsync(userIdExpected)).ReturnsAsync(user);
 

@@ -19,15 +19,14 @@ public class AuthenticationTests : TestBase
     public async Task GivenUserInformation_WhenRegister_ThenDomainUserAndIdentityUserAreCreated()
     {
         // Given
-        var registerDto = new RegisterDto("user@example.com", "P@ssw0rd", new NameDto("John", "Doe"));
+        var registerDto = new RegisterDto("test", "test@example.com", "P@ssw0rd", new NameDto("John", "Doe"));
 
         var httpContent = new StringContent(JsonConvert.SerializeObject(registerDto), Encoding.UTF8,
             "application/json");
 
         // When
         var response = await _httpClient.PostAsync($"{BaseUrl}/register", httpContent);
-
-
+        
         // Then
         Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
         var responseContent = await response.Content.ReadAsStringAsync();
@@ -57,7 +56,7 @@ public class AuthenticationTests : TestBase
     public async Task GivenInvalidUserInformation_WhenRegister_ThenErrorResponseIsReturned()
     {
         // Given
-        var registerDto = new RegisterDto("user@example.com", "Passw0rd", new NameDto("John", "Doe"));
+        var registerDto = new RegisterDto("test", "test@example.com", "Passw0rd", new NameDto("John", "Doe"));
 
         var httpContent = new StringContent(JsonConvert.SerializeObject(registerDto), Encoding.UTF8,
             "application/json");

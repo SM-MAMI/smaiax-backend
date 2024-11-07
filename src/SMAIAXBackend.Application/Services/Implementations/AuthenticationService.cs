@@ -24,16 +24,15 @@ public class AuthenticationService(
     public async Task<Guid> RegisterAsync(RegisterDto registerDto)
     {
         var userId = userRepository.NextIdentity();
-        
+
         var tenantId = tenantRepository.NextIdentity();
         var databaseName = $"tenant_{tenantId.Id.ToString().Replace("-", "_")}_db";
-        var databaseUsername = $"tenant_user_{userId.Id.ToString().Replace("-", "_")}";
-        
+
         await transactionManager.TransactionScope(async () =>
         {
             var identityUser = new IdentityUser
             {
-                Id = userId.Id.ToString(), UserName = registerDto.Email, Email = registerDto.Email
+                Id = userId.Id.ToString(), UserName = registerDto.UserName, Email = registerDto.Email
             };
 
             var result = await userManager.CreateAsync(identityUser, registerDto.Password);
@@ -44,18 +43,18 @@ public class AuthenticationService(
                 logger.LogError("Registration failed with the following errors: {ErrorMessages}", errorMessages);
                 throw new RegistrationException(errorMessages);
             }
-            
-            var tenant = Tenant.Create(tenantId, databaseUsername, registerDto.Password, databaseName);
+
+            var tenant = Tenant.Create(tenantId, registerDto.UserName, registerDto.Password, databaseName);
             await tenantRepository.AddAsync(tenant);
 
             var name = new Name(registerDto.Name.FirstName, registerDto.Name.LastName);
-            var domainUser = User.Create(userId, name, registerDto.Email, tenantId);
+            var domainUser = User.Create(userId, name, registerDto.UserName, registerDto.Email, tenantId);
             await userRepository.AddAsync(domainUser);
         });
-        
+
         // TODO: How to handle the case if the database creation fails e.g. deleting identity user, domain user and tenant?
         // Needs to be done outside of transaction
-        await tenantRepository.CreateDatabaseForTenantAsync(databaseName, databaseUsername,
+        await tenantRepository.CreateDatabaseForTenantAsync(databaseName, registerDto.UserName,
             registerDto.Password);
 
         return userId.Id;
@@ -63,11 +62,12 @@ public class AuthenticationService(
 
     public async Task<TokenDto> LoginAsync(LoginDto loginDto)
     {
-        var user = await userManager.FindByNameAsync(loginDto.Username);
+        var user = await userManager.FindByNameAsync(loginDto.UserName) ??
+                   await userManager.FindByEmailAsync(loginDto.UserName);
 
         if (user == null)
         {
-            logger.LogError("User with `{Username}` not found.", loginDto.Username);
+            logger.LogError("User with `{Username}` not found.", loginDto.UserName);
             throw new InvalidLoginException();
         }
 
@@ -75,7 +75,7 @@ public class AuthenticationService(
 
         if (!isPasswordCorrect)
         {
-            logger.LogError("Invalid password for user `{Username}`.", loginDto.Username);
+            logger.LogError("Invalid password for user `{Username}`.", loginDto.UserName);
             throw new InvalidLoginException();
         }
 

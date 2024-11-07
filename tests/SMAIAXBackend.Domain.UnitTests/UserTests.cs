@@ -13,11 +13,12 @@ public class UserTests
         // Given
         var userId = new UserId(Guid.NewGuid());
         var name = new Name("John", "Doe");
-        var email = "john.doe@example.com";
+        const string userName = "johndoe";
+        const string email = "john.doe@example.com";
         var tenantId = new TenantId(Guid.NewGuid());
 
         // When
-        var user = User.Create(userId, name, email, tenantId);
+        var user = User.Create(userId, name, userName, email, tenantId);
 
         // Then
         Assert.Multiple(() =>
