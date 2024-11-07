@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
 using SMAIAXBackend.Application.DTOs;
+using SMAIAXBackend.Domain.Model.Enums;
 using SMAIAXBackend.Domain.Model.ValueObjects.Ids;
 
 namespace SMAIAXBackend.IntegrationTests.EndToEndTests;
@@ -66,7 +67,7 @@ public class SmartMeterTests : TestBase
         var smartMetersExpected = new List<SmartMeterOverviewDto>()
         {
             new(Guid.Parse("5e9db066-1b47-46cc-bbde-0b54c30167cd"), "Smart Meter 1", 0, 0),
-            new(Guid.Parse("f4c70232-6715-4c15-966f-bf4bcef46d39"), "Smart Meter 2", 0, 0)
+            new(Guid.Parse("f4c70232-6715-4c15-966f-bf4bcef46d39"), "Smart Meter 2", 1, 0)
         };
         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _accessToken);
 
@@ -188,6 +189,107 @@ public class SmartMeterTests : TestBase
 
         // When
         var response = await _httpClient.PutAsync($"{BaseUrl}/{smartMeterId}", httpContent);
+
+        // Then
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
+    }
+
+    [Test]
+    public async Task GivenSmartMeterIdAndMetadataCreateDtoAndAccessToken_WhenAddMetadata_ThenMetadataIsAddedToSmartMeter()
+    {
+        // Given
+        const int metadataCountExpected = 1;
+        var smartMeterId = Guid.Parse("5e9db066-1b47-46cc-bbde-0b54c30167cd");
+        var locationDto = new LocationDto("Some street name", "Some city name", "Some state", "some country", Continent.Europe);
+        var metadataCreateDto = new MetadataCreateDto(DateTime.UtcNow, locationDto, 4);
+        var httpContent = new StringContent(JsonConvert.SerializeObject(metadataCreateDto), Encoding.UTF8,
+            "application/json");
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _accessToken);
+
+        // When
+        var response = await _httpClient.PostAsync($"{BaseUrl}/{smartMeterId}/metadata", httpContent);
+
+        // Then
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+
+        var responseContent = await response.Content.ReadAsStringAsync();
+        Assert.That(responseContent, Is.Not.Null);
+
+        var returnedId = Guid.Parse(responseContent.Trim('"'));
+        Assert.That(returnedId, Is.EqualTo(smartMeterId));
+
+        var smartMeter = await _applicationDbContext.SmartMeters
+            .AsNoTracking()
+            .Include(smartMeter => smartMeter.Metadata)
+            .FirstOrDefaultAsync(x => x.Id.Equals(new SmartMeterId(returnedId)));
+
+        Assert.That(smartMeter, Is.Not.Null);
+        Assert.That(smartMeter.Metadata, Has.Count.EqualTo(metadataCountExpected));
+        var metadataActual = smartMeter.Metadata[0];
+        Assert.Multiple(() =>
+        {
+            Assert.That(metadataActual.ValidFrom, Is.EqualTo(metadataCreateDto.ValidFrom).Within(TimeSpan.FromMilliseconds(1)));
+            Assert.That(metadataActual.Location.StreetName, Is.EqualTo(metadataCreateDto.Location.StreetName));
+            Assert.That(metadataActual.Location.City, Is.EqualTo(metadataCreateDto.Location.City));
+            Assert.That(metadataActual.Location.State, Is.EqualTo(metadataCreateDto.Location.State));
+            Assert.That(metadataActual.Location.Country, Is.EqualTo(metadataCreateDto.Location.Country));
+            Assert.That(metadataActual.Location.Continent, Is.EqualTo(metadataCreateDto.Location.Continent));
+            Assert.That(metadataActual.HouseholdSize, Is.EqualTo(metadataCreateDto.HouseholdSize));
+        });
+    }
+
+    [Test]
+    public async Task GivenSmartMeterIdAndMetadataCreateDtoAndNoAccessToken_WhenAddMetadata_ThenUnauthorizedIsReturned()
+    {
+        // Given
+        var smartMeterId = Guid.Parse("5e9db066-1b47-46cc-bbde-0b54c30167cd");
+        var locationDto = new LocationDto("Some street name", "Some city name", "Some state", "some country", Continent.Europe);
+        var metadataCreateDto = new MetadataCreateDto(DateTime.UtcNow, locationDto, 4);
+        var httpContent = new StringContent(JsonConvert.SerializeObject(metadataCreateDto), Encoding.UTF8,
+            "application/json");
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "");
+
+        // When
+        var response = await _httpClient.PostAsync($"{BaseUrl}/{smartMeterId}/metadata", httpContent);
+
+        // Then
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
+    }
+
+    [Test]
+    public async Task GivenSmartMeterIdAndMetadataIdAndAccessToken_WhenRemoveMetadata_ThenMetadataIsRemovedFromSmartMeter()
+    {
+        // Given
+        const int metadataCountExpected = 0;
+        var smartMeterId = Guid.Parse("f4c70232-6715-4c15-966f-bf4bcef46d39");
+        var metadataId = Guid.Parse("1c8c8313-6fc4-4ebd-9ca8-8a1267441e06");
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _accessToken);
+
+        // When
+        var response = await _httpClient.DeleteAsync($"{BaseUrl}/{smartMeterId}/metadata/{metadataId}");
+
+        // Then
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NoContent));
+
+        var smartMeter = await _applicationDbContext.SmartMeters
+            .AsNoTracking()
+            .Include(smartMeter => smartMeter.Metadata)
+            .FirstOrDefaultAsync(x => x.Id.Equals(new SmartMeterId(smartMeterId)));
+
+        Assert.That(smartMeter, Is.Not.Null);
+        Assert.That(smartMeter.Metadata, Has.Count.EqualTo(metadataCountExpected));
+    }
+
+    [Test]
+    public async Task GivenSmartMeterIdAndMetadataIdAndNoAccessToken_WhenRemoveMetadata_ThenUnauthorizedIsReturned()
+    {
+        // Given
+        var smartMeterId = Guid.Parse("f4c70232-6715-4c15-966f-bf4bcef46d39");
+        var metadataId = Guid.Parse("1c8c8313-6fc4-4ebd-9ca8-8a1267441e06");
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "");
+
+        // When
+        var response = await _httpClient.DeleteAsync($"{BaseUrl}/{smartMeterId}/metadata/{metadataId}");
 
         // Then
         Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));

@@ -21,6 +21,8 @@ public class MetadataConfiguration : IEntityTypeConfiguration<Metadata>
 
         builder.Property(m => m.ValidFrom)
             .IsRequired();
+        builder.HasIndex(m => m.ValidFrom)
+            .IsUnique();
 
         builder.OwnsOne(m => m.Location, location =>
         {

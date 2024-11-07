@@ -38,6 +38,8 @@ public class AuthenticationService(
                 Id = userId.Id.ToString(), UserName = registerDto.UserName, Email = registerDto.Email
             };
 
+        await transactionManager.ReadCommittedTransactionScope(async () =>
+        {
             var result = await userManager.CreateAsync(identityUser, registerDto.Password);
 
             if (!result.Succeeded)

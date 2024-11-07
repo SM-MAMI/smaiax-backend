@@ -7,8 +7,7 @@ namespace SMAIAXBackend.API.Endpoints.SmartMeter;
 
 public static class GetSmartMetersEndpoint
 {
-    public static async Task<Results<Ok<List<SmartMeterOverviewDto>>, ProblemHttpResult>> Handle(
-        ISmartMeterListService smartMeterListService)
+    public static async Task<Ok<List<SmartMeterOverviewDto>>> Handle(ISmartMeterListService smartMeterListService)
     {
         var smartMeters = await smartMeterListService.GetSmartMetersAsync();
 

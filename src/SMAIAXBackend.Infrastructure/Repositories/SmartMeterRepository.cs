@@ -13,7 +13,12 @@ public class SmartMeterRepository(ITenantDbContextFactory tenantDbContextFactory
     {
         return new SmartMeterId(Guid.NewGuid());
     }
-
+    
+    public MetadataId NextMetadataIdentity()
+    {
+        return new MetadataId(Guid.NewGuid());
+    }
+    
     public async Task AddAsync(SmartMeter meter, Tenant tenant)
     {
         var tenantDbContext = tenantDbContextFactory.CreateDbContext(tenant);

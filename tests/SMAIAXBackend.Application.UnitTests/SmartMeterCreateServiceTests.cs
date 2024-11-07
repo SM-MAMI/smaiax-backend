@@ -3,10 +3,12 @@ using Microsoft.Extensions.Logging;
 using Moq;
 
 using SMAIAXBackend.Application.DTOs;
+using SMAIAXBackend.Application.Exceptions;
 using SMAIAXBackend.Application.Services.Implementations;
 using SMAIAXBackend.Application.Services.Interfaces;
 using SMAIAXBackend.Domain.Model.Entities;
 using SMAIAXBackend.Domain.Model.ValueObjects;
+using SMAIAXBackend.Domain.Model.Enums;
 using SMAIAXBackend.Domain.Model.ValueObjects.Ids;
 using SMAIAXBackend.Domain.Repositories;
 
@@ -49,5 +51,52 @@ public class SmartMeterCreateServiceTests
 
         // Then
         Assert.That(smartMeterIdActual, Is.EqualTo(smartMeterIdExpected.Id));
+    }
+
+    [Test]
+    public async Task
+        GivenSmartMeterIdAndMetadataCreateDtoAndExistentUserId_WhenAddMetadata_ThenSmartMeterIdIsReturned()
+    {
+        // Given
+        var smartMeterId = new SmartMeterId(Guid.NewGuid());
+        var metadataIdExpected = new MetadataId(Guid.NewGuid());
+        var metadataCreateDto = new MetadataCreateDto(DateTime.Now,
+            new LocationDto("Test Street", "Test City", "Test State", "Test Country", Continent.Europe), 1);
+        var userId = new UserId(Guid.NewGuid());
+        var smartMeter = SmartMeter.Create(smartMeterId, "Test Smart Meter", userId);
+
+        _userValidationServiceMock.Setup(service => service.ValidateUserAsync(userId.Id.ToString()))
+            .ReturnsAsync(userId);
+        _smartMeterRepositoryMock.Setup(repo => repo.GetSmartMeterByIdAndUserIdAsync(smartMeterId, userId))
+            .ReturnsAsync(smartMeter);
+        _smartMeterRepositoryMock.Setup(repo => repo.NextMetadataIdentity()).Returns(metadataIdExpected);
+
+        // When
+        var smartMeterIdActual =
+            await _smartMeterCreateService.AddMetadataAsync(smartMeterId.Id, metadataCreateDto, userId.Id.ToString());
+
+        // Then
+        Assert.That(smartMeterIdActual, Is.EqualTo(smartMeterId.Id));
+        _smartMeterRepositoryMock.Verify(repo => repo.UpdateAsync(smartMeter), Times.Once);
+    }
+
+    [Test]
+    public void
+        GivenSmartMeterIdAndMetadataCreateDtoAndNonexistentUserId_WhenAddMetadata_ThenSmartMeterNotFoundExceptionIsThrown()
+    {
+        // Given
+        var smartMeterId = new SmartMeterId(Guid.NewGuid());
+        var metadataCreateDto = new MetadataCreateDto(DateTime.Now,
+            new LocationDto("Test Street", "Test City", "Test State", "Test Country", Continent.Europe), 1);
+        var userId = new UserId(Guid.NewGuid());
+
+        _userValidationServiceMock.Setup(service => service.ValidateUserAsync(userId.Id.ToString()))
+            .ReturnsAsync(userId);
+        _smartMeterRepositoryMock.Setup(repo => repo.GetSmartMeterByIdAndUserIdAsync(smartMeterId, userId))
+            .ReturnsAsync((SmartMeter)null!);
+
+        // Then ... Then
+        Assert.ThrowsAsync<SmartMeterNotFoundException>(async () =>
+            await _smartMeterCreateService.AddMetadataAsync(smartMeterId.Id, metadataCreateDto, userId.Id.ToString()));
     }
 }

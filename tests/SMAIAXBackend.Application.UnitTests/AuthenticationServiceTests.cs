@@ -35,7 +35,7 @@ public class AuthenticationServiceTests
         );
         _transactionManagerMock = new Mock<ITransactionManager>();
         _transactionManagerMock
-            .Setup(mgr => mgr.TransactionScope(It.IsAny<Func<Task>>()))
+            .Setup(mgr => mgr.ReadCommittedTransactionScope(It.IsAny<Func<Task>>()))
             .Returns((Func<Task> transactionalOperation) => transactionalOperation());
         _loggerMock = new Mock<ILogger<AuthenticationService>>();
         _authenticationService = new AuthenticationService(_tenantRepositoryMock.Object, _userRepositoryMock.Object,

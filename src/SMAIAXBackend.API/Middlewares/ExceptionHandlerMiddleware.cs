@@ -34,6 +34,11 @@ public class ExceptionHandlerMiddleware : IExceptionHandler
                 problemDetails.Status = StatusCodes.Status400BadRequest;
                 problemDetails.Title = "Registration Error";
                 break;
+            case ArgumentException:
+                problemDetails.Type = "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.8";
+                problemDetails.Status = StatusCodes.Status409Conflict;
+                problemDetails.Title = "Conflict";
+                break;
             case SmartMeterIdMismatchException:
                 problemDetails.Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1";
                 problemDetails.Status = StatusCodes.Status400BadRequest;

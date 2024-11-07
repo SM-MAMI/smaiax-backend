@@ -33,6 +33,27 @@ public sealed class SmartMeter : IEquatable<SmartMeter>
         Policies = policies;
     }
 
+    public void AddMetadata(Metadata metadata)
+    {
+        if (Metadata.Contains(metadata))
+        {
+            throw new ArgumentException("Metadata already exists");
+        }
+
+        Metadata.Add(metadata);
+    }
+
+    public void RemoveMetadata(MetadataId metadataId)
+    {
+        var metadata = Metadata.FirstOrDefault(m => m.Id.Equals(metadataId));
+        if (metadata == null)
+        {
+            throw new ArgumentException("Metadata not found");
+        }
+
+        Metadata.Remove(metadata);
+    }
+
     public void Update(string name)
     {
         Name = name;

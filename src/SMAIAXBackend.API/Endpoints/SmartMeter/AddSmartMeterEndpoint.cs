@@ -8,7 +8,7 @@ namespace SMAIAXBackend.API.Endpoints.SmartMeter;
 
 public static class AddSmartMeterEndpoint
 {
-    public static async Task<Results<CreatedAtRoute, ProblemHttpResult>> Handle(
+    public static async Task<CreatedAtRoute> Handle(
         ISmartMeterCreateService smartMeterCreateService,
         [FromBody] SmartMeterCreateDto smartMeterCreateDto)
     {
