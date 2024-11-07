@@ -64,7 +64,7 @@ public class PolicyRequestTests : TestBase
             Assert.That(policyRequestActual.PolicyFilter.MeasurementResolution, Is.EqualTo(policyRequestCreateDto.MeasurementResolution));
             Assert.That(policyRequestActual.PolicyFilter.MinHouseHoldSize, Is.EqualTo(policyRequestCreateDto.MinHouseHoldSize));
             Assert.That(policyRequestActual.PolicyFilter.MaxHouseHoldSize, Is.EqualTo(policyRequestCreateDto.MaxHouseHoldSize));
-            Assert.That(policyRequestActual.PolicyFilter.Locations.Count, Is.EqualTo(policyRequestCreateDto.Locations.Count));
+            Assert.That(policyRequestActual.PolicyFilter.Locations, Has.Count.EqualTo(policyRequestCreateDto.Locations.Count));
         });
     }
 }
