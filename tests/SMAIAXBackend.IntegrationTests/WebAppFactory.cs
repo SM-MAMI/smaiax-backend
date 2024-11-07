@@ -8,8 +8,6 @@ public class WebAppFactory(int postgresMappedPublicPort) : WebApplicationFactory
 {
     private readonly Dictionary<string, string> _testAppSettings = new()
     {
-        ["ConnectionStrings:smaiax-db"] = $"Host=localhost:{postgresMappedPublicPort};Username=user;Password=password;Database=smaiax-db",
-        ["ConnectionStrings:tenant-db"] = $"Host=localhost:{postgresMappedPublicPort};Username=user;Password=password;Database=tenant-db",
         ["DatabaseConfiguration:Host"] = "localhost",
         ["DatabaseConfiguration:Port"] = $"{postgresMappedPublicPort}",
         ["DatabaseConfiguration:SuperUsername"] = "user",

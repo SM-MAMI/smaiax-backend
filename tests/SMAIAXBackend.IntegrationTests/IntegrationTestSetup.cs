@@ -18,6 +18,7 @@ internal static class IntegrationTestSetup
     public static TenantDbContext TenantDbContext { get; private set; } = null!;
     public static ISmartMeterRepository SmartMeterRepository { get; private set; } = null!;
     public static IUserRepository UserRepository { get; private set; } = null!;
+    public static ITenantRepository TenantRepository { get; private set; } = null!;
     public static HttpClient HttpClient { get; private set; } = null!;
     public static string AccessToken { get; private set; } = null!;
 
@@ -25,10 +26,12 @@ internal static class IntegrationTestSetup
     public static async Task OneTimeSetup()
     {
         const int postgresPort = 5432;
+        const string superUserName = "user";
+        const string superUserPassword = "password";
         _postgresContainer = new PostgreSqlBuilder()
             .WithImage("postgres:16-bullseye")
-            .WithUsername("user")
-            .WithPassword("password")
+            .WithUsername(superUserName)
+            .WithPassword(superUserPassword)
             .WithDatabase("smaiax-db")
             .WithPortBinding(postgresPort, true)
             .WithWaitStrategy(Wait.ForUnixContainer().UntilPortIsAvailable(postgresPort))
@@ -42,7 +45,9 @@ internal static class IntegrationTestSetup
         HttpClient = _webAppFactory.CreateClient();
 
         ApplicationDbContext = _webAppFactory.Services.GetRequiredService<ApplicationDbContext>();
-        TenantDbContext = _webAppFactory.Services.GetRequiredService<TenantDbContext>();
+        var tenantDbContextFactory = _webAppFactory.Services.GetRequiredService<ITenantDbContextFactory>();
+        TenantDbContext = tenantDbContextFactory.CreateDbContext("tenant_1_db", superUserName, superUserPassword);
+        TenantRepository = _webAppFactory.Services.GetRequiredService<ITenantRepository>();
         SmartMeterRepository = _webAppFactory.Services.GetRequiredService<ISmartMeterRepository>();
         UserRepository = _webAppFactory.Services.GetRequiredService<IUserRepository>();
 
