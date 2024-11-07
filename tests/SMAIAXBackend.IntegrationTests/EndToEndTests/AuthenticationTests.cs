@@ -26,7 +26,7 @@ public class AuthenticationTests : TestBase
 
         // When
         var response = await _httpClient.PostAsync($"{BaseUrl}/register", httpContent);
-        
+
         // Then
         Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
         var responseContent = await response.Content.ReadAsStringAsync();

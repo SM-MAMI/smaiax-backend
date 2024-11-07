@@ -35,7 +35,7 @@ public class SmartMeterListServiceTests
             SmartMeter.Create(new SmartMeterId(Guid.NewGuid()), "Smart Meter 1"),
             SmartMeter.Create(new SmartMeterId(Guid.NewGuid()), "Smart Meter 2")
         };
-        
+
         _smartMeterRepositoryMock.Setup(repo => repo.GetSmartMetersAsync())
             .ReturnsAsync(smartMetersExpected);
 
@@ -65,7 +65,7 @@ public class SmartMeterListServiceTests
         // Given
         var smartMeterId = Guid.NewGuid();
         var smartMeterExpected = SmartMeter.Create(new SmartMeterId(smartMeterId), "Smart Meter 1");
-        
+
         _smartMeterRepositoryMock.Setup(repo => repo.GetSmartMeterByIdAsync(smartMeterExpected.Id))
             .ReturnsAsync(smartMeterExpected);
 

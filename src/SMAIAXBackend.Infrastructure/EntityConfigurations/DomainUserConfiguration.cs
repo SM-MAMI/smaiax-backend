@@ -30,10 +30,10 @@ public class DomainUserConfiguration : IEntityTypeConfiguration<User>
 
         builder.HasIndex(u => u.UserName)
             .IsUnique();
-        
+
         builder.Property(u => u.Email)
             .IsRequired();
-        
+
         builder.HasIndex(u => u.Email)
             .IsUnique();
 

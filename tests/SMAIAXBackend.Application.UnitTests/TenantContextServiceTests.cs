@@ -20,7 +20,7 @@ public class TenantContextServiceTests
     private Mock<IHttpContextAccessor> _httpContextAccessorMock;
     private Mock<ILogger<TenantContextService>> _loggerMock;
     private TenantContextService _tenantContextService;
-    
+
     [SetUp]
     public void SetUp()
     {
@@ -28,7 +28,7 @@ public class TenantContextServiceTests
         _userRepositoryMock = new Mock<IUserRepository>();
         _httpContextAccessorMock = new Mock<IHttpContextAccessor>();
         _loggerMock = new Mock<ILogger<TenantContextService>>();
-        
+
         _tenantContextService = new TenantContextService(
             _tenantRepositoryMock.Object,
             _userRepositoryMock.Object,
@@ -59,18 +59,18 @@ public class TenantContextServiceTests
         // Then
         Assert.That(tenantActual, Is.EqualTo(tenant));
     }
-    
+
     [Test]
     public void GivenNoUserId_WhenGetTenant_ThenInvalidTokenExceptionIsThrown()
     {
         // Given
         _httpContextAccessorMock.Setup(httpContextAccessor => httpContextAccessor.HttpContext!.Items["UserId"])
-            .Returns((string?) null);
+            .Returns((string?)null);
 
         // When ... Then
         Assert.ThrowsAsync<InvalidTokenException>(async () => await _tenantContextService.GetCurrentTenantAsync());
     }
-    
+
     [Test]
     public void GivenInvalidUserId_WhenGetTenant_ThenInvalidTokenExceptionIsThrown()
     {
@@ -81,17 +81,17 @@ public class TenantContextServiceTests
         // When ... Then
         Assert.ThrowsAsync<InvalidTokenException>(async () => await _tenantContextService.GetCurrentTenantAsync());
     }
-    
+
     [Test]
     public void GivenNonExistentUser_WhenGetTenant_ThenUserNotFoundExceptionIsThrown()
     {
         // Given
         var userId = Guid.NewGuid();
-        
+
         _httpContextAccessorMock.Setup(httpContextAccessor => httpContextAccessor.HttpContext!.Items["UserId"])
             .Returns(userId.ToString());
         _userRepositoryMock.Setup(userRepository => userRepository.GetUserByIdAsync(new UserId(userId)))
-            .ReturnsAsync((User) null!);
+            .ReturnsAsync((User)null!);
 
         // When ... Then
         Assert.ThrowsAsync<UserNotFoundException>(async () => await _tenantContextService.GetCurrentTenantAsync());

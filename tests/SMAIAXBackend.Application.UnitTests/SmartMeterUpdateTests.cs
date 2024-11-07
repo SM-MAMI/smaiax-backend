@@ -33,7 +33,7 @@ public class SmartMeterUpdateTests
         var smartMeterIdExpected = Guid.NewGuid();
         var smartMeterUpdateDto = new SmartMeterUpdateDto(smartMeterIdExpected, "Updated name");
         var smartMeter = SmartMeter.Create(new SmartMeterId(smartMeterIdExpected), "Name");
-        
+
         _smartMeterRepositoryMock.Setup(repo =>
                 repo.GetSmartMeterByIdAsync(new SmartMeterId(smartMeterIdExpected)))
             .ReturnsAsync(smartMeter);

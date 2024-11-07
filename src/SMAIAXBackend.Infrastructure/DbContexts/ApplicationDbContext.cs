@@ -60,7 +60,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         testUser.PasswordHash = passwordHash;
 
         var tenant = Tenant.Create(new TenantId(Guid.NewGuid()), userName, password, "tenant_1_db");
-        var domainUser = User.Create(userId, new Name("John", "Doe"),userName, email, tenant.Id);
+        var domainUser = User.Create(userId, new Name("John", "Doe"), userName, email, tenant.Id);
 
         await Users.AddAsync(testUser);
         await Tenants.AddAsync(tenant);

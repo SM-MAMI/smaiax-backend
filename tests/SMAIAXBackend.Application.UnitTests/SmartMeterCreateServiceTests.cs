@@ -33,7 +33,7 @@ public class SmartMeterCreateServiceTests
         // Given
         var smartMeterIdExpected = new SmartMeterId(Guid.NewGuid());
         var smartMeterCreateDto = new SmartMeterCreateDto("Test Smart Meter");
-        
+
         _smartMeterRepositoryMock.Setup(repo => repo.NextIdentity()).Returns(smartMeterIdExpected);
 
         // When

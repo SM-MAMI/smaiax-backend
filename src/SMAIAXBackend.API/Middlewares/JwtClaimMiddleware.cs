@@ -14,7 +14,7 @@ public class JwtClaimMiddleware(RequestDelegate next)
 
             var jwtHandler = new JwtSecurityTokenHandler();
             var jwtToken = jwtHandler.ReadJwtToken(token);
-                
+
             var nameIdentifierClaim = jwtToken?.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Sub);
 
             if (nameIdentifierClaim != null)
@@ -22,7 +22,7 @@ public class JwtClaimMiddleware(RequestDelegate next)
                 context.Items["UserId"] = nameIdentifierClaim.Value;
             }
         }
-        
+
         await next(context);
     }
 }

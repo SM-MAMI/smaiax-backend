@@ -22,7 +22,7 @@ public class SmartMeterCreateService(
 
         return smartMeterId.Id;
     }
-    
+
     public async Task<Guid> AddMetadataAsync(Guid smartMeterId, MetadataCreateDto metadataCreateDto)
     {
         var smartMeter =

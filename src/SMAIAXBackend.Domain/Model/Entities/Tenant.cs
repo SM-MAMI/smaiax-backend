@@ -14,12 +14,12 @@ public sealed class Tenant : IEquatable<Tenant>
     {
         return new Tenant(id, databaseUsername, databasePassword, databaseName);
     }
-    
+
     // Needed by EF Core
     private Tenant()
     {
     }
-    
+
     private Tenant(TenantId id, string databaseUsername, string databasePassword, string databaseName)
     {
         Id = id;
@@ -27,7 +27,7 @@ public sealed class Tenant : IEquatable<Tenant>
         DatabasePassword = databasePassword;
         DatabaseName = databaseName;
     }
-    
+
     public bool Equals(Tenant? other)
     {
         if (other is null)

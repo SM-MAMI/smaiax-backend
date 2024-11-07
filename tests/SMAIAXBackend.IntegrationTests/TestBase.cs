@@ -66,7 +66,7 @@ public class TestBase
         };
         var passwordHash = hasher.HashPassword(testUser, password);
         testUser.PasswordHash = passwordHash;
-        
+
         var tenantId = new TenantId(Guid.Parse("f4c70232-6715-4c15-966f-bf4bcef46d39"));
         var tenant = Tenant.Create(tenantId, userName, password, "tenant_1_db");
         var domainUser = User.Create(userId, new Name("John", "Doe"), userName, email, tenantId);
@@ -138,7 +138,7 @@ public class TestBase
         await _applicationDbContext.RefreshTokens.AddAsync(refreshToken4);
         await _tenantDbContext.SmartMeters.AddAsync(smartMeter1);
         await _tenantDbContext.SmartMeters.AddAsync(smartMeter2);
-        
+
         await _applicationDbContext.SaveChangesAsync();
         await _tenantDbContext.SaveChangesAsync();
     }

@@ -16,7 +16,7 @@ public static class DatabaseExtensions
     public static void AddDatabaseConfigurations(this IServiceCollection services, IConfiguration configuration)
     {
         services.Configure<DatabaseConfiguration>(configuration.GetSection("DatabaseConfiguration"));
-       
+
         services.AddDbContext<ApplicationDbContext>(options =>
         {
             var dbConfig = configuration.GetSection("DatabaseConfiguration").Get<DatabaseConfiguration>();
@@ -30,7 +30,7 @@ public static class DatabaseExtensions
             };
             options.UseNpgsql(connectionStringBuilder.ConnectionString);
         });
-        
+
         services.AddDbContext<TenantDbContext>((serviceProvider, options) =>
         {
             var tenantContextService = serviceProvider.GetRequiredService<ITenantContextService>();
@@ -39,7 +39,7 @@ public static class DatabaseExtensions
             var connectionString = tenantDbContextFactory.GetConnectionStringForTenant(currentTenant);
             options.UseNpgsql(connectionString);
         });
-        
+
         services.AddScoped<ITenantDbContextFactory, TenantDbContextFactory>();
     }
 }

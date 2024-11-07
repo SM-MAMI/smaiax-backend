@@ -23,7 +23,7 @@ public class SmartMeterUpdateService(
                 smartMeterIdExpected, smartMeterUpdateDto.Id);
             throw new SmartMeterIdMismatchException(smartMeterIdExpected, smartMeterUpdateDto.Id);
         }
-        
+
         var smartMeter =
             await smartMeterRepository.GetSmartMeterByIdAsync(new SmartMeterId(smartMeterIdExpected));
 

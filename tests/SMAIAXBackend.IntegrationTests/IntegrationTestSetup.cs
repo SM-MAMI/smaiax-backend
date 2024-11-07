@@ -39,7 +39,7 @@ internal static class IntegrationTestSetup
             .Build();
 
         await _postgresContainer.StartAsync();
-        
+
         var postgresMappedPublicPort = _postgresContainer.GetMappedPublicPort(postgresPort);
         _webAppFactory = new WebAppFactory(postgresMappedPublicPort);
 

@@ -11,7 +11,7 @@ public class TenantConfiguration : IEntityTypeConfiguration<Tenant>
     public void Configure(EntityTypeBuilder<Tenant> builder)
     {
         builder.ToTable("Tenant", "domain");
-        
+
         builder.HasKey(t => t.Id);
         builder.Property(t => t.Id)
             .HasConversion(
@@ -24,7 +24,7 @@ public class TenantConfiguration : IEntityTypeConfiguration<Tenant>
 
         builder.Property(t => t.DatabasePassword)
             .IsRequired();
-        
+
         builder.Property(t => t.DatabaseName)
             .IsRequired();
     }

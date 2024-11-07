@@ -46,11 +46,11 @@ public class TenantRepository(
         await CreateUserAsync(databaseUserName, databasePassword);
         await GrantDatabasePrivilegesAsync(databaseName, databaseUserName);
         await CloseDatabaseConnectionAsync(applicationDbContext);
-        
+
         var tenantDbContext = tenantDbContextFactory.CreateDbContext(databaseName,
             databaseConfigOptions.Value.SuperUsername, databaseConfigOptions.Value.SuperUserPassword);
         await tenantDbContext.Database.MigrateAsync();
-        
+
         await OpenDatabaseConnectionAsync(tenantDbContext);
         await SetSchemaPrivilegesAsync(tenantDbContext, databaseUserName);
         await CloseDatabaseConnectionAsync(tenantDbContext);

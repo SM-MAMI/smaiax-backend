@@ -25,7 +25,7 @@ public class TenantDbContextFactory(IOptions<DatabaseConfiguration> databaseConf
 
         return new TenantDbContext(optionsBuilder.Options);
     }
-    
+
     public string GetConnectionStringForTenant(Tenant tenant)
     {
         var connectionStringBuilder = new NpgsqlConnectionStringBuilder

@@ -35,9 +35,11 @@ public class AuthenticationService(
         {
             identityUser = new IdentityUser
             {
-                Id = userId.Id.ToString(), UserName = registerDto.UserName, Email = registerDto.Email
+                Id = userId.Id.ToString(),
+                UserName = registerDto.UserName,
+                Email = registerDto.Email
             };
-            
+
             var result = await userManager.CreateAsync(identityUser, registerDto.Password);
 
             if (!result.Succeeded)
@@ -54,7 +56,7 @@ public class AuthenticationService(
             domainUser = User.Create(userId, name, registerDto.UserName, registerDto.Email, tenantId);
             await userRepository.AddAsync(domainUser);
         });
-        
+
         try
         {
             // Needs to be done outside of transaction
