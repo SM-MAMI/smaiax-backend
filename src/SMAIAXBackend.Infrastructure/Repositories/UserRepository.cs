@@ -24,4 +24,10 @@ public class UserRepository(ApplicationDbContext applicationDbContext) : IUserRe
     {
         return await applicationDbContext.DomainUsers.FirstOrDefaultAsync(u => u.Id.Equals(userId));
     }
+
+    public async Task DeleteAsync(User user)
+    {
+        applicationDbContext.DomainUsers.Remove(user);
+        await applicationDbContext.SaveChangesAsync();
+    }
 }

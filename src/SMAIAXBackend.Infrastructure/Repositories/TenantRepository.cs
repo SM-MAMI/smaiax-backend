@@ -25,6 +25,12 @@ public class TenantRepository(
         await applicationDbContext.SaveChangesAsync();
     }
 
+    public async Task DeleteAsync(Tenant tenant)
+    {
+        applicationDbContext.Tenants.Remove(tenant);
+        await applicationDbContext.SaveChangesAsync();
+    }
+
     public async Task CreateDatabaseForTenantAsync(string databaseName, string databaseUserName, string databasePassword)
     {
         await applicationDbContext.Database.OpenConnectionAsync();

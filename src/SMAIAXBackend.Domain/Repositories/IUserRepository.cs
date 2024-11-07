@@ -8,4 +8,5 @@ public interface IUserRepository
     UserId NextIdentity();
     Task AddAsync(User user);
     Task<User?> GetUserByIdAsync(UserId userId);
+    Task DeleteAsync(User user);
 }

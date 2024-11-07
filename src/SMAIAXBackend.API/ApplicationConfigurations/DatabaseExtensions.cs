@@ -2,6 +2,8 @@ using System.Diagnostics.CodeAnalysis;
 
 using Microsoft.EntityFrameworkCore;
 
+using Npgsql;
+
 using SMAIAXBackend.Infrastructure.Configurations;
 using SMAIAXBackend.Infrastructure.DbContexts;
 
@@ -16,8 +18,15 @@ public static class DatabaseExtensions
         services.AddDbContext<ApplicationDbContext>(options =>
         {
             var dbConfig = configuration.GetSection("DatabaseConfiguration").Get<DatabaseConfiguration>();
-            var connectionString = $"Host={dbConfig.Host};Port={dbConfig.Port};Username={dbConfig.SuperUsername};Password={dbConfig.SuperUserPassword};Database={dbConfig.MainDatabase}";
-            options.UseNpgsql(connectionString);
+            var connectionStringBuilder = new NpgsqlConnectionStringBuilder
+            {
+                Host = dbConfig!.Host,
+                Port = dbConfig.Port,
+                Username = dbConfig.SuperUsername,
+                Password = dbConfig.SuperUserPassword,
+                Database = dbConfig.MainDatabase
+            };
+            options.UseNpgsql(connectionStringBuilder.ConnectionString);
         });
 
         services.AddDbContext<TenantDbContext>(options =>

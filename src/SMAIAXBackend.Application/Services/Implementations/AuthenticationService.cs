@@ -20,7 +20,6 @@ public class AuthenticationService(
     ITransactionManager transactionManager,
     ILogger<AuthenticationService> logger) : IAuthenticationService
 {
-    // TODO: Refactor method
     public async Task<Guid> RegisterAsync(RegisterDto registerDto)
     {
         var userId = userRepository.NextIdentity();
@@ -28,9 +27,13 @@ public class AuthenticationService(
         var tenantId = tenantRepository.NextIdentity();
         var databaseName = $"tenant_{tenantId.Id.ToString().Replace("-", "_")}_db";
 
+        IdentityUser? identityUser = null;
+        Tenant? tenant = null;
+        User? domainUser = null;
+        
         await transactionManager.TransactionScope(async () =>
         {
-            var identityUser = new IdentityUser
+            identityUser = new IdentityUser
             {
                 Id = userId.Id.ToString(), UserName = registerDto.UserName, Email = registerDto.Email
             };
@@ -44,18 +47,38 @@ public class AuthenticationService(
                 throw new RegistrationException(errorMessages);
             }
 
-            var tenant = Tenant.Create(tenantId, registerDto.UserName, registerDto.Password, databaseName);
+            tenant = Tenant.Create(tenantId, registerDto.UserName, registerDto.Password, databaseName);
             await tenantRepository.AddAsync(tenant);
 
             var name = new Name(registerDto.Name.FirstName, registerDto.Name.LastName);
-            var domainUser = User.Create(userId, name, registerDto.UserName, registerDto.Email, tenantId);
+            domainUser = User.Create(userId, name, registerDto.UserName, registerDto.Email, tenantId);
             await userRepository.AddAsync(domainUser);
         });
-
-        // TODO: How to handle the case if the database creation fails e.g. deleting identity user, domain user and tenant?
-        // Needs to be done outside of transaction
-        await tenantRepository.CreateDatabaseForTenantAsync(databaseName, registerDto.UserName,
-            registerDto.Password);
+        
+        try
+        {
+            // Needs to be done outside of transaction
+            await tenantRepository.CreateDatabaseForTenantAsync(databaseName, registerDto.UserName,
+                registerDto.Password);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to create database for tenant: {TenantId}", tenantId.Id);
+            if (domainUser != null)
+            {
+                await userRepository.DeleteAsync(domainUser);
+            }
+            if (tenant != null)
+            {
+                await tenantRepository.DeleteAsync(tenant);
+            }
+            if (identityUser != null)
+            {
+                await userManager.DeleteAsync(identityUser);
+            }
+            
+            throw new RegistrationException($"Failed to create database for tenant: {tenantId.Id}");
+        }
 
         return userId.Id;
     }
