@@ -8,21 +8,18 @@ using SMAIAXBackend.Domain.Repositories;
 namespace SMAIAXBackend.Application.Services.Implementations;
 
 public class SmartMeterDeleteService(
-    IUserValidationService userValidationService,
     ISmartMeterRepository smartMeterRepository,
     ILogger<SmartMeterDeleteService> logger) : ISmartMeterDeleteService
 {
-    public async Task RemoveMetadataFromSmartMeterAsync(Guid smartMeterId, Guid metadataId, string? userId)
+    public async Task RemoveMetadataFromSmartMeterAsync(Guid smartMeterId, Guid metadataId)
     {
-        var validatedUserId = await userValidationService.ValidateUserAsync(userId);
         var smartMeter =
-            await smartMeterRepository.GetSmartMeterByIdAndUserIdAsync(new SmartMeterId(smartMeterId), validatedUserId);
+            await smartMeterRepository.GetSmartMeterByIdAsync(new SmartMeterId(smartMeterId));
 
         if (smartMeter == null)
         {
-            logger.LogWarning("SmartMeter with id {SmartMeterId} not found for user {UserId}", smartMeterId,
-                validatedUserId.Id);
-            throw new SmartMeterNotFoundException(smartMeterId, validatedUserId.Id);
+            logger.LogError("Smart meter with id '{SmartMeterId} not found.", smartMeterId);
+            throw new SmartMeterNotFoundException(smartMeterId);
         }
 
         smartMeter.RemoveMetadata(new MetadataId(metadataId));

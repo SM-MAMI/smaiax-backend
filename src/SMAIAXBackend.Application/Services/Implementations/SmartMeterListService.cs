@@ -11,13 +11,11 @@ namespace SMAIAXBackend.Application.Services.Implementations;
 
 public class SmartMeterListService(
     ISmartMeterRepository smartMeterRepository,
-    ITenantContextService tenantContextService,
     ILogger<SmartMeterListService> logger) : ISmartMeterListService
 {
     public async Task<List<SmartMeterOverviewDto>> GetSmartMetersAsync()
     {
-        var tenant = await tenantContextService.GetCurrentTenantAsync();
-        List<SmartMeter> smartMeters = await smartMeterRepository.GetSmartMetersAsync(tenant);
+        List<SmartMeter> smartMeters = await smartMeterRepository.GetSmartMetersAsync();
         var smartMeterOverviewDtos = new List<SmartMeterOverviewDto>();
 
         foreach (var smartMeter in smartMeters)
@@ -31,15 +29,13 @@ public class SmartMeterListService(
 
     public async Task<SmartMeterOverviewDto> GetSmartMeterByIdAsync(Guid smartMeterId)
     {
-        var tenant = await tenantContextService.GetCurrentTenantAsync();
         var smartMeter =
-            await smartMeterRepository.GetSmartMeterByIdAsync(new SmartMeterId(smartMeterId), tenant);
+            await smartMeterRepository.GetSmartMeterByIdAsync(new SmartMeterId(smartMeterId));
 
         if (smartMeter == null)
         {
-            logger.LogError("Smart meter with id '{SmartMeterId} not found for tenant with id '{TenantId}'.", smartMeterId,
-                tenant.Id);
-            throw new SmartMeterNotFoundException(smartMeterId, tenant.Id.Id);
+            logger.LogError("Smart meter with id '{SmartMeterId} not found.", smartMeterId);
+            throw new SmartMeterNotFoundException(smartMeterId);
         }
 
         var smartMeterOverviewDto = SmartMeterOverviewDtoFromSmartMeter(smartMeter);

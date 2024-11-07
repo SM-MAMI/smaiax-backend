@@ -13,11 +13,9 @@ public class SmartMeterRepositoryTests : TestBase
     {
         // Given
         var smartMeterExpected = SmartMeter.Create(new SmartMeterId(Guid.NewGuid()), "Test");
-        var tenant = Tenant.Create(new TenantId(Guid.Parse("f4c70232-6715-4c15-966f-bf4bcef46d39")), "johndoe",
-            "P@ssw0rd", "tenant_1_db");
 
         // When
-        await _smartMeterRepository.AddAsync(smartMeterExpected, tenant);
+        await _smartMeterRepository.AddAsync(smartMeterExpected);
         var smartMeterActual = await _tenantDbContext.SmartMeters
             .AsNoTracking()
             .FirstOrDefaultAsync(sm => sm.Id.Equals(smartMeterExpected.Id));
@@ -35,8 +33,6 @@ public class SmartMeterRepositoryTests : TestBase
     public async Task GivenSmartMetersInRepository_WhenGetSmartMetersByUserId_ThenExpectedSmartMetersAreReturned()
     {
         // Given
-        var tenant = Tenant.Create(new TenantId(Guid.Parse("f4c70232-6715-4c15-966f-bf4bcef46d39")), "johndoe",
-            "P@ssw0rd", "tenant_1_db");
         var smartMetersExpected = new List<SmartMeter>()
         {
             SmartMeter.Create(new SmartMeterId(Guid.Parse("5e9db066-1b47-46cc-bbde-0b54c30167cd")), "Smart Meter 1"),
@@ -44,7 +40,7 @@ public class SmartMeterRepositoryTests : TestBase
         };
 
         // When
-        var smartMetersActual = await _smartMeterRepository.GetSmartMetersAsync(tenant);
+        var smartMetersActual = await _smartMeterRepository.GetSmartMetersAsync();
 
         // Then
         Assert.That(smartMetersActual, Is.Not.Null);
@@ -61,16 +57,14 @@ public class SmartMeterRepositoryTests : TestBase
     }
 
     [Test]
-    public async Task GivenSmartMeterInRepository_WhenGetSmartMeterByIdAndUserId_ThenExpectedSmartMeterIsReturned()
+    public async Task GivenSmartMeterInRepository_WhenGetSmartMeterById_ThenExpectedSmartMeterIsReturned()
     {
         // Given
-        var tenant = Tenant.Create(new TenantId(Guid.Parse("f4c70232-6715-4c15-966f-bf4bcef46d39")), "johndoe",
-            "P@ssw0rd", "tenant_1_db");
         var smartMeterExpected = SmartMeter.Create(new SmartMeterId(Guid.Parse("5e9db066-1b47-46cc-bbde-0b54c30167cd")),
             "Smart Meter 1");
 
         // When
-        var smartMeterActual = await _smartMeterRepository.GetSmartMeterByIdAsync(smartMeterExpected.Id, tenant);
+        var smartMeterActual = await _smartMeterRepository.GetSmartMeterByIdAsync(smartMeterExpected.Id);
 
         // Then
         Assert.That(smartMeterActual, Is.Not.Null);
@@ -85,14 +79,12 @@ public class SmartMeterRepositoryTests : TestBase
     public async Task GivenSmartMeterInRepository_WhenUpdate_ThenExpectedSmartMeterIsUpdated()
     {
         // Given
-        var tenant = Tenant.Create(new TenantId(Guid.Parse("f4c70232-6715-4c15-966f-bf4bcef46d39")), "johndoe",
-            "P@ssw0rd", "tenant_1_db");
         const string name = "Smart Meter 1";
         var smartMeterExpected = SmartMeter.Create(new SmartMeterId(Guid.Parse("5e9db066-1b47-46cc-bbde-0b54c30167cd")),
             "Smart Meter 1 Updated");
 
         // When
-        await _smartMeterRepository.UpdateAsync(smartMeterExpected, tenant);
+        await _smartMeterRepository.UpdateAsync(smartMeterExpected);
 
         // Then
         var smartMeterActual = await _tenantDbContext.SmartMeters

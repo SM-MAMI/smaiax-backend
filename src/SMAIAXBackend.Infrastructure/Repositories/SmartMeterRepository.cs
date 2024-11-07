@@ -7,7 +7,7 @@ using SMAIAXBackend.Infrastructure.DbContexts;
 
 namespace SMAIAXBackend.Infrastructure.Repositories;
 
-public class SmartMeterRepository(ITenantDbContextFactory tenantDbContextFactory) : ISmartMeterRepository
+public class SmartMeterRepository(TenantDbContext tenantDbContext) : ISmartMeterRepository
 {
     public SmartMeterId NextIdentity()
     {
@@ -19,36 +19,30 @@ public class SmartMeterRepository(ITenantDbContextFactory tenantDbContextFactory
         return new MetadataId(Guid.NewGuid());
     }
     
-    public async Task AddAsync(SmartMeter meter, Tenant tenant)
+    public async Task AddAsync(SmartMeter meter)
     {
-        var tenantDbContext = tenantDbContextFactory.CreateDbContext(tenant);
         await tenantDbContext.SmartMeters.AddAsync(meter);
         await tenantDbContext.SaveChangesAsync();
     }
 
-    public Task<List<SmartMeter>> GetSmartMetersAsync(Tenant tenant)
+    public async Task<List<SmartMeter>> GetSmartMetersAsync()
     {
-        var tenantDbContext = tenantDbContextFactory.CreateDbContext(tenant);
-        return tenantDbContext.SmartMeters
+        return await tenantDbContext.SmartMeters
             .Include(sm => sm.Metadata)
             .Include(sm => sm.Policies)
             .ToListAsync();
     }
 
-    public Task<SmartMeter?> GetSmartMeterByIdAsync(SmartMeterId smartMeterId, Tenant tenant)
+    public async Task<SmartMeter?> GetSmartMeterByIdAsync(SmartMeterId smartMeterId)
     {
-        var tenantDbContext = tenantDbContextFactory.CreateDbContext(tenant);
-        return tenantDbContext.SmartMeters
+        return await tenantDbContext.SmartMeters
             .Include(sm => sm.Metadata)
             .Include(sm => sm.Policies)
             .FirstOrDefaultAsync(sm => sm.Id.Equals(smartMeterId));
     }
 
-    public async Task UpdateAsync(SmartMeter smartMeter, Tenant tenant)
+    public async Task UpdateAsync(SmartMeter smartMeter)
     {
-        var tenantDbContext =
-            tenantDbContextFactory.CreateDbContext(tenant.DatabaseName, tenant.DatabaseUsername,
-                tenant.DatabasePassword);
         tenantDbContext.SmartMeters.Update(smartMeter);
         await tenantDbContext.SaveChangesAsync();
     }

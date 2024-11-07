@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 using Npgsql;
 
+using SMAIAXBackend.Application.Services.Interfaces;
 using SMAIAXBackend.Infrastructure.Configurations;
 using SMAIAXBackend.Infrastructure.DbContexts;
 
@@ -30,19 +31,13 @@ public static class DatabaseExtensions
             options.UseNpgsql(connectionStringBuilder.ConnectionString);
         });
         
-        // This is needed to create migrations for the TenantDbContext
-        services.AddDbContext<TenantDbContext>(options =>
+        services.AddDbContext<TenantDbContext>((serviceProvider, options) =>
         {
-            var dbConfig = configuration.GetSection("DatabaseConfiguration").Get<DatabaseConfiguration>();
-            var connectionStringBuilder = new NpgsqlConnectionStringBuilder
-            {
-                Host = dbConfig!.Host,
-                Port = dbConfig.Port,
-                Username = dbConfig.SuperUsername,
-                Password = dbConfig.SuperUserPassword,
-                Database = "tenant_template_db"
-            };
-            options.UseNpgsql(connectionStringBuilder.ConnectionString);
+            var tenantContextService = serviceProvider.GetRequiredService<ITenantContextService>();
+            var tenantDbContextFactory = serviceProvider.GetRequiredService<ITenantDbContextFactory>();
+            var currentTenant = tenantContextService.GetCurrentTenantAsync().GetAwaiter().GetResult();
+            var connectionString = tenantDbContextFactory.GetConnectionStringForTenant(currentTenant);
+            options.UseNpgsql(connectionString);
         });
         
         services.AddScoped<ITenantDbContextFactory, TenantDbContextFactory>();

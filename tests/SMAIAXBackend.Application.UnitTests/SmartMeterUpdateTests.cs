@@ -5,7 +5,6 @@ using Moq;
 using SMAIAXBackend.Application.DTOs;
 using SMAIAXBackend.Application.Exceptions;
 using SMAIAXBackend.Application.Services.Implementations;
-using SMAIAXBackend.Application.Services.Interfaces;
 using SMAIAXBackend.Domain.Model.Entities;
 using SMAIAXBackend.Domain.Model.ValueObjects.Ids;
 using SMAIAXBackend.Domain.Repositories;
@@ -16,7 +15,6 @@ namespace SMAIAXBackend.Application.UnitTests;
 public class SmartMeterUpdateTests
 {
     private Mock<ISmartMeterRepository> _smartMeterRepositoryMock;
-    private Mock<ITenantContextService> _tenantContextServiceMock;
     private Mock<ILogger<SmartMeterUpdateService>> _loggerMock;
     private SmartMeterUpdateService _smartMeterUpdateService;
 
@@ -24,10 +22,8 @@ public class SmartMeterUpdateTests
     public void Setup()
     {
         _smartMeterRepositoryMock = new Mock<ISmartMeterRepository>();
-        _tenantContextServiceMock = new Mock<ITenantContextService>();
         _loggerMock = new Mock<ILogger<SmartMeterUpdateService>>();
-        _smartMeterUpdateService = new SmartMeterUpdateService(_smartMeterRepositoryMock.Object,
-            _tenantContextServiceMock.Object, _loggerMock.Object);
+        _smartMeterUpdateService = new SmartMeterUpdateService(_smartMeterRepositoryMock.Object, _loggerMock.Object);
     }
 
     [Test]
@@ -36,12 +32,10 @@ public class SmartMeterUpdateTests
         // Given
         var smartMeterIdExpected = Guid.NewGuid();
         var smartMeterUpdateDto = new SmartMeterUpdateDto(smartMeterIdExpected, "Updated name");
-        var tenant = Tenant.Create(new TenantId(Guid.NewGuid()), "test", "test", "test");
         var smartMeter = SmartMeter.Create(new SmartMeterId(smartMeterIdExpected), "Name");
-
-        _tenantContextServiceMock.Setup(service => service.GetCurrentTenantAsync()).ReturnsAsync(tenant);
+        
         _smartMeterRepositoryMock.Setup(repo =>
-                repo.GetSmartMeterByIdAsync(new SmartMeterId(smartMeterIdExpected), tenant))
+                repo.GetSmartMeterByIdAsync(new SmartMeterId(smartMeterIdExpected)))
             .ReturnsAsync(smartMeter);
 
         // When
@@ -58,8 +52,6 @@ public class SmartMeterUpdateTests
         // Given
         var smartMeterIdExpected = Guid.NewGuid();
         var smartMeterUpdateDto = new SmartMeterUpdateDto(Guid.NewGuid(), "Updated name");
-        var tenant = Tenant.Create(new TenantId(Guid.NewGuid()), "test", "test", "test");
-        _tenantContextServiceMock.Setup(service => service.GetCurrentTenantAsync()).ReturnsAsync(tenant);
 
         // When ... Then
         Assert.ThrowsAsync<SmartMeterIdMismatchException>(async () =>
@@ -73,11 +65,9 @@ public class SmartMeterUpdateTests
         // Given
         var smartMeterIdExpected = Guid.NewGuid();
         var smartMeterUpdateDto = new SmartMeterUpdateDto(smartMeterIdExpected, "Updated name");
-        var tenant = Tenant.Create(new TenantId(Guid.NewGuid()), "test", "test", "test");
 
-        _tenantContextServiceMock.Setup(service => service.GetCurrentTenantAsync()).ReturnsAsync(tenant);
         _smartMeterRepositoryMock.Setup(repo =>
-                repo.GetSmartMeterByIdAsync(new SmartMeterId(smartMeterIdExpected), tenant))
+                repo.GetSmartMeterByIdAsync(new SmartMeterId(smartMeterIdExpected)))
             .ReturnsAsync((SmartMeter)null!);
 
         // When ... Then

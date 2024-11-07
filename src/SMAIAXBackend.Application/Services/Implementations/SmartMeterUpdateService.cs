@@ -10,7 +10,6 @@ namespace SMAIAXBackend.Application.Services.Implementations;
 
 public class SmartMeterUpdateService(
     ISmartMeterRepository smartMeterRepository,
-    ITenantContextService tenantContextService,
     ILogger<SmartMeterUpdateService> logger) : ISmartMeterUpdateService
 {
     public async Task<Guid> UpdateSmartMeterAsync(
@@ -24,21 +23,18 @@ public class SmartMeterUpdateService(
                 smartMeterIdExpected, smartMeterUpdateDto.Id);
             throw new SmartMeterIdMismatchException(smartMeterIdExpected, smartMeterUpdateDto.Id);
         }
-
-        var tenant = await tenantContextService.GetCurrentTenantAsync();
+        
         var smartMeter =
-            await smartMeterRepository.GetSmartMeterByIdAsync(new SmartMeterId(smartMeterIdExpected),
-                tenant);
+            await smartMeterRepository.GetSmartMeterByIdAsync(new SmartMeterId(smartMeterIdExpected));
 
         if (smartMeter == null)
         {
-            logger.LogError("Smart meter with id '{SmartMeterId} not found for tenant with id '{TenantId}'.", smartMeterIdExpected,
-                tenant.Id);
-            throw new SmartMeterNotFoundException(smartMeterIdExpected, tenant.Id.Id);
+            logger.LogError("Smart meter with id '{SmartMeterId} not found.", smartMeterIdExpected);
+            throw new SmartMeterNotFoundException(smartMeterIdExpected);
         }
 
         smartMeter.Update(smartMeterUpdateDto.Name);
-        await smartMeterRepository.UpdateAsync(smartMeter, tenant);
+        await smartMeterRepository.UpdateAsync(smartMeter);
 
         return smartMeterIdExpected;
     }

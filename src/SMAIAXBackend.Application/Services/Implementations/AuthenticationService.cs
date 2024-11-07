@@ -30,16 +30,14 @@ public class AuthenticationService(
         IdentityUser? identityUser = null;
         Tenant? tenant = null;
         User? domainUser = null;
-        
-        await transactionManager.TransactionScope(async () =>
+
+        await transactionManager.ReadCommittedTransactionScope(async () =>
         {
             identityUser = new IdentityUser
             {
                 Id = userId.Id.ToString(), UserName = registerDto.UserName, Email = registerDto.Email
             };
-
-        await transactionManager.ReadCommittedTransactionScope(async () =>
-        {
+            
             var result = await userManager.CreateAsync(identityUser, registerDto.Password);
 
             if (!result.Succeeded)

@@ -218,7 +218,7 @@ public class SmartMeterTests : TestBase
         var returnedId = Guid.Parse(responseContent.Trim('"'));
         Assert.That(returnedId, Is.EqualTo(smartMeterId));
 
-        var smartMeter = await _applicationDbContext.SmartMeters
+        var smartMeter = await _tenantDbContext.SmartMeters
             .AsNoTracking()
             .Include(smartMeter => smartMeter.Metadata)
             .FirstOrDefaultAsync(x => x.Id.Equals(new SmartMeterId(returnedId)));
@@ -271,7 +271,7 @@ public class SmartMeterTests : TestBase
         // Then
         Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NoContent));
 
-        var smartMeter = await _applicationDbContext.SmartMeters
+        var smartMeter = await _tenantDbContext.SmartMeters
             .AsNoTracking()
             .Include(smartMeter => smartMeter.Metadata)
             .FirstOrDefaultAsync(x => x.Id.Equals(new SmartMeterId(smartMeterId)));

@@ -26,7 +26,7 @@ public class TenantDbContextFactory(IOptions<DatabaseConfiguration> databaseConf
         return new TenantDbContext(optionsBuilder.Options);
     }
     
-    public TenantDbContext CreateDbContext(Tenant tenant)
+    public string GetConnectionStringForTenant(Tenant tenant)
     {
         var connectionStringBuilder = new NpgsqlConnectionStringBuilder
         {
@@ -36,9 +36,7 @@ public class TenantDbContextFactory(IOptions<DatabaseConfiguration> databaseConf
             Password = tenant.DatabasePassword,
             Database = tenant.DatabaseName
         };
-        var optionsBuilder = new DbContextOptionsBuilder<TenantDbContext>();
-        optionsBuilder.UseNpgsql(connectionStringBuilder.ConnectionString);
 
-        return new TenantDbContext(optionsBuilder.Options);
+        return connectionStringBuilder.ConnectionString;
     }
 }

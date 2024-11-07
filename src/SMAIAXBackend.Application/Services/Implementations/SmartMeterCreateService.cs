@@ -12,30 +12,26 @@ namespace SMAIAXBackend.Application.Services.Implementations;
 
 public class SmartMeterCreateService(
     ISmartMeterRepository smartMeterRepository,
-    ITenantContextService tenantContextService,
     ILogger<SmartMeterCreateService> logger) : ISmartMeterCreateService
 {
     public async Task<Guid> AddSmartMeterAsync(SmartMeterCreateDto smartMeterCreateDto)
     {
-        var tenant = await tenantContextService.GetCurrentTenantAsync();
         var smartMeterId = smartMeterRepository.NextIdentity();
         var smartMeter = SmartMeter.Create(smartMeterId, smartMeterCreateDto.Name);
-        await smartMeterRepository.AddAsync(smartMeter, tenant);
+        await smartMeterRepository.AddAsync(smartMeter);
 
         return smartMeterId.Id;
     }
-
-    public async Task<Guid> AddMetadataAsync(Guid smartMeterId, MetadataCreateDto metadataCreateDto, string? userId)
+    
+    public async Task<Guid> AddMetadataAsync(Guid smartMeterId, MetadataCreateDto metadataCreateDto)
     {
-        var tenant = await tenantContextService.GetCurrentTenantAsync();
         var smartMeter =
-            await smartMeterRepository.GetSmartMeterByIdAsync(new SmartMeterId(smartMeterId), tenant);
+            await smartMeterRepository.GetSmartMeterByIdAsync(new SmartMeterId(smartMeterId));
 
         if (smartMeter == null)
         {
-            logger.LogWarning("SmartMeter with id {SmartMeterId} not found for tenant {TenantId}", smartMeterId,
-                tenant.Id);
-            throw new SmartMeterNotFoundException(smartMeterId, validatedUserId.Id);
+            logger.LogError("Smart meter with id '{SmartMeterId} not found.", smartMeterId);
+            throw new SmartMeterNotFoundException(smartMeterId);
         }
 
         var metadataId = smartMeterRepository.NextMetadataIdentity();

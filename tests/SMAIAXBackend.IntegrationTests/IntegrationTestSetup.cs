@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 using SMAIAXBackend.Domain.Repositories;
 using SMAIAXBackend.Infrastructure.DbContexts;
+using SMAIAXBackend.Infrastructure.Repositories;
 
 using Testcontainers.PostgreSql;
 
@@ -48,8 +49,11 @@ internal static class IntegrationTestSetup
         var tenantDbContextFactory = _webAppFactory.Services.GetRequiredService<ITenantDbContextFactory>();
         TenantDbContext = tenantDbContextFactory.CreateDbContext("tenant_1_db", superUserName, superUserPassword);
         TenantRepository = _webAppFactory.Services.GetRequiredService<ITenantRepository>();
-        SmartMeterRepository = _webAppFactory.Services.GetRequiredService<ISmartMeterRepository>();
         UserRepository = _webAppFactory.Services.GetRequiredService<IUserRepository>();
+
+        // Repositories that are using the TenantDatabase need to be instantiated because
+        // They are injected with a connection string that is created based on the http request
+        SmartMeterRepository = new SmartMeterRepository(TenantDbContext);
 
         var tokenRepository = _webAppFactory.Services.GetRequiredService<ITokenRepository>();
         AccessToken = await tokenRepository.GenerateAccessTokenAsync($"{Guid.NewGuid()}-{Guid.NewGuid()}",

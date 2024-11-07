@@ -48,7 +48,7 @@ public class SmartMeterTests
     public void GivenSmartMeterAndMetadata_WhenAddMetadata_ThenMetadataIsAdded()
     {
         // Given
-        var smartMeter = SmartMeter.Create(new SmartMeterId(Guid.NewGuid()), "SmartMeter", new UserId(Guid.NewGuid()));
+        var smartMeter = SmartMeter.Create(new SmartMeterId(Guid.NewGuid()), "SmartMeter");
         var metadata = Metadata.Create(new MetadataId(Guid.NewGuid()), DateTime.UtcNow,
             new Location("Some street", "Some city", "Some state", "Some country", Continent.Europe),
             4, smartMeter.Id);
@@ -65,7 +65,7 @@ public class SmartMeterTests
     public void GivenSmartMeterAndMetadata_WhenAddMetadataTwice_ThenArgumentExceptionIsThrown()
     {
         // Given
-        var smartMeter = SmartMeter.Create(new SmartMeterId(Guid.NewGuid()), "SmartMeter", new UserId(Guid.NewGuid()));
+        var smartMeter = SmartMeter.Create(new SmartMeterId(Guid.NewGuid()), "SmartMeter");
         var metadata = Metadata.Create(new MetadataId(Guid.NewGuid()), DateTime.UtcNow,
             new Location("Some street", "Some city", "Some state", "Some country", Continent.Europe),
             4, smartMeter.Id);
@@ -79,7 +79,7 @@ public class SmartMeterTests
     public void GivenSmartMeterAndMetadataId_WhenRemoveMetadata_ThenMetadataIsRemoved()
     {
         // Given
-        var smartMeter = SmartMeter.Create(new SmartMeterId(Guid.NewGuid()), "SmartMeter", new UserId(Guid.NewGuid()));
+        var smartMeter = SmartMeter.Create(new SmartMeterId(Guid.NewGuid()), "SmartMeter");
         var metadata = Metadata.Create(new MetadataId(Guid.NewGuid()), DateTime.UtcNow,
             new Location("Some street", "Some city", "Some state", "Some country", Continent.Europe),
             4, smartMeter.Id);
@@ -96,7 +96,7 @@ public class SmartMeterTests
     public void GivenSmartMeterAndNonExistentMetadataId_WhenRemoveMetadata_ThenArgumentExceptionIsThrown()
     {
         // Given
-        var smartMeter = SmartMeter.Create(new SmartMeterId(Guid.NewGuid()), "SmartMeter", new UserId(Guid.NewGuid()));
+        var smartMeter = SmartMeter.Create(new SmartMeterId(Guid.NewGuid()), "SmartMeter");
 
         // When ... Then
         Assert.Throws<ArgumentException>(() => smartMeter.RemoveMetadata(new MetadataId(Guid.NewGuid())));

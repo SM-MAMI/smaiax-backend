@@ -7,9 +7,8 @@ public interface ISmartMeterRepository
 {
     SmartMeterId NextIdentity();
     MetadataId NextMetadataIdentity();
+    Task AddAsync(SmartMeter meter);
+    Task<List<SmartMeter>> GetSmartMetersAsync();
+    Task<SmartMeter?> GetSmartMeterByIdAsync(SmartMeterId smartMeterId);
     Task UpdateAsync(SmartMeter smartMeter);
-    Task AddAsync(SmartMeter meter, Tenant tenant);
-    Task<List<SmartMeter>> GetSmartMetersAsync(Tenant tenant);
-    Task<SmartMeter?> GetSmartMeterByIdAsync(SmartMeterId smartMeterId, Tenant tenant);
-    Task UpdateAsync(SmartMeter smartMeter, Tenant tenant);
 }
