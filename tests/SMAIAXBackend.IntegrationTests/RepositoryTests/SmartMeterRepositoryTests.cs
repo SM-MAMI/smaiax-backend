@@ -42,7 +42,7 @@ public class SmartMeterRepositoryTests : TestBase
         };
 
         // When
-        var smartMetersActual = await _smartMeterRepository.GetSmartMetersByUserIdAsync(userId);
+        var smartMetersActual = await _smartMeterRepository.GetSmartMetersAsync(userId);
 
         // Then
         Assert.That(smartMetersActual, Is.Not.Null);
@@ -68,7 +68,7 @@ public class SmartMeterRepositoryTests : TestBase
             "Smart Meter 1", userId);
 
         // When
-        var smartMeterActual = await _smartMeterRepository.GetSmartMeterByIdAndUserIdAsync(smartMeterExpected.Id, userId);
+        var smartMeterActual = await _smartMeterRepository.GetSmartMeterByIdAsync(smartMeterExpected.Id, userId);
 
         // Then
         Assert.That(smartMeterActual, Is.Not.Null);

@@ -11,14 +11,23 @@ namespace SMAIAXBackend.Application.Services.Implementations;
 
 public class SmartMeterListService(
     ISmartMeterRepository smartMeterRepository,
+    ITenantRepository tenantRepository,
     IUserValidationService userValidationService,
     ILogger<SmartMeterListService> logger) : ISmartMeterListService
 {
     public async Task<List<SmartMeterOverviewDto>> GetSmartMetersByUserIdAsync(string? userId)
     {
-        var validatedUserId = await userValidationService.ValidateUserAsync(userId);
+        var user = await userValidationService.ValidateUserAsync(userId);
+        var tenant = await tenantRepository.GetByIdAsync(user.TenantId);
 
-        List<SmartMeter> smartMeters = await smartMeterRepository.GetSmartMetersByUserIdAsync(validatedUserId);
+        if (tenant == null)
+        {
+            // TODO: Throw custom exception
+            logger.LogWarning("Tenant not found for user {userId}", userId);
+            throw new Exception("Tenant not found");
+        }
+
+        List<SmartMeter> smartMeters = await smartMeterRepository.GetSmartMetersAsync(tenant);
         var smartMeterOverviewDtos = new List<SmartMeterOverviewDto>();
 
         foreach (var smartMeter in smartMeters)
@@ -32,15 +41,23 @@ public class SmartMeterListService(
 
     public async Task<SmartMeterOverviewDto> GetSmartMeterByIdAndUserIdAsync(Guid smartMeterId, string? userId)
     {
-        var validatedUserId = await userValidationService.ValidateUserAsync(userId);
+        var user = await userValidationService.ValidateUserAsync(userId);
+        var tenant = await tenantRepository.GetByIdAsync(user.TenantId);
+
+        if (tenant == null)
+        {
+            // TODO: Throw custom exception
+            logger.LogWarning("Tenant not found for user {userId}", userId);
+            throw new Exception("Tenant not found");
+        }
         var smartMeter =
-            await smartMeterRepository.GetSmartMeterByIdAndUserIdAsync(new SmartMeterId(smartMeterId), validatedUserId);
+            await smartMeterRepository.GetSmartMeterByIdAsync(new SmartMeterId(smartMeterId), tenant);
 
         if (smartMeter == null)
         {
             logger.LogError("Smart meter with id '{SmartMeterId} not found for user with id '{UserId}'.", smartMeterId,
-                validatedUserId.Id);
-            throw new SmartMeterNotFoundException(smartMeterId, validatedUserId.Id);
+                user.Id);
+            throw new SmartMeterNotFoundException(smartMeterId, user.Id.Id);
         }
 
         var smartMeterOverviewDto = SmartMeterOverviewDtoFromSmartMeter(smartMeter);

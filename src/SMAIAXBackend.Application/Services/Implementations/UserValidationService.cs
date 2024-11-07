@@ -2,6 +2,7 @@ using Microsoft.Extensions.Logging;
 
 using SMAIAXBackend.Application.Exceptions;
 using SMAIAXBackend.Application.Services.Interfaces;
+using SMAIAXBackend.Domain.Model.Entities;
 using SMAIAXBackend.Domain.Model.ValueObjects.Ids;
 using SMAIAXBackend.Domain.Repositories;
 
@@ -9,7 +10,7 @@ namespace SMAIAXBackend.Application.Services.Implementations;
 
 public class UserValidationService(IUserRepository userRepository, ILogger<UserValidationService> logger) : IUserValidationService
 {
-    public async Task<UserId> ValidateUserAsync(string? userId)
+    public async Task<User> ValidateUserAsync(string? userId)
     {
         if (string.IsNullOrEmpty(userId))
         {
@@ -31,6 +32,6 @@ public class UserValidationService(IUserRepository userRepository, ILogger<UserV
             throw new UserNotFoundException(userIdGuid);
         }
 
-        return new UserId(userIdGuid);
+        return user;
     }
 }

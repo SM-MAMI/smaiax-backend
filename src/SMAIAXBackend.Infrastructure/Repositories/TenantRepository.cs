@@ -31,6 +31,11 @@ public class TenantRepository(
         await applicationDbContext.SaveChangesAsync();
     }
 
+    public async Task<Tenant?> GetByIdAsync(TenantId tenantId)
+    {
+        return await applicationDbContext.Tenants.FindAsync(tenantId);
+    }
+
     public async Task CreateDatabaseForTenantAsync(string databaseName, string databaseUserName, string databasePassword)
     {
         await applicationDbContext.Database.OpenConnectionAsync();
@@ -44,7 +49,7 @@ public class TenantRepository(
         await createDbCommand.ExecuteNonQueryAsync();
         
         await using var grantPrivilegesCommand = applicationDbContext.Database.GetDbConnection().CreateCommand();
-        createDbCommand.CommandText = $"GRANT ALL PRIVILEGES ON DATABASE {databaseName} TO {databaseUserName};";
+        createDbCommand.CommandText = $"GRANT CONNECT ON DATABASE {databaseName} TO {databaseUserName};";
         await createDbCommand.ExecuteNonQueryAsync();
 
         await applicationDbContext.Database.CloseConnectionAsync();
@@ -60,6 +65,27 @@ public class TenantRepository(
         
         var tenantDbContext = tenantDbContextFactory.CreateDbContext(databaseName, superUsername, superPassword);
         
+        // Creates also the schema 'domain'
         await tenantDbContext.Database.MigrateAsync();
+        
+        await tenantDbContext.Database.OpenConnectionAsync();
+        await using var setSchemaPrivilegesCommand = tenantDbContext.Database.GetDbConnection().CreateCommand();
+        
+        setSchemaPrivilegesCommand.CommandText = $@"
+        GRANT USAGE ON SCHEMA domain TO {databaseUserName};
+        GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA domain TO {databaseUserName};
+        ";
+        await setSchemaPrivilegesCommand.ExecuteNonQueryAsync();
+        
+        setSchemaPrivilegesCommand.CommandText = $@"
+        ALTER DEFAULT PRIVILEGES IN SCHEMA domain 
+        GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO {databaseUserName};
+        ";
+        await setSchemaPrivilegesCommand.ExecuteNonQueryAsync();
+        
+        setSchemaPrivilegesCommand.CommandText = $"REVOKE ALL ON SCHEMA public FROM {databaseUserName};";
+        await setSchemaPrivilegesCommand.ExecuteNonQueryAsync();
+        
+        await tenantDbContext.Database.CloseConnectionAsync();
     }
 }

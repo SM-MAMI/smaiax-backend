@@ -1,8 +1,8 @@
-using SMAIAXBackend.Domain.Model.ValueObjects.Ids;
+using SMAIAXBackend.Domain.Model.Entities;
 
 namespace SMAIAXBackend.Application.Services.Interfaces;
 
 public interface IUserValidationService
 {
-    Task<UserId> ValidateUserAsync(string? userId);
+    Task<User> ValidateUserAsync(string? userId);
 }

@@ -76,8 +76,8 @@ public class AuthenticationService(
             {
                 await userManager.DeleteAsync(identityUser);
             }
-            
-            throw new RegistrationException($"Failed to create database for tenant: {tenantId.Id}");
+
+            throw;
         }
 
         return userId.Id;

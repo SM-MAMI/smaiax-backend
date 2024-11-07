@@ -44,7 +44,7 @@ public class SmartMeterListServiceTests
 
         _userValidationServiceMock.Setup(service => service.ValidateUserAsync(userId.Id.ToString()))
             .ReturnsAsync(userId);
-        _smartMeterRepositoryMock.Setup(repo => repo.GetSmartMetersByUserIdAsync(userId))
+        _smartMeterRepositoryMock.Setup(repo => repo.GetSmartMetersAsync(userId))
             .ReturnsAsync(smartMetersExpected);
 
         // When
@@ -77,7 +77,7 @@ public class SmartMeterListServiceTests
 
         _userValidationServiceMock.Setup(service => service.ValidateUserAsync(userId.Id.ToString()))
             .ReturnsAsync(userId);
-        _smartMeterRepositoryMock.Setup(repo => repo.GetSmartMeterByIdAndUserIdAsync(smartMeterExpected.Id, userId))
+        _smartMeterRepositoryMock.Setup(repo => repo.GetSmartMeterByIdAsync(smartMeterExpected.Id, userId))
             .ReturnsAsync(smartMeterExpected);
 
         // When
@@ -105,7 +105,7 @@ public class SmartMeterListServiceTests
 
         _userValidationServiceMock.Setup(service => service.ValidateUserAsync(userId.Id.ToString()))
             .ReturnsAsync(userId);
-        _smartMeterRepositoryMock.Setup(repo => repo.GetSmartMeterByIdAndUserIdAsync(smartMeterId, userId))
+        _smartMeterRepositoryMock.Setup(repo => repo.GetSmartMeterByIdAsync(smartMeterId, userId))
             .ReturnsAsync((SmartMeter)null!);
 
         // When ... Then
