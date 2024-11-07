@@ -47,6 +47,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         var userId = new UserId(Guid.Parse("3c07065a-b964-44a9-9cdf-fbd49d755ea7"));
         const string userName = "johndoe";
         const string email = "john.doe@example.com";
+        const string password = "P@ssw0rd";
         var testUser = new IdentityUser
         {
             Id = userId.Id.ToString(),
@@ -55,10 +56,10 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             Email = email,
             NormalizedEmail = email.ToUpper(),
         };
-        var passwordHash = hasher.HashPassword(testUser, "P@ssw0rd");
+        var passwordHash = hasher.HashPassword(testUser, password);
         testUser.PasswordHash = passwordHash;
 
-        var tenant = Tenant.Create(new TenantId(Guid.NewGuid()), "test", "test", "test");
+        var tenant = Tenant.Create(new TenantId(Guid.NewGuid()), userName, password, "tenant_1_db");
         var domainUser = User.Create(userId, new Name("John", "Doe"),userName, email, tenant.Id);
 
         await Users.AddAsync(testUser);
