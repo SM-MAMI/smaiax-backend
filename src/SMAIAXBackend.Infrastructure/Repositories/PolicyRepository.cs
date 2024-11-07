@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+
 using SMAIAXBackend.Domain.Model.Entities;
 using SMAIAXBackend.Domain.Model.ValueObjects.Ids;
 using SMAIAXBackend.Domain.Repositories;
@@ -16,5 +18,13 @@ public class PolicyRepository(ApplicationDbContext applicationDbContext) : IPoli
     {
         await applicationDbContext.Policies.AddAsync(policy);
         await applicationDbContext.SaveChangesAsync();
+    }
+
+    public Task<List<Policy>> GetPoliciesBySmartMeterIdAndUserIdAsync(SmartMeterId smartMeterId, UserId userId)
+    {
+        return applicationDbContext.Policies
+            .Where(p => p.SmartMeterId.Equals(smartMeterId))
+            .Where(p => p.UserId.Equals(userId))
+            .ToListAsync();
     }
 }

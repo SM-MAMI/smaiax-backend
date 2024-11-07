@@ -21,8 +21,8 @@ public class PolicyTests : TestBase
     public async Task GivenPolicyCreateDtoAndAccessToken_WhenCreatePolicy_ThenPolicyIsCreated()
     {
         // Given
-        var locationDto = new LocationDto("Some street name", "Some city", "Some state", "Some country", Continent.Europe);
-        var policyCreateDto = new PolicyCreateDto(MeasurementResolution.Minute, 4, locationDto, LocationResolution.City, 100);
+        var smartMeterId = Guid.Parse("f4c70232-6715-4c15-966f-bf4bcef46d39");
+        var policyCreateDto = new PolicyCreateDto(MeasurementResolution.Minute, LocationResolution.City, 100, smartMeterId);
 
         var httpContent = new StringContent(JsonConvert.SerializeObject(policyCreateDto), Encoding.UTF8,
             "application/json");
@@ -46,12 +46,6 @@ public class PolicyTests : TestBase
         Assert.Multiple(() =>
         {
             Assert.That(policyActual.MeasurementResolution, Is.EqualTo(policyCreateDto.MeasurementResolution));
-            Assert.That(policyActual.HouseholdSize, Is.EqualTo(policyCreateDto.HouseholdSize));
-            Assert.That(policyActual.Location.StreetName, Is.EqualTo(policyCreateDto.Location.StreetName));
-            Assert.That(policyActual.Location.City, Is.EqualTo(policyCreateDto.Location.City));
-            Assert.That(policyActual.Location.State, Is.EqualTo(policyCreateDto.Location.State));
-            Assert.That(policyActual.Location.Country, Is.EqualTo(policyCreateDto.Location.Country));
-            Assert.That(policyActual.Location.Continent, Is.EqualTo(policyCreateDto.Location.Continent));
             Assert.That(policyActual.LocationResolution, Is.EqualTo(policyCreateDto.LocationResolution));
             Assert.That(policyActual.Price, Is.EqualTo(policyCreateDto.Price));
             Assert.That(policyActual.State, Is.EqualTo(PolicyState.Active));
@@ -62,8 +56,8 @@ public class PolicyTests : TestBase
     public async Task GivenPolicyCreateDtoAndNoAccessToken_WhenCreatePolicy_ThenUnauthorizedIsReturned()
     {
         // Given
-        var locationDto = new LocationDto("Some street name", "Some city", "Some state", "Some country", Continent.Europe);
-        var policyCreateDto = new PolicyCreateDto(MeasurementResolution.Minute, 4, locationDto, LocationResolution.City, 100);
+        var smartMeterId = Guid.Parse("f4c70232-6715-4c15-966f-bf4bcef46d39");
+        var policyCreateDto = new PolicyCreateDto(MeasurementResolution.Minute, LocationResolution.City, 100, smartMeterId);
 
         var httpContent = new StringContent(JsonConvert.SerializeObject(policyCreateDto), Encoding.UTF8,
             "application/json");
