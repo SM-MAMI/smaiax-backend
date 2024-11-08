@@ -4,7 +4,7 @@ namespace SMAIAXBackend.Domain.Model.Entities;
 
 public sealed class Tenant : IEquatable<Tenant>
 {
-    public TenantId Id { get; }
+    public TenantId Id { get; } = null!;
     // TODO: Move credentials to a secure store e.g. HashiCorp Vault
     public string DatabaseUsername { get; }
     public string DatabasePassword { get; }

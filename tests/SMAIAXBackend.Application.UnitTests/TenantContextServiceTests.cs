@@ -65,7 +65,7 @@ public class TenantContextServiceTests
     {
         // Given
         _httpContextAccessorMock.Setup(httpContextAccessor => httpContextAccessor.HttpContext!.Items["UserId"])
-            .Returns((string?)null);
+            .Returns((string)null!);
 
         // When ... Then
         Assert.ThrowsAsync<InvalidTokenException>(async () => await _tenantContextService.GetCurrentTenantAsync());

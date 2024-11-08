@@ -79,7 +79,7 @@ public class AuthenticationService(
                 await userManager.DeleteAsync(identityUser);
             }
 
-            throw;
+            throw new TenantDatabaseCreationException();
         }
 
         return userId.Id;
