@@ -48,7 +48,6 @@ internal static class IntegrationTestSetup
         HttpClient = _webAppFactory.CreateClient();
 
         ApplicationDbContext = _webAppFactory.Services.GetRequiredService<ApplicationDbContext>();
-        SmartMeterRepository = _webAppFactory.Services.GetRequiredService<ISmartMeterRepository>();
         var tenantDbContextFactory = _webAppFactory.Services.GetRequiredService<ITenantDbContextFactory>();
         TenantDbContext = tenantDbContextFactory.CreateDbContext("tenant_1_db", superUserName, superUserPassword);
         TenantRepository = _webAppFactory.Services.GetRequiredService<ITenantRepository>();

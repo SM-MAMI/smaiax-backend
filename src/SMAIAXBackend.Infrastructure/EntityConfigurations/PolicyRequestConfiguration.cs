@@ -45,11 +45,5 @@ public class PolicyRequestConfiguration : IEntityTypeConfiguration<PolicyRequest
         });
 
         builder.Property(p => p.State).HasConversion<string>().IsRequired();
-
-        builder.Property(p => p.UserId)
-            .HasConversion(
-                v => v.Id,
-                v => new UserId(v))
-            .IsRequired();
     }
 }

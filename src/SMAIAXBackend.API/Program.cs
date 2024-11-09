@@ -67,7 +67,7 @@ if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("DockerDeve
     var testUsername = app.Configuration.GetValue<string>("TestUser:Username");
     var testUserPassword = app.Configuration.GetValue<string>("TestUser:Password");
     var testUserDatabase = app.Configuration.GetValue<string>("TestUser:Database");
-    
+
     var tenantDbContext =
         tenantDbContextFactory.CreateDbContext("tenant_1_db", dbConfig!.SuperUsername, dbConfig.SuperUserPassword);
     await tenantDbContext.Database.EnsureDeletedAsync();

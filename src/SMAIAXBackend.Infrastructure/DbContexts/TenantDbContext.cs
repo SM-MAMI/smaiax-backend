@@ -9,6 +9,8 @@ namespace SMAIAXBackend.Infrastructure.DbContexts;
 public class TenantDbContext(DbContextOptions<TenantDbContext> options) : DbContext(options)
 {
     public DbSet<SmartMeter> SmartMeters { get; init; }
+    public DbSet<Policy> Policies { get; init; }
+    public DbSet<PolicyRequest> PolicyRequests { get; init; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -24,7 +26,6 @@ public class TenantDbContext(DbContextOptions<TenantDbContext> options) : DbCont
         modelBuilder.ApplyConfiguration(new PolicyConfiguration());
         modelBuilder.ApplyConfiguration(new PolicyRequestConfiguration());
         modelBuilder.ApplyConfiguration(new SmartMeterConfiguration());
-        modelBuilder.ApplyConfiguration(new PolicySmartMeterConfiguration());
     }
 
     public async Task SeedTestData()

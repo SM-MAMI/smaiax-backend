@@ -16,10 +16,9 @@ public class PolicyRequestTests
         var isAutomaticContractingEnabled = true;
         var policyFilter = new PolicyFilter(MeasurementResolution.Raw, 1, 5, [],
             LocationResolution.City, 100);
-        var userId = new UserId(Guid.NewGuid());
 
         // When
-        var policyRequest = PolicyRequest.Create(policyRequestId, isAutomaticContractingEnabled, policyFilter, userId);
+        var policyRequest = PolicyRequest.Create(policyRequestId, isAutomaticContractingEnabled, policyFilter);
 
         // Then
         Assert.Multiple(() =>
@@ -27,7 +26,6 @@ public class PolicyRequestTests
             Assert.That(policyRequest.Id, Is.EqualTo(policyRequestId));
             Assert.That(policyRequest.IsAutomaticContractingEnabled, Is.EqualTo(isAutomaticContractingEnabled));
             Assert.That(policyRequest.PolicyFilter, Is.EqualTo(policyFilter));
-            Assert.That(policyRequest.UserId, Is.EqualTo(userId));
             Assert.That(policyRequest.State, Is.EqualTo(PolicyRequestState.Pending));
         });
     }

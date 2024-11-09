@@ -31,6 +31,9 @@ public static class DatabaseExtensions
             options.UseNpgsql(connectionStringBuilder.ConnectionString);
         });
 
+        // To generate migrations use a hardcoded connection string and comment out 
+        // the variables
+        services.AddScoped<ITenantDbContextFactory, TenantDbContextFactory>();
         services.AddDbContext<TenantDbContext>((serviceProvider, options) =>
         {
             var tenantContextService = serviceProvider.GetRequiredService<ITenantContextService>();
@@ -39,7 +42,5 @@ public static class DatabaseExtensions
             var connectionString = tenantDbContextFactory.GetConnectionStringForTenant(currentTenant);
             options.UseNpgsql(connectionString);
         });
-
-        services.AddScoped<ITenantDbContextFactory, TenantDbContextFactory>();
     }
 }

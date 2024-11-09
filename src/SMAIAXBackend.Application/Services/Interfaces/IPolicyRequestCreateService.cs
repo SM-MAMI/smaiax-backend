@@ -4,5 +4,5 @@ namespace SMAIAXBackend.Application.Services.Interfaces;
 
 public interface IPolicyRequestCreateService
 {
-    Task<Guid> CreatePolicyRequestAsync(PolicyRequestCreateDto policyRequestCreateDto, string? userId);
+    Task<Guid> CreatePolicyRequestAsync(PolicyRequestCreateDto policyRequestCreateDto);
 }

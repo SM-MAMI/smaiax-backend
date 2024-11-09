@@ -2,7 +2,6 @@ using Moq;
 
 using SMAIAXBackend.Application.DTOs;
 using SMAIAXBackend.Application.Services.Implementations;
-using SMAIAXBackend.Application.Services.Interfaces;
 using SMAIAXBackend.Domain.Model.Entities;
 using SMAIAXBackend.Domain.Model.Enums;
 using SMAIAXBackend.Domain.Model.ValueObjects.Ids;
@@ -14,16 +13,14 @@ namespace SMAIAXBackend.Application.UnitTests;
 public class PolicyRequestCreateServiceTests
 {
     private Mock<IPolicyRequestRepository> _policyRequestRepositoryMock;
-    private Mock<IUserValidationService> _userValidationServiceMock;
     private PolicyRequestCreateService _policyRequestCreateService;
 
     [SetUp]
     public void Setup()
     {
         _policyRequestRepositoryMock = new Mock<IPolicyRequestRepository>();
-        _userValidationServiceMock = new Mock<IUserValidationService>();
         _policyRequestCreateService =
-            new PolicyRequestCreateService(_policyRequestRepositoryMock.Object, _userValidationServiceMock.Object);
+            new PolicyRequestCreateService(_policyRequestRepositoryMock.Object);
     }
 
     [Test]
@@ -31,7 +28,6 @@ public class PolicyRequestCreateServiceTests
     {
         // Given
         var policyRequestIdExpected = new PolicyRequestId(Guid.NewGuid());
-        var userIdExpected = new UserId(Guid.NewGuid());
         var policyRequestCreateDto = new PolicyRequestCreateDto(
             isAutomaticContractingEnabled: true,
             measurementResolution: MeasurementResolution.Hour,
@@ -50,13 +46,10 @@ public class PolicyRequestCreateServiceTests
             locationResolution: LocationResolution.State,
             maxPrice: 100);
 
-        _userValidationServiceMock.Setup(service => service.ValidateUserAsync(userIdExpected.Id.ToString()))
-            .ReturnsAsync(userIdExpected);
         _policyRequestRepositoryMock.Setup(repo => repo.NextIdentity()).Returns(policyRequestIdExpected);
 
         // When
-        var policyRequestIdActual = await _policyRequestCreateService.CreatePolicyRequestAsync(policyRequestCreateDto,
-            userIdExpected.Id.ToString());
+        var policyRequestIdActual = await _policyRequestCreateService.CreatePolicyRequestAsync(policyRequestCreateDto);
 
         // Then
         Assert.That(policyRequestIdActual, Is.EqualTo(policyRequestIdExpected.Id));

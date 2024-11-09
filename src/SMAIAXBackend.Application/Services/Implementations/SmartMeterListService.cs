@@ -22,7 +22,7 @@ public class SmartMeterListService(
         foreach (var smartMeter in smartMeters)
         {
             var policies =
-                await policyRepository.GetPoliciesBySmartMeterIdAndUserIdAsync(smartMeter.Id, validatedUserId);
+                await policyRepository.GetPoliciesBySmartMeterIdAsync(smartMeter.Id);
             var smartMeterOverviewDto = SmartMeterOverviewDto.FromSmartMeter(smartMeter, policies);
             smartMeterOverviewDtos.Add(smartMeterOverviewDto);
         }
@@ -41,7 +41,7 @@ public class SmartMeterListService(
             throw new SmartMeterNotFoundException(smartMeterId);
         }
 
-        var policies = await policyRepository.GetPoliciesBySmartMeterIdAndUserIdAsync(smartMeter.Id, validatedUserId);
+        var policies = await policyRepository.GetPoliciesBySmartMeterIdAsync(smartMeter.Id);
         var smartMeterOverviewDto = SmartMeterOverviewDto.FromSmartMeter(smartMeter, policies);
 
         return smartMeterOverviewDto;

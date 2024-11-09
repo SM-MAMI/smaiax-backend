@@ -39,11 +39,11 @@ public class SmartMeterListServiceTests
             SmartMeter.Create(new SmartMeterId(Guid.NewGuid()), "Smart Meter 2")
         };
         var policies = new List<Policy>();
-        
+
         _smartMeterRepositoryMock.Setup(repo => repo.GetSmartMetersAsync())
             .ReturnsAsync(smartMetersExpected);
         _policyRepositoryMock.Setup(repo =>
-            repo.GetPoliciesBySmartMeterIdAndUserIdAsync(It.IsAny<SmartMeterId>(), userId)).ReturnsAsync(policies);
+            repo.GetPoliciesBySmartMeterIdAsync(It.IsAny<SmartMeterId>())).ReturnsAsync(policies);
 
         // When
         var smartMetersActual = await _smartMeterListService.GetSmartMetersAsync();
@@ -70,17 +70,16 @@ public class SmartMeterListServiceTests
     {
         // Given
         var smartMeterId = Guid.NewGuid();
-        var userId = new UserId(Guid.NewGuid());
         var smartMeterExpected = SmartMeter.Create(new SmartMeterId(smartMeterId), "Smart Meter 1");
         var policies = new List<Policy>
         {
             Policy.Create(new PolicyId(Guid.NewGuid()), MeasurementResolution.Day, LocationResolution.City, 1000,
-                userId, smartMeterExpected.Id)
+                smartMeterExpected.Id)
         };
-        
+
         _smartMeterRepositoryMock.Setup(repo => repo.GetSmartMeterByIdAsync(smartMeterExpected.Id))
             .ReturnsAsync(smartMeterExpected);
-        _policyRepositoryMock.Setup(repo => repo.GetPoliciesBySmartMeterIdAndUserIdAsync(smartMeterExpected.Id, userId))
+        _policyRepositoryMock.Setup(repo => repo.GetPoliciesBySmartMeterIdAsync(smartMeterExpected.Id))
             .ReturnsAsync(policies);
 
         // When

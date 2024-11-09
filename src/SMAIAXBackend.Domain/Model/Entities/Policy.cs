@@ -12,7 +12,6 @@ public sealed class Policy : IEquatable<Policy>
     public LocationResolution LocationResolution { get; }
     public decimal Price { get; }
     public PolicyState State { get; }
-    public UserId UserId { get; }
     public SmartMeterId SmartMeterId { get; }
 
     public static Policy Create(
@@ -20,10 +19,9 @@ public sealed class Policy : IEquatable<Policy>
         MeasurementResolution measurementResolution,
         LocationResolution locationResolution,
         decimal price,
-        UserId userId,
         SmartMeterId smartMeterId)
     {
-        return new Policy(id, measurementResolution, locationResolution, price, userId, smartMeterId);
+        return new Policy(id, measurementResolution, locationResolution, price, smartMeterId);
     }
 
     // Needed by EF Core
@@ -37,7 +35,6 @@ public sealed class Policy : IEquatable<Policy>
         MeasurementResolution measurementResolution,
         LocationResolution locationResolution,
         decimal price,
-        UserId userId,
         SmartMeterId smartMeterId)
     {
         Id = id;
@@ -45,7 +42,6 @@ public sealed class Policy : IEquatable<Policy>
         LocationResolution = locationResolution;
         Price = price;
         State = PolicyState.Active;
-        UserId = userId;
         SmartMeterId = smartMeterId;
     }
 

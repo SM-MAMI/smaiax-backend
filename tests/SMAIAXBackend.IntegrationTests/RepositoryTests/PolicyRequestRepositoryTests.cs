@@ -14,15 +14,14 @@ public class PolicyRequestRepositoryTests : TestBase
     public async Task GivenPolicyRequest_WhenAdd_ThenExpectedPolicyRequestIsPersisted()
     {
         // Given
-        var userId = new UserId(Guid.Parse("3c07065a-b964-44a9-9cdf-fbd49d755ea7"));
         var policyRequestId = new PolicyRequestId(Guid.NewGuid());
         var policyFilter = new PolicyFilter(MeasurementResolution.Hour, 1, 10, [],
             LocationResolution.State, 1000);
-        var policyRequestExpected = PolicyRequest.Create(policyRequestId, false, policyFilter, userId);
+        var policyRequestExpected = PolicyRequest.Create(policyRequestId, false, policyFilter);
 
         // When
         await _policyRequestRepository.AddAsync(policyRequestExpected);
-        var policyRequestActual = await _applicationDbContext.PolicyRequests
+        var policyRequestActual = await _tenantDbContext.PolicyRequests
             .AsNoTracking()
             .FirstOrDefaultAsync(pr => pr.Id.Equals(policyRequestExpected.Id));
 
@@ -46,7 +45,6 @@ public class PolicyRequestRepositoryTests : TestBase
             Assert.That(policyRequestActual.PolicyFilter.MaxPrice,
                 Is.EqualTo(policyRequestExpected.PolicyFilter.MaxPrice));
             Assert.That(policyRequestActual.State, Is.EqualTo(policyRequestExpected.State));
-            Assert.That(policyRequestActual.UserId, Is.EqualTo(policyRequestExpected.UserId));
         });
     }
 }

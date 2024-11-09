@@ -15,11 +15,10 @@ public class PolicyTests
         const MeasurementResolution measurementResolution = MeasurementResolution.Raw;
         const LocationResolution locationResolution = LocationResolution.City;
         const decimal price = 100.0m;
-        var userId = new UserId(Guid.NewGuid());
         var smartMeterId = new SmartMeterId(Guid.NewGuid());
 
         // When
-        var policy = Policy.Create(policyId, measurementResolution, locationResolution, price, userId, smartMeterId);
+        var policy = Policy.Create(policyId, measurementResolution, locationResolution, price, smartMeterId);
 
         // Then
         Assert.Multiple(() =>
@@ -29,7 +28,6 @@ public class PolicyTests
             Assert.That(policy.LocationResolution, Is.EqualTo(locationResolution));
             Assert.That(policy.Price, Is.EqualTo(price));
             Assert.That(policy.State, Is.EqualTo(PolicyState.Active));
-            Assert.That(policy.UserId, Is.EqualTo(userId));
             Assert.That(policy.SmartMeterId, Is.EqualTo(smartMeterId));
         });
     }

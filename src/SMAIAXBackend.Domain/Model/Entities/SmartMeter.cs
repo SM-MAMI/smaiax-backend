@@ -1,6 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
 
-using SMAIAXBackend.Domain.Model.RelationshipHelpers;
 using SMAIAXBackend.Domain.Model.ValueObjects.Ids;
 
 namespace SMAIAXBackend.Domain.Model.Entities;
@@ -42,7 +41,7 @@ public sealed class SmartMeter : IEquatable<SmartMeter>
 
     public void RemoveMetadata(MetadataId metadataId)
     {
-        var metadata = Metadata.FirstOrDefault(m => m.Id.Equals(metadataId));
+        var metadata = Metadata.Find(m => m.Id.Equals(metadataId));
         if (metadata == null)
         {
             throw new ArgumentException("Metadata not found");

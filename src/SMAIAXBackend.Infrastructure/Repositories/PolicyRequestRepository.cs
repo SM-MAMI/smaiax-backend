@@ -5,7 +5,7 @@ using SMAIAXBackend.Infrastructure.DbContexts;
 
 namespace SMAIAXBackend.Infrastructure.Repositories;
 
-public class PolicyRequestRepository(ApplicationDbContext applicationDbContext) : IPolicyRequestRepository
+public class PolicyRequestRepository(TenantDbContext tenantDbContext) : IPolicyRequestRepository
 {
     public PolicyRequestId NextIdentity()
     {
@@ -14,7 +14,7 @@ public class PolicyRequestRepository(ApplicationDbContext applicationDbContext) 
 
     public async Task AddAsync(PolicyRequest policyRequest)
     {
-        await applicationDbContext.PolicyRequests.AddAsync(policyRequest);
-        await applicationDbContext.SaveChangesAsync();
+        await tenantDbContext.PolicyRequests.AddAsync(policyRequest);
+        await tenantDbContext.SaveChangesAsync();
     }
 }

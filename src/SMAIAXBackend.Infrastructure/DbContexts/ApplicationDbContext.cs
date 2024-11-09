@@ -50,7 +50,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         var email = configuration.GetValue<string>("TestUser:Email");
         var password = configuration.GetValue<string>("TestUser:Password");
         var tenantDatabase = configuration.GetValue<string>("TestUser:Database");
-        
+
         var testUser = new IdentityUser
         {
             Id = userId.Id.ToString(),
