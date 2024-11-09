@@ -60,8 +60,12 @@ if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("DockerDeve
     await applicationDbContext.Database.EnsureCreatedAsync();
     await applicationDbContext.SeedTestData();
 
-    // Create a database for tenant_1 with test data for development
+    // Create a database for the test user with test data for development
     var dbConfig = app.Configuration.GetSection("DatabaseConfiguration").Get<DatabaseConfiguration>();
+    var testUsername = app.Configuration.GetValue<string>("TestUser:Username");
+    var testUserPassword = app.Configuration.GetValue<string>("TestUser:Password");
+    var testUserDatabase = app.Configuration.GetValue<string>("TestUser:Database");
+    
     var tenantDbContext =
         tenantDbContextFactory.CreateDbContext("tenant_1_db", dbConfig!.SuperUsername, dbConfig.SuperUserPassword);
     await tenantDbContext.Database.EnsureDeletedAsync();
@@ -72,7 +76,7 @@ if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("DockerDeve
         await deleteUserCommand.ExecuteNonQueryAsync();
         await applicationDbContext.Database.CloseConnectionAsync();
     }
-    await tenantRepository.CreateDatabaseForTenantAsync("tenant_1_db", "johndoe", "P@ssw0rd");
+    await tenantRepository.CreateDatabaseForTenantAsync(testUserDatabase!, testUsername!, testUserPassword!);
     await tenantDbContext.SeedTestData();
 }
 
