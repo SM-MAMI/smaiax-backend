@@ -24,7 +24,6 @@ public class SmartMeterTests
             Assert.That(smartMeter.Id, Is.EqualTo(smartMeterId));
             Assert.That(smartMeter.Name, Is.EqualTo(name));
             Assert.That(smartMeter.Metadata, Is.Empty);
-            Assert.That(smartMeter.Policies, Is.Empty);
         });
     }
 

@@ -51,7 +51,6 @@ classDiagram
             <<AggregateRoot>>
             id
             measurementResolution
-            location
             locationResolution
             price
             state
@@ -93,7 +92,7 @@ Policy "0..*" -- "1" User : creates
 PolicyRequest -- PolicyFilter
 PolicyRequest "0..*" -- "1" User : creates
 User "1" -- "0..*" SmartMeter : owns
-SmartMeter "0..*" -- "0..*" Policy : refers to
+SmartMeter "1" -- "0..*" Policy : refers to
 SmartMeter "1" -- "0..*" Measurement : produces
 SmartMeter "1" -- "0..*" Metadata : is enriched with
 ```

@@ -18,6 +18,8 @@ internal static class IntegrationTestSetup
     public static ApplicationDbContext ApplicationDbContext { get; private set; } = null!;
     public static TenantDbContext TenantDbContext { get; private set; } = null!;
     public static ISmartMeterRepository SmartMeterRepository { get; private set; } = null!;
+    public static IPolicyRepository PolicyRepository { get; private set; } = null!;
+    public static IPolicyRequestRepository PolicyRequestRepository { get; private set; } = null!;
     public static IUserRepository UserRepository { get; private set; } = null!;
     public static ITenantRepository TenantRepository { get; private set; } = null!;
     public static HttpClient HttpClient { get; private set; } = null!;
@@ -46,6 +48,7 @@ internal static class IntegrationTestSetup
         HttpClient = _webAppFactory.CreateClient();
 
         ApplicationDbContext = _webAppFactory.Services.GetRequiredService<ApplicationDbContext>();
+        SmartMeterRepository = _webAppFactory.Services.GetRequiredService<ISmartMeterRepository>();
         var tenantDbContextFactory = _webAppFactory.Services.GetRequiredService<ITenantDbContextFactory>();
         TenantDbContext = tenantDbContextFactory.CreateDbContext("tenant_1_db", superUserName, superUserPassword);
         TenantRepository = _webAppFactory.Services.GetRequiredService<ITenantRepository>();
@@ -54,6 +57,8 @@ internal static class IntegrationTestSetup
         // Repositories that are using the TenantDatabase need to be instantiated because
         // They are injected with a connection string that is created based on the http request
         SmartMeterRepository = new SmartMeterRepository(TenantDbContext);
+        PolicyRepository = new PolicyRepository(TenantDbContext);
+        PolicyRequestRepository = new PolicyRequestRepository(TenantDbContext);
 
         var tokenRepository = _webAppFactory.Services.GetRequiredService<ITokenRepository>();
         AccessToken = await tokenRepository.GenerateAccessTokenAsync($"{Guid.NewGuid()}-{Guid.NewGuid()}",

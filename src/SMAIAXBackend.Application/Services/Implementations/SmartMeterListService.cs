@@ -11,6 +11,7 @@ namespace SMAIAXBackend.Application.Services.Implementations;
 
 public class SmartMeterListService(
     ISmartMeterRepository smartMeterRepository,
+    IPolicyRepository policyRepository,
     ILogger<SmartMeterListService> logger) : ISmartMeterListService
 {
     public async Task<List<SmartMeterOverviewDto>> GetSmartMetersAsync()
@@ -20,7 +21,9 @@ public class SmartMeterListService(
 
         foreach (var smartMeter in smartMeters)
         {
-            var smartMeterOverviewDto = SmartMeterOverviewDtoFromSmartMeter(smartMeter);
+            var policies =
+                await policyRepository.GetPoliciesBySmartMeterIdAndUserIdAsync(smartMeter.Id, validatedUserId);
+            var smartMeterOverviewDto = SmartMeterOverviewDto.FromSmartMeter(smartMeter, policies);
             smartMeterOverviewDtos.Add(smartMeterOverviewDto);
         }
 
@@ -38,14 +41,9 @@ public class SmartMeterListService(
             throw new SmartMeterNotFoundException(smartMeterId);
         }
 
-        var smartMeterOverviewDto = SmartMeterOverviewDtoFromSmartMeter(smartMeter);
+        var policies = await policyRepository.GetPoliciesBySmartMeterIdAndUserIdAsync(smartMeter.Id, validatedUserId);
+        var smartMeterOverviewDto = SmartMeterOverviewDto.FromSmartMeter(smartMeter, policies);
 
         return smartMeterOverviewDto;
-    }
-
-    private static SmartMeterOverviewDto SmartMeterOverviewDtoFromSmartMeter(SmartMeter smartMeter)
-    {
-        return new SmartMeterOverviewDto(smartMeter.Id.Id, smartMeter.Name,
-            smartMeter.Metadata.Count, smartMeter.Policies.Count);
     }
 }

@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 
 using SMAIAXBackend.API.ApplicationConfigurations;
 using SMAIAXBackend.API.Endpoints.Authentication;
+using SMAIAXBackend.API.Endpoints.Policy;
+using SMAIAXBackend.API.Endpoints.PolicyRequest;
 using SMAIAXBackend.API.Endpoints.SmartMeter;
 using SMAIAXBackend.API.Middlewares;
 using SMAIAXBackend.Domain.Repositories;
@@ -85,7 +87,9 @@ app.UseMiddleware<JwtClaimMiddleware>();
 app.UseHttpsRedirection();
 app.UseExceptionHandler();
 app.MapAuthenticationEndpoints()
-    .MapSmartMeterEndpoints();
+    .MapSmartMeterEndpoints()
+    .MapPolicyEndpoints()
+    .MapPolicyRequestEndpoints();
 
 await app.RunAsync();
 

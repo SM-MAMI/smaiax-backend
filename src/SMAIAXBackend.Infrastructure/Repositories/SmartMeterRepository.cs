@@ -29,7 +29,6 @@ public class SmartMeterRepository(TenantDbContext tenantDbContext) : ISmartMeter
     {
         return await tenantDbContext.SmartMeters
             .Include(sm => sm.Metadata)
-            .Include(sm => sm.Policies)
             .ToListAsync();
     }
 
@@ -37,7 +36,6 @@ public class SmartMeterRepository(TenantDbContext tenantDbContext) : ISmartMeter
     {
         return await tenantDbContext.SmartMeters
             .Include(sm => sm.Metadata)
-            .Include(sm => sm.Policies)
             .FirstOrDefaultAsync(sm => sm.Id.Equals(smartMeterId));
     }
 

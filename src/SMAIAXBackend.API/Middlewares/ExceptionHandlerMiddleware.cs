@@ -40,6 +40,7 @@ public class ExceptionHandlerMiddleware : IExceptionHandler
                 problemDetails.Title = "Conflict";
                 break;
             case SmartMeterIdMismatchException:
+            case InsufficientLocationDataException:
                 problemDetails.Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1";
                 problemDetails.Status = StatusCodes.Status400BadRequest;
                 problemDetails.Title = "Bad Request";

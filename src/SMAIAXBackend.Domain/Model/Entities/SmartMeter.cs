@@ -10,13 +10,11 @@ public sealed class SmartMeter : IEquatable<SmartMeter>
     public SmartMeterId Id { get; } = null!;
     public string Name { get; private set; } = null!;
     public List<Metadata> Metadata { get; }
-    public List<PolicySmartMeter> Policies { get; }
 
     public static SmartMeter Create(SmartMeterId smartMeterId, string name)
     {
         var metadata = new List<Metadata>();
-        var policies = new List<PolicySmartMeter>();
-        return new SmartMeter(smartMeterId, name, metadata, policies);
+        return new SmartMeter(smartMeterId, name, metadata);
     }
 
     // Needed by EF Core
@@ -25,12 +23,11 @@ public sealed class SmartMeter : IEquatable<SmartMeter>
     {
     }
 
-    private SmartMeter(SmartMeterId smartMeterId, string name, List<Metadata> metadata, List<PolicySmartMeter> policies)
+    private SmartMeter(SmartMeterId smartMeterId, string name, List<Metadata> metadata)
     {
         Id = smartMeterId;
         Name = name;
         Metadata = metadata;
-        Policies = policies;
     }
 
     public void AddMetadata(Metadata metadata)

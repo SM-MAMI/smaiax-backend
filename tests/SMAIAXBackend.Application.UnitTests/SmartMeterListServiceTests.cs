@@ -5,6 +5,7 @@ using Moq;
 using SMAIAXBackend.Application.Exceptions;
 using SMAIAXBackend.Application.Services.Implementations;
 using SMAIAXBackend.Domain.Model.Entities;
+using SMAIAXBackend.Domain.Model.Enums;
 using SMAIAXBackend.Domain.Model.ValueObjects.Ids;
 using SMAIAXBackend.Domain.Repositories;
 
@@ -14,6 +15,7 @@ namespace SMAIAXBackend.Application.UnitTests;
 public class SmartMeterListServiceTests
 {
     private Mock<ISmartMeterRepository> _smartMeterRepositoryMock;
+    private Mock<IPolicyRepository> _policyRepositoryMock;
     private Mock<ILogger<SmartMeterListService>> _loggerMock;
     private SmartMeterListService _smartMeterListService;
 
@@ -21,9 +23,10 @@ public class SmartMeterListServiceTests
     public void Setup()
     {
         _smartMeterRepositoryMock = new Mock<ISmartMeterRepository>();
+        _policyRepositoryMock = new Mock<IPolicyRepository>();
         _loggerMock = new Mock<ILogger<SmartMeterListService>>();
         _smartMeterListService =
-            new SmartMeterListService(_smartMeterRepositoryMock.Object, _loggerMock.Object);
+            new SmartMeterListService(_smartMeterRepositoryMock.Object, _policyRepositoryMock.Object, _loggerMock.Object);
     }
 
     [Test]
@@ -35,9 +38,12 @@ public class SmartMeterListServiceTests
             SmartMeter.Create(new SmartMeterId(Guid.NewGuid()), "Smart Meter 1"),
             SmartMeter.Create(new SmartMeterId(Guid.NewGuid()), "Smart Meter 2")
         };
-
+        var policies = new List<Policy>();
+        
         _smartMeterRepositoryMock.Setup(repo => repo.GetSmartMetersAsync())
             .ReturnsAsync(smartMetersExpected);
+        _policyRepositoryMock.Setup(repo =>
+            repo.GetPoliciesBySmartMeterIdAndUserIdAsync(It.IsAny<SmartMeterId>(), userId)).ReturnsAsync(policies);
 
         // When
         var smartMetersActual = await _smartMeterListService.GetSmartMetersAsync();
@@ -53,7 +59,7 @@ public class SmartMeterListServiceTests
                 Assert.That(smartMetersActual[i].Id, Is.EqualTo(smartMetersExpected[i].Id.Id));
                 Assert.That(smartMetersActual[i].Name, Is.EqualTo(smartMetersExpected[i].Name));
                 Assert.That(smartMetersActual[i].MetadataCount, Is.EqualTo(smartMetersExpected[i].Metadata.Count));
-                Assert.That(smartMetersActual[i].PolicyCount, Is.EqualTo(smartMetersExpected[i].Policies.Count));
+                Assert.That(smartMetersActual[i].PolicyCount, Is.EqualTo(policies.Count));
             });
         }
     }
@@ -64,10 +70,18 @@ public class SmartMeterListServiceTests
     {
         // Given
         var smartMeterId = Guid.NewGuid();
+        var userId = new UserId(Guid.NewGuid());
         var smartMeterExpected = SmartMeter.Create(new SmartMeterId(smartMeterId), "Smart Meter 1");
-
+        var policies = new List<Policy>
+        {
+            Policy.Create(new PolicyId(Guid.NewGuid()), MeasurementResolution.Day, LocationResolution.City, 1000,
+                userId, smartMeterExpected.Id)
+        };
+        
         _smartMeterRepositoryMock.Setup(repo => repo.GetSmartMeterByIdAsync(smartMeterExpected.Id))
             .ReturnsAsync(smartMeterExpected);
+        _policyRepositoryMock.Setup(repo => repo.GetPoliciesBySmartMeterIdAndUserIdAsync(smartMeterExpected.Id, userId))
+            .ReturnsAsync(policies);
 
         // When
         var smartMeterActual =
@@ -80,7 +94,7 @@ public class SmartMeterListServiceTests
             Assert.That(smartMeterActual.Id, Is.EqualTo(smartMeterExpected.Id.Id));
             Assert.That(smartMeterActual.Name, Is.EqualTo(smartMeterExpected.Name));
             Assert.That(smartMeterActual.MetadataCount, Is.EqualTo(smartMeterExpected.Metadata.Count));
-            Assert.That(smartMeterActual.PolicyCount, Is.EqualTo(smartMeterExpected.Policies.Count));
+            Assert.That(smartMeterActual.PolicyCount, Is.EqualTo(policies.Count));
         });
     }
 
