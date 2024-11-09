@@ -24,7 +24,9 @@ public class SmartMeterListService(
 
         foreach (var smartMeter in smartMeters)
         {
-            var smartMeterOverviewDto = await SmartMeterOverviewDtoFromSmartMeter(smartMeter, validatedUserId);
+            var policies =
+                await policyRepository.GetPoliciesBySmartMeterIdAndUserIdAsync(smartMeter.Id, validatedUserId);
+            var smartMeterOverviewDto = SmartMeterOverviewDto.FromSmartMeter(smartMeter, policies);
             smartMeterOverviewDtos.Add(smartMeterOverviewDto);
         }
 
@@ -44,15 +46,9 @@ public class SmartMeterListService(
             throw new SmartMeterNotFoundException(smartMeterId, validatedUserId.Id);
         }
 
-        var smartMeterOverviewDto = await SmartMeterOverviewDtoFromSmartMeter(smartMeter, validatedUserId);
+        var policies = await policyRepository.GetPoliciesBySmartMeterIdAndUserIdAsync(smartMeter.Id, validatedUserId);
+        var smartMeterOverviewDto = SmartMeterOverviewDto.FromSmartMeter(smartMeter, policies);
 
         return smartMeterOverviewDto;
-    }
-
-    private async Task<SmartMeterOverviewDto> SmartMeterOverviewDtoFromSmartMeter(SmartMeter smartMeter, UserId userId)
-    {
-        var policies = await policyRepository.GetPoliciesBySmartMeterIdAndUserIdAsync(smartMeter.Id, userId);
-        return new SmartMeterOverviewDto(smartMeter.Id.Id, smartMeter.Name,
-            smartMeter.Metadata.Count, policies.Count);
     }
 }
