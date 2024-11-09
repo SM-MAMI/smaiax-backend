@@ -14,6 +14,8 @@ public class TestBase
     protected readonly HttpClient _httpClient = IntegrationTestSetup.HttpClient;
     protected readonly ApplicationDbContext _applicationDbContext = IntegrationTestSetup.ApplicationDbContext;
     protected readonly ISmartMeterRepository _smartMeterRepository = IntegrationTestSetup.SmartMeterRepository;
+    protected readonly IPolicyRepository _policyRepository = IntegrationTestSetup.PolicyRepository;
+    protected readonly IPolicyRequestRepository _policyRequestRepository = IntegrationTestSetup.PolicyRequestRepository;
     protected readonly IUserRepository _userRepository = IntegrationTestSetup.UserRepository;
     protected readonly string _accessToken = IntegrationTestSetup.AccessToken;
 

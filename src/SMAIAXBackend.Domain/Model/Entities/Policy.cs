@@ -1,8 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 
 using SMAIAXBackend.Domain.Model.Enums;
-using SMAIAXBackend.Domain.Model.RelationshipHelpers;
-using SMAIAXBackend.Domain.Model.ValueObjects;
 using SMAIAXBackend.Domain.Model.ValueObjects.Ids;
 
 namespace SMAIAXBackend.Domain.Model.Entities;
@@ -11,25 +9,21 @@ public sealed class Policy : IEquatable<Policy>
 {
     public PolicyId Id { get; } = null!;
     public MeasurementResolution MeasurementResolution { get; }
-    public int HouseholdSize { get; }
-    public Location Location { get; } = null!;
     public LocationResolution LocationResolution { get; }
     public decimal Price { get; }
     public PolicyState State { get; }
     public UserId UserId { get; }
-    public List<PolicySmartMeter> SmartMeters { get; }
+    public SmartMeterId SmartMeterId { get; }
 
     public static Policy Create(
         PolicyId id,
         MeasurementResolution measurementResolution,
-        int householdSize,
-        Location location,
         LocationResolution locationResolution,
         decimal price,
-        UserId userId)
+        UserId userId,
+        SmartMeterId smartMeterId)
     {
-        var smartMeters = new List<PolicySmartMeter>();
-        return new Policy(id, measurementResolution, householdSize, location, locationResolution, price, userId, smartMeters);
+        return new Policy(id, measurementResolution, locationResolution, price, userId, smartMeterId);
     }
 
     // Needed by EF Core
@@ -41,22 +35,18 @@ public sealed class Policy : IEquatable<Policy>
     private Policy(
         PolicyId id,
         MeasurementResolution measurementResolution,
-        int householdSize,
-        Location location,
         LocationResolution locationResolution,
         decimal price,
         UserId userId,
-        List<PolicySmartMeter> smartMeters)
+        SmartMeterId smartMeterId)
     {
         Id = id;
         MeasurementResolution = measurementResolution;
-        HouseholdSize = householdSize;
-        Location = location;
         LocationResolution = locationResolution;
         Price = price;
         State = PolicyState.Active;
         UserId = userId;
-        SmartMeters = smartMeters;
+        SmartMeterId = smartMeterId;
     }
 
     [ExcludeFromCodeCoverage]

@@ -22,20 +22,11 @@ public class PolicyConfiguration : IEntityTypeConfiguration<Policy>
 
         builder.Property(p => p.MeasurementResolution).HasConversion<string>().IsRequired();
 
-        builder.Property(p => p.HouseholdSize).IsRequired();
-
-        builder.OwnsOne(p => p.Location, location =>
-        {
-            location.Property(l => l.StreetName).HasColumnName("streetName");
-            location.Property(l => l.City).HasColumnName("city");
-            location.Property(l => l.State).HasColumnName("state");
-            location.Property(l => l.Country).HasColumnName("country");
-            location.Property(l => l.Continent).HasColumnName("continent").HasConversion<string>();
-        });
-
         builder.Property(p => p.LocationResolution).HasConversion<string>().IsRequired();
 
         builder.Property(p => p.Price).IsRequired();
+
+        builder.Property(p => p.State).HasConversion<string>().IsRequired();
 
         builder.Property(p => p.UserId)
             .HasConversion(
@@ -43,6 +34,10 @@ public class PolicyConfiguration : IEntityTypeConfiguration<Policy>
                 v => new UserId(v))
             .IsRequired();
 
-        builder.Property(p => p.State).HasConversion<string>().IsRequired();
+        builder.Property(p => p.SmartMeterId)
+            .HasConversion(
+                v => v.Id,
+                v => new SmartMeterId(v))
+            .IsRequired();
     }
 }

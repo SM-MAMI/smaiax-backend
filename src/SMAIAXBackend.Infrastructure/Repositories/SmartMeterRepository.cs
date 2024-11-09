@@ -30,7 +30,6 @@ public class SmartMeterRepository(ApplicationDbContext applicationDbContext) : I
         return applicationDbContext.SmartMeters
             .Where(sm => sm.UserId.Equals(userId))
             .Include(sm => sm.Metadata)
-            .Include(sm => sm.Policies)
             .ToListAsync();
     }
 
@@ -38,7 +37,6 @@ public class SmartMeterRepository(ApplicationDbContext applicationDbContext) : I
     {
         return applicationDbContext.SmartMeters
             .Include(sm => sm.Metadata)
-            .Include(sm => sm.Policies)
             .FirstOrDefaultAsync(sm => sm.Id.Equals(smartMeterId) && sm.UserId.Equals(userId));
     }
 

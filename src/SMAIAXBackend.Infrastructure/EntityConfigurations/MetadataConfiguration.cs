@@ -26,11 +26,11 @@ public class MetadataConfiguration : IEntityTypeConfiguration<Metadata>
 
         builder.OwnsOne(m => m.Location, location =>
         {
-            location.Property(l => l.StreetName).HasColumnName("StreetName");
-            location.Property(l => l.City).HasColumnName("City");
-            location.Property(l => l.State).HasColumnName("State");
-            location.Property(l => l.Country).HasColumnName("Country");
-            location.Property(l => l.Continent).HasColumnName("Continent").HasConversion<string>();
+            location.Property(l => l.StreetName).HasColumnName("streetName");
+            location.Property(l => l.City).HasColumnName("city");
+            location.Property(l => l.State).HasColumnName("state");
+            location.Property(l => l.Country).HasColumnName("country");
+            location.Property(l => l.Continent).HasColumnName("continent").HasConversion<string>();
         });
 
         builder.Property(m => m.HouseholdSize)
