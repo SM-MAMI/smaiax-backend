@@ -12,30 +12,26 @@ namespace SMAIAXBackend.Application.Services.Implementations;
 
 public class SmartMeterCreateService(
     ISmartMeterRepository smartMeterRepository,
-    IUserValidationService userValidationService,
     ILogger<SmartMeterCreateService> logger) : ISmartMeterCreateService
 {
-    public async Task<Guid> AddSmartMeterAsync(SmartMeterCreateDto smartMeterCreateDto, string? userId)
+    public async Task<Guid> AddSmartMeterAsync(SmartMeterCreateDto smartMeterCreateDto)
     {
-        var validatedUserId = await userValidationService.ValidateUserAsync(userId);
         var smartMeterId = smartMeterRepository.NextIdentity();
-        var smartMeter = SmartMeter.Create(smartMeterId, smartMeterCreateDto.Name, validatedUserId);
+        var smartMeter = SmartMeter.Create(smartMeterId, smartMeterCreateDto.Name);
         await smartMeterRepository.AddAsync(smartMeter);
 
         return smartMeterId.Id;
     }
 
-    public async Task<Guid> AddMetadataAsync(Guid smartMeterId, MetadataCreateDto metadataCreateDto, string? userId)
+    public async Task<Guid> AddMetadataAsync(Guid smartMeterId, MetadataCreateDto metadataCreateDto)
     {
-        var validatedUserId = await userValidationService.ValidateUserAsync(userId);
         var smartMeter =
-            await smartMeterRepository.GetSmartMeterByIdAndUserIdAsync(new SmartMeterId(smartMeterId), validatedUserId);
+            await smartMeterRepository.GetSmartMeterByIdAsync(new SmartMeterId(smartMeterId));
 
         if (smartMeter == null)
         {
-            logger.LogWarning("SmartMeter with id {SmartMeterId} not found for user {UserId}", smartMeterId,
-                validatedUserId.Id);
-            throw new SmartMeterNotFoundException(smartMeterId, validatedUserId.Id);
+            logger.LogError("Smart meter with id '{SmartMeterId} not found.", smartMeterId);
+            throw new SmartMeterNotFoundException(smartMeterId);
         }
 
         var metadataId = smartMeterRepository.NextMetadataIdentity();

@@ -13,10 +13,12 @@ public class UserTests
         // Given
         var userId = new UserId(Guid.NewGuid());
         var name = new Name("John", "Doe");
-        var email = "john.doe@example.com";
+        const string userName = "johndoe";
+        const string email = "john.doe@example.com";
+        var tenantId = new TenantId(Guid.NewGuid());
 
         // When
-        var user = User.Create(userId, name, email);
+        var user = User.Create(userId, name, userName, email, tenantId);
 
         // Then
         Assert.Multiple(() =>
@@ -24,6 +26,7 @@ public class UserTests
             Assert.That(user.Id, Is.EqualTo(userId));
             Assert.That(user.Name, Is.EqualTo(name));
             Assert.That(user.Email, Is.EqualTo(email));
+            Assert.That(user.TenantId, Is.EqualTo(tenantId));
         });
     }
 }

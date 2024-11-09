@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 using SMAIAXBackend.Domain.Model.Entities;
 using SMAIAXBackend.Domain.Model.Enums;
@@ -13,6 +14,7 @@ public class TestBase
 {
     protected readonly HttpClient _httpClient = IntegrationTestSetup.HttpClient;
     protected readonly ApplicationDbContext _applicationDbContext = IntegrationTestSetup.ApplicationDbContext;
+    protected readonly TenantDbContext _tenantDbContext = IntegrationTestSetup.TenantDbContext;
     protected readonly ISmartMeterRepository _smartMeterRepository = IntegrationTestSetup.SmartMeterRepository;
     protected readonly IPolicyRepository _policyRepository = IntegrationTestSetup.PolicyRepository;
     protected readonly IPolicyRequestRepository _policyRequestRepository = IntegrationTestSetup.PolicyRequestRepository;
@@ -23,15 +25,29 @@ public class TestBase
     public async Task Setup()
     {
         await IntegrationTestSetup.ApplicationDbContext.Database.EnsureCreatedAsync();
+        await IntegrationTestSetup.TenantRepository.CreateDatabaseForTenantAsync("tenant_1_db", "johndoe", "P@ssw0rd");
         await InsertTestData();
         IntegrationTestSetup.ApplicationDbContext.ChangeTracker.Clear();
+        IntegrationTestSetup.TenantDbContext.ChangeTracker.Clear();
     }
 
     [TearDown]
     public async Task TearDown()
     {
         IntegrationTestSetup.ApplicationDbContext.ChangeTracker.Clear();
+        IntegrationTestSetup.TenantDbContext.ChangeTracker.Clear();
+        await IntegrationTestSetup.TenantDbContext.Database.EnsureDeletedAsync();
+        await CleanupTenantDatabase();
         await IntegrationTestSetup.ApplicationDbContext.Database.EnsureDeletedAsync();
+    }
+
+    private static async Task CleanupTenantDatabase()
+    {
+        await using var deleteUserCommand = IntegrationTestSetup.ApplicationDbContext.Database.GetDbConnection().CreateCommand();
+        deleteUserCommand.CommandText = "DROP ROLE IF EXISTS johndoe;";
+        await IntegrationTestSetup.ApplicationDbContext.Database.OpenConnectionAsync();
+        await deleteUserCommand.ExecuteNonQueryAsync();
+        await IntegrationTestSetup.ApplicationDbContext.Database.CloseConnectionAsync();
     }
 
     private async Task InsertTestData()
@@ -39,18 +55,23 @@ public class TestBase
         var hasher = new PasswordHasher<IdentityUser>();
 
         var userId = new UserId(Guid.Parse("3c07065a-b964-44a9-9cdf-fbd49d755ea7"));
-        const string userName = "john.doe@example.com";
+        const string userName = "johndoe";
+        const string email = "john.doe@example.com";
+        const string password = "P@ssw0rd";
         var testUser = new IdentityUser
         {
             Id = userId.Id.ToString(),
             UserName = userName,
             NormalizedUserName = userName.ToUpper(),
-            Email = userName,
-            NormalizedEmail = userName.ToUpper(),
+            Email = email,
+            NormalizedEmail = email.ToUpper(),
         };
-        var passwordHash = hasher.HashPassword(testUser, "P@ssw0rd");
+        var passwordHash = hasher.HashPassword(testUser, password);
         testUser.PasswordHash = passwordHash;
-        var domainUser = User.Create(userId, new Name("John", "Doe"), userName);
+
+        var tenantId = new TenantId(Guid.Parse("f4c70232-6715-4c15-966f-bf4bcef46d39"));
+        var tenant = Tenant.Create(tenantId, userName, password, "tenant_1_db");
+        var domainUser = User.Create(userId, new Name("John", "Doe"), userName, email, tenantId);
 
         // Valid refresh token
         const string jwtId = "19f77b2e-e485-4031-8506-62f6d3b69e4d";
@@ -102,22 +123,25 @@ public class TestBase
         );
 
         var smartMeter1 = SmartMeter.Create(new SmartMeterId(Guid.Parse("5e9db066-1b47-46cc-bbde-0b54c30167cd")),
-            "Smart Meter 1", domainUser.Id);
+            "Smart Meter 1");
         var smartMeter2 = SmartMeter.Create(new SmartMeterId(Guid.Parse("f4c70232-6715-4c15-966f-bf4bcef46d39")),
-            "Smart Meter 2", domainUser.Id);
+            "Smart Meter 2");
         var smartMeter2Metadata = Metadata.Create(new MetadataId(Guid.Parse("1c8c8313-6fc4-4ebd-9ca8-8a1267441e06")),
             DateTime.UtcNow, new Location("Some Streetname", "Some city", "Some state", "Some county", Continent.Asia),
             4, smartMeter2.Id);
         smartMeter2.AddMetadata(smartMeter2Metadata);
 
+        await _applicationDbContext.Tenants.AddAsync(tenant);
         await _applicationDbContext.Users.AddAsync(testUser);
         await _applicationDbContext.DomainUsers.AddAsync(domainUser);
         await _applicationDbContext.RefreshTokens.AddAsync(refreshToken1);
         await _applicationDbContext.RefreshTokens.AddAsync(refreshToken2);
         await _applicationDbContext.RefreshTokens.AddAsync(refreshToken3);
         await _applicationDbContext.RefreshTokens.AddAsync(refreshToken4);
-        await _applicationDbContext.SmartMeters.AddAsync(smartMeter1);
-        await _applicationDbContext.SmartMeters.AddAsync(smartMeter2);
+        await _tenantDbContext.SmartMeters.AddAsync(smartMeter1);
+        await _tenantDbContext.SmartMeters.AddAsync(smartMeter2);
+
         await _applicationDbContext.SaveChangesAsync();
+        await _tenantDbContext.SaveChangesAsync();
     }
 }

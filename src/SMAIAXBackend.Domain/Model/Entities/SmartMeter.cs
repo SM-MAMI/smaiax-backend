@@ -9,12 +9,11 @@ public sealed class SmartMeter : IEquatable<SmartMeter>
     public SmartMeterId Id { get; } = null!;
     public string Name { get; private set; } = null!;
     public List<Metadata> Metadata { get; }
-    public UserId UserId { get; }
 
-    public static SmartMeter Create(SmartMeterId smartMeterId, string name, UserId userId)
+    public static SmartMeter Create(SmartMeterId smartMeterId, string name)
     {
         var metadata = new List<Metadata>();
-        return new SmartMeter(smartMeterId, name, metadata, userId);
+        return new SmartMeter(smartMeterId, name, metadata);
     }
 
     // Needed by EF Core
@@ -23,12 +22,11 @@ public sealed class SmartMeter : IEquatable<SmartMeter>
     {
     }
 
-    private SmartMeter(SmartMeterId smartMeterId, string name, List<Metadata> metadata, UserId userId)
+    private SmartMeter(SmartMeterId smartMeterId, string name, List<Metadata> metadata)
     {
         Id = smartMeterId;
         Name = name;
         Metadata = metadata;
-        UserId = userId;
     }
 
     public void AddMetadata(Metadata metadata)
@@ -43,7 +41,7 @@ public sealed class SmartMeter : IEquatable<SmartMeter>
 
     public void RemoveMetadata(MetadataId metadataId)
     {
-        var metadata = Metadata.FirstOrDefault(m => m.Id.Equals(metadataId));
+        var metadata = Metadata.Find(m => m.Id.Equals(metadataId));
         if (metadata == null)
         {
             throw new ArgumentException("Metadata not found");

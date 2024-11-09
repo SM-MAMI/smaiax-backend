@@ -12,15 +12,13 @@ public sealed class PolicyRequest : IEquatable<PolicyRequest>
     public bool IsAutomaticContractingEnabled { get; }
     public PolicyFilter PolicyFilter { get; }
     public PolicyRequestState State { get; }
-    public UserId UserId { get; }
 
     public static PolicyRequest Create(
         PolicyRequestId id,
         bool isAutomaticContractingEnabled,
-        PolicyFilter policyFilter,
-        UserId userId)
+        PolicyFilter policyFilter)
     {
-        return new PolicyRequest(id, isAutomaticContractingEnabled, policyFilter, userId);
+        return new PolicyRequest(id, isAutomaticContractingEnabled, policyFilter);
     }
 
     // Needed by EF Core
@@ -32,13 +30,11 @@ public sealed class PolicyRequest : IEquatable<PolicyRequest>
     private PolicyRequest(
         PolicyRequestId id,
         bool isAutomaticContractingEnabled,
-        PolicyFilter policyFilter,
-        UserId userId)
+        PolicyFilter policyFilter)
     {
         Id = id;
         IsAutomaticContractingEnabled = isAutomaticContractingEnabled;
         PolicyFilter = policyFilter;
-        UserId = userId;
         State = PolicyRequestState.Pending;
     }
 

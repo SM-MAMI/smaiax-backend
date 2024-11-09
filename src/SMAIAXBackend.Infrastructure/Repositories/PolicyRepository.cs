@@ -7,7 +7,7 @@ using SMAIAXBackend.Infrastructure.DbContexts;
 
 namespace SMAIAXBackend.Infrastructure.Repositories;
 
-public class PolicyRepository(ApplicationDbContext applicationDbContext) : IPolicyRepository
+public class PolicyRepository(TenantDbContext tenantDbContext) : IPolicyRepository
 {
     public PolicyId NextIdentity()
     {
@@ -16,15 +16,14 @@ public class PolicyRepository(ApplicationDbContext applicationDbContext) : IPoli
 
     public async Task AddAsync(Policy policy)
     {
-        await applicationDbContext.Policies.AddAsync(policy);
-        await applicationDbContext.SaveChangesAsync();
+        await tenantDbContext.Policies.AddAsync(policy);
+        await tenantDbContext.SaveChangesAsync();
     }
 
-    public Task<List<Policy>> GetPoliciesBySmartMeterIdAndUserIdAsync(SmartMeterId smartMeterId, UserId userId)
+    public Task<List<Policy>> GetPoliciesBySmartMeterIdAsync(SmartMeterId smartMeterId)
     {
-        return applicationDbContext.Policies
+        return tenantDbContext.Policies
             .Where(p => p.SmartMeterId.Equals(smartMeterId))
-            .Where(p => p.UserId.Equals(userId))
             .ToListAsync();
     }
 }

@@ -53,7 +53,7 @@ public class PolicyRequestTests : TestBase
         Assert.That(responseContent, Is.Not.Null);
 
         var returnedId = Guid.Parse(responseContent.Trim('"'));
-        var policyRequestActual = await _applicationDbContext.PolicyRequests
+        var policyRequestActual = await _tenantDbContext.PolicyRequests
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.Id.Equals(new PolicyRequestId(returnedId)));
 

@@ -25,7 +25,7 @@
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
-      POSTGRES_DB: user-store
+      POSTGRES_DB: smaiax-db
     networks:
       - smaiax-backend-network
 

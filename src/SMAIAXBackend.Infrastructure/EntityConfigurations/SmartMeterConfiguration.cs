@@ -25,11 +25,5 @@ public class SmartMeterConfiguration : IEntityTypeConfiguration<SmartMeter>
             .WithOne(m => m.SmartMeter)
             .HasForeignKey(m => m.SmartMeterId)
             .IsRequired();
-
-        builder.Property(sm => sm.UserId)
-            .HasConversion(
-                v => v.Id,
-                v => new UserId(v))
-            .IsRequired();
     }
 }

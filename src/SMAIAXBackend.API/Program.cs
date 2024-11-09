@@ -1,11 +1,15 @@
 using System.Diagnostics.CodeAnalysis;
 
-using SMAIAXBackend.API;
+using Microsoft.EntityFrameworkCore;
+
 using SMAIAXBackend.API.ApplicationConfigurations;
 using SMAIAXBackend.API.Endpoints.Authentication;
 using SMAIAXBackend.API.Endpoints.Policy;
 using SMAIAXBackend.API.Endpoints.PolicyRequest;
 using SMAIAXBackend.API.Endpoints.SmartMeter;
+using SMAIAXBackend.API.Middlewares;
+using SMAIAXBackend.Domain.Repositories;
+using SMAIAXBackend.Infrastructure.Configurations;
 using SMAIAXBackend.Infrastructure.DbContexts;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,7 +22,8 @@ builder.Services.AddJwtAuthentication(builder.Configuration);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddProblemDetails();
-builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddExceptionHandler<ExceptionHandlerMiddleware>();
+builder.Services.AddHttpContextAccessor();
 
 // Add Swagger if in development environment
 if (builder.Environment.IsDevelopment() || builder.Environment.IsEnvironment("DockerDevelopment"))
@@ -48,15 +53,39 @@ if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("DockerDeve
 
     using var scope = app.Services.CreateScope();
     var services = scope.ServiceProvider;
+
     var applicationDbContext = services.GetRequiredService<ApplicationDbContext>();
+    var tenantRepository = services.GetRequiredService<ITenantRepository>();
+    var tenantDbContextFactory = services.GetRequiredService<ITenantDbContextFactory>();
+
     await applicationDbContext.Database.EnsureDeletedAsync();
     await applicationDbContext.Database.EnsureCreatedAsync();
     await applicationDbContext.SeedTestData();
+
+    // Create a database for the test user with test data for development
+    var dbConfig = app.Configuration.GetSection("DatabaseConfiguration").Get<DatabaseConfiguration>();
+    var testUsername = app.Configuration.GetValue<string>("TestUser:Username");
+    var testUserPassword = app.Configuration.GetValue<string>("TestUser:Password");
+    var testUserDatabase = app.Configuration.GetValue<string>("TestUser:Database");
+
+    var tenantDbContext =
+        tenantDbContextFactory.CreateDbContext("tenant_1_db", dbConfig!.SuperUsername, dbConfig.SuperUserPassword);
+    await tenantDbContext.Database.EnsureDeletedAsync();
+    await using (var deleteUserCommand = applicationDbContext.Database.GetDbConnection().CreateCommand())
+    {
+        deleteUserCommand.CommandText = "DROP ROLE IF EXISTS johndoe;";
+        await applicationDbContext.Database.OpenConnectionAsync();
+        await deleteUserCommand.ExecuteNonQueryAsync();
+        await applicationDbContext.Database.CloseConnectionAsync();
+    }
+    await tenantRepository.CreateDatabaseForTenantAsync(testUserDatabase!, testUsername!, testUserPassword!);
+    await tenantDbContext.SeedTestData();
 }
 
-app.UseExceptionHandler();
-app.UseHttpsRedirection();
 app.UseAuthorization();
+app.UseMiddleware<JwtClaimMiddleware>();
+app.UseHttpsRedirection();
+app.UseExceptionHandler();
 app.MapAuthenticationEndpoints()
     .MapSmartMeterEndpoints()
     .MapPolicyEndpoints()
@@ -66,4 +95,6 @@ await app.RunAsync();
 
 // For integration tests
 [ExcludeFromCodeCoverage]
-public abstract partial class Program { }
+public abstract partial class Program
+{
+}

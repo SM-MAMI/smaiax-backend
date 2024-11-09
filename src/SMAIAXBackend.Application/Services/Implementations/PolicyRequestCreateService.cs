@@ -7,12 +7,10 @@ using SMAIAXBackend.Domain.Repositories;
 namespace SMAIAXBackend.Application.Services.Implementations;
 
 public class PolicyRequestCreateService(
-    IPolicyRequestRepository policyRequestRepository,
-    IUserValidationService userValidationService) : IPolicyRequestCreateService
+    IPolicyRequestRepository policyRequestRepository) : IPolicyRequestCreateService
 {
-    public async Task<Guid> CreatePolicyRequestAsync(PolicyRequestCreateDto policyRequestCreateDto, string? userId)
+    public async Task<Guid> CreatePolicyRequestAsync(PolicyRequestCreateDto policyRequestCreateDto)
     {
-        var validatedUserId = await userValidationService.ValidateUserAsync(userId);
         var policyRequestId = policyRequestRepository.NextIdentity();
 
         var locations = new List<Location>();
@@ -32,7 +30,7 @@ public class PolicyRequestCreateService(
             policyRequestCreateDto.MaxPrice);
 
         var policyRequest = PolicyRequest.Create(policyRequestId, policyRequestCreateDto.IsAutomaticContractingEnabled,
-            policyFilter, validatedUserId);
+            policyFilter);
 
         await policyRequestRepository.AddAsync(policyRequest);
 

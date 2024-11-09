@@ -1,5 +1,3 @@
-using System.Security.Claims;
-
 using Microsoft.AspNetCore.Http.HttpResults;
 
 using SMAIAXBackend.Application.DTOs;
@@ -9,12 +7,9 @@ namespace SMAIAXBackend.API.Endpoints.SmartMeter;
 
 public static class GetSmartMetersEndpoint
 {
-    public static async Task<Ok<List<SmartMeterOverviewDto>>> Handle(
-        ISmartMeterListService smartMeterListService,
-        ClaimsPrincipal user)
+    public static async Task<Ok<List<SmartMeterOverviewDto>>> Handle(ISmartMeterListService smartMeterListService)
     {
-        var userIdClaim = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-        var smartMeters = await smartMeterListService.GetSmartMetersByUserIdAsync(userIdClaim);
+        var smartMeters = await smartMeterListService.GetSmartMetersAsync();
 
         return TypedResults.Ok(smartMeters);
     }

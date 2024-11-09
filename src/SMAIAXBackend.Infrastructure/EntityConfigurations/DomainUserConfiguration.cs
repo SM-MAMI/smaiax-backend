@@ -25,7 +25,22 @@ public class DomainUserConfiguration : IEntityTypeConfiguration<User>
             name.Property(fn => fn.LastName).HasColumnName("lastName").IsRequired();
         });
 
+        builder.Property(u => u.UserName)
+            .IsRequired();
+
+        builder.HasIndex(u => u.UserName)
+            .IsUnique();
+
         builder.Property(u => u.Email)
+            .IsRequired();
+
+        builder.HasIndex(u => u.Email)
+            .IsUnique();
+
+        builder.Property(u => u.TenantId)
+            .HasConversion(
+                v => v.Id,
+                v => new TenantId(v))
             .IsRequired();
     }
 }

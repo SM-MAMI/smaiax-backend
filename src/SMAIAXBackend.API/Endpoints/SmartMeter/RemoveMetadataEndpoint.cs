@@ -15,8 +15,7 @@ public static class RemoveMetadataEndpoint
         [FromRoute] Guid metadataId,
         ClaimsPrincipal user)
     {
-        var userIdClaim = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-        await smartMeterDeleteService.RemoveMetadataFromSmartMeterAsync(smartMeterId, metadataId, userIdClaim);
+        await smartMeterDeleteService.RemoveMetadataFromSmartMeterAsync(smartMeterId, metadataId);
 
         return TypedResults.NoContent();
     }

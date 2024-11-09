@@ -35,7 +35,7 @@ public class SmartMeterTests : TestBase
         Assert.That(locationHeader, Is.Not.Null);
 
         var id = locationHeader.Segments[^1];
-        var smartMeterActual = await _applicationDbContext.SmartMeters
+        var smartMeterActual = await _tenantDbContext.SmartMeters
             .AsNoTracking()
             .FirstOrDefaultAsync(x =>
                 x.Id.Equals(new SmartMeterId(Guid.Parse(id))));
@@ -170,7 +170,7 @@ public class SmartMeterTests : TestBase
         var returnedId = Guid.Parse(responseContent.Trim('"'));
         Assert.That(returnedId, Is.EqualTo(smartMeterId));
 
-        var smartMeterActual = await _applicationDbContext.SmartMeters
+        var smartMeterActual = await _tenantDbContext.SmartMeters
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.Id.Equals(new SmartMeterId(returnedId)));
         Assert.That(smartMeterActual, Is.Not.Null);
@@ -218,7 +218,7 @@ public class SmartMeterTests : TestBase
         var returnedId = Guid.Parse(responseContent.Trim('"'));
         Assert.That(returnedId, Is.EqualTo(smartMeterId));
 
-        var smartMeter = await _applicationDbContext.SmartMeters
+        var smartMeter = await _tenantDbContext.SmartMeters
             .AsNoTracking()
             .Include(smartMeter => smartMeter.Metadata)
             .FirstOrDefaultAsync(x => x.Id.Equals(new SmartMeterId(returnedId)));
@@ -271,7 +271,7 @@ public class SmartMeterTests : TestBase
         // Then
         Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NoContent));
 
-        var smartMeter = await _applicationDbContext.SmartMeters
+        var smartMeter = await _tenantDbContext.SmartMeters
             .AsNoTracking()
             .Include(smartMeter => smartMeter.Metadata)
             .FirstOrDefaultAsync(x => x.Id.Equals(new SmartMeterId(smartMeterId)));

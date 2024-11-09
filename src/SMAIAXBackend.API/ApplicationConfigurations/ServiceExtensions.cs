@@ -15,7 +15,7 @@ public static class ServiceExtensions
         services.AddScoped<ISmartMeterListService, SmartMeterListService>();
         services.AddScoped<ISmartMeterUpdateService, SmartMeterUpdateService>();
         services.AddScoped<ISmartMeterDeleteService, SmartMeterDeleteService>();
-        services.AddScoped<IUserValidationService, UserValidationService>();
+        services.AddScoped<ITenantContextService, TenantContextService>();
         services.AddScoped<IPolicyCreateService, PolicyCreateService>();
         services.AddScoped<IPolicyRequestCreateService, PolicyRequestCreateService>();
     }

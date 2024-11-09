@@ -12,20 +12,17 @@ namespace SMAIAXBackend.Application.Services.Implementations;
 public class SmartMeterListService(
     ISmartMeterRepository smartMeterRepository,
     IPolicyRepository policyRepository,
-    IUserValidationService userValidationService,
     ILogger<SmartMeterListService> logger) : ISmartMeterListService
 {
-    public async Task<List<SmartMeterOverviewDto>> GetSmartMetersByUserIdAsync(string? userId)
+    public async Task<List<SmartMeterOverviewDto>> GetSmartMetersAsync()
     {
-        var validatedUserId = await userValidationService.ValidateUserAsync(userId);
-
-        List<SmartMeter> smartMeters = await smartMeterRepository.GetSmartMetersByUserIdAsync(validatedUserId);
+        List<SmartMeter> smartMeters = await smartMeterRepository.GetSmartMetersAsync();
         var smartMeterOverviewDtos = new List<SmartMeterOverviewDto>();
 
         foreach (var smartMeter in smartMeters)
         {
             var policies =
-                await policyRepository.GetPoliciesBySmartMeterIdAndUserIdAsync(smartMeter.Id, validatedUserId);
+                await policyRepository.GetPoliciesBySmartMeterIdAsync(smartMeter.Id);
             var smartMeterOverviewDto = SmartMeterOverviewDto.FromSmartMeter(smartMeter, policies);
             smartMeterOverviewDtos.Add(smartMeterOverviewDto);
         }
@@ -33,20 +30,18 @@ public class SmartMeterListService(
         return smartMeterOverviewDtos;
     }
 
-    public async Task<SmartMeterOverviewDto> GetSmartMeterByIdAndUserIdAsync(Guid smartMeterId, string? userId)
+    public async Task<SmartMeterOverviewDto> GetSmartMeterByIdAsync(Guid smartMeterId)
     {
-        var validatedUserId = await userValidationService.ValidateUserAsync(userId);
         var smartMeter =
-            await smartMeterRepository.GetSmartMeterByIdAndUserIdAsync(new SmartMeterId(smartMeterId), validatedUserId);
+            await smartMeterRepository.GetSmartMeterByIdAsync(new SmartMeterId(smartMeterId));
 
         if (smartMeter == null)
         {
-            logger.LogError("Smart meter with id '{SmartMeterId} not found for user with id '{UserId}'.", smartMeterId,
-                validatedUserId.Id);
-            throw new SmartMeterNotFoundException(smartMeterId, validatedUserId.Id);
+            logger.LogError("Smart meter with id '{SmartMeterId} not found.", smartMeterId);
+            throw new SmartMeterNotFoundException(smartMeterId);
         }
 
-        var policies = await policyRepository.GetPoliciesBySmartMeterIdAndUserIdAsync(smartMeter.Id, validatedUserId);
+        var policies = await policyRepository.GetPoliciesBySmartMeterIdAsync(smartMeter.Id);
         var smartMeterOverviewDto = SmartMeterOverviewDto.FromSmartMeter(smartMeter, policies);
 
         return smartMeterOverviewDto;

@@ -5,7 +5,6 @@ using Moq;
 using SMAIAXBackend.Application.DTOs;
 using SMAIAXBackend.Application.Exceptions;
 using SMAIAXBackend.Application.Services.Implementations;
-using SMAIAXBackend.Application.Services.Interfaces;
 using SMAIAXBackend.Domain.Model.Entities;
 using SMAIAXBackend.Domain.Model.Enums;
 using SMAIAXBackend.Domain.Model.ValueObjects;
@@ -17,7 +16,6 @@ namespace SMAIAXBackend.Application.UnitTests;
 [TestFixture]
 public class PolicyCreateServiceTests
 {
-    private Mock<IUserValidationService> _userValidationServiceMock;
     private Mock<IPolicyRepository> _policyRepositoryMock;
     private Mock<ISmartMeterRepository> _smartMeterRepositoryMock;
     private Mock<ILogger<PolicyCreateService>> _loggerMock;
@@ -26,12 +24,11 @@ public class PolicyCreateServiceTests
     [SetUp]
     public void Setup()
     {
-        _userValidationServiceMock = new Mock<IUserValidationService>();
         _policyRepositoryMock = new Mock<IPolicyRepository>();
         _smartMeterRepositoryMock = new Mock<ISmartMeterRepository>();
         _loggerMock = new Mock<ILogger<PolicyCreateService>>();
         _policyCreateService = new PolicyCreateService(_policyRepositoryMock.Object, _smartMeterRepositoryMock.Object,
-            _userValidationServiceMock.Object, _loggerMock.Object);
+            _loggerMock.Object);
     }
 
     [Test]
@@ -39,20 +36,17 @@ public class PolicyCreateServiceTests
     {
         // Given
         var policyIdExpected = new PolicyId(Guid.NewGuid());
-        var userIdExpected = new UserId(Guid.NewGuid());
-        var smartMeter = SmartMeter.Create(new SmartMeterId(Guid.NewGuid()), "Smart Meter 1", userIdExpected);
+        var smartMeter = SmartMeter.Create(new SmartMeterId(Guid.NewGuid()), "Smart Meter 1");
         var policyCreateDto =
             new PolicyCreateDto(MeasurementResolution.Hour, LocationResolution.None, 100, smartMeter.Id.Id);
 
-        _userValidationServiceMock.Setup(service => service.ValidateUserAsync(userIdExpected.Id.ToString()))
-            .ReturnsAsync(userIdExpected);
         _policyRepositoryMock.Setup(repo => repo.NextIdentity()).Returns(policyIdExpected);
-        _smartMeterRepositoryMock.Setup(repo => repo.GetSmartMeterByIdAndUserIdAsync(smartMeter.Id, userIdExpected))
+        _smartMeterRepositoryMock.Setup(repo => repo.GetSmartMeterByIdAsync(smartMeter.Id))
             .ReturnsAsync(smartMeter);
 
         // When
         var policyIdActual =
-            await _policyCreateService.CreatePolicyAsync(policyCreateDto, userIdExpected.Id.ToString());
+            await _policyCreateService.CreatePolicyAsync(policyCreateDto);
 
         // Then
         Assert.That(policyIdActual, Is.EqualTo(policyIdExpected.Id));
@@ -64,40 +58,16 @@ public class PolicyCreateServiceTests
         GivenPolicyCreateDtoAndNonExistentSmartMeterId_WhenCreatePolicy_ThenSmartMeterNotFoundExceptionIsThrown()
     {
         // Given
-        var userIdExpected = new UserId(Guid.NewGuid());
         var smartMeterId = new SmartMeterId(Guid.NewGuid());
         var policyCreateDto =
             new PolicyCreateDto(MeasurementResolution.Hour, LocationResolution.City, 100, smartMeterId.Id);
 
-        _userValidationServiceMock.Setup(service => service.ValidateUserAsync(userIdExpected.Id.ToString()))
-            .ReturnsAsync(userIdExpected);
-        _smartMeterRepositoryMock.Setup(repo => repo.GetSmartMeterByIdAndUserIdAsync(smartMeterId, userIdExpected))
+        _smartMeterRepositoryMock.Setup(repo => repo.GetSmartMeterByIdAsync(smartMeterId))
             .ReturnsAsync((SmartMeter)null!);
 
         // When ... Then
         Assert.ThrowsAsync<SmartMeterNotFoundException>(() =>
-            _policyCreateService.CreatePolicyAsync(policyCreateDto, userIdExpected.Id.ToString()));
-    }
-
-    [Test]
-    public void
-        GivenPolicyCreateDtoAndNonMatchingSmartMeteridAndUserId_WhenCreatePolicy_ThenSmartMeterOwnershipExceptionIsThrown()
-    {
-        // Given
-        var userIdExpected = new UserId(Guid.NewGuid());
-        var smartMeter =
-            SmartMeter.Create(new SmartMeterId(Guid.NewGuid()), "Smart Meter 1", new UserId(Guid.NewGuid()));
-        var policyCreateDto =
-            new PolicyCreateDto(MeasurementResolution.Hour, LocationResolution.City, 100, smartMeter.Id.Id);
-
-        _userValidationServiceMock.Setup(service => service.ValidateUserAsync(userIdExpected.Id.ToString()))
-            .ReturnsAsync(userIdExpected);
-        _smartMeterRepositoryMock.Setup(repo => repo.GetSmartMeterByIdAndUserIdAsync(smartMeter.Id, userIdExpected))
-            .ReturnsAsync(smartMeter);
-
-        // When ... Then
-        Assert.ThrowsAsync<SmartMeterOwnershipException>(() =>
-            _policyCreateService.CreatePolicyAsync(policyCreateDto, userIdExpected.Id.ToString()));
+            _policyCreateService.CreatePolicyAsync(policyCreateDto));
     }
 
     [Test]
@@ -106,20 +76,17 @@ public class PolicyCreateServiceTests
     {
         // Given
         var policyIdExpected = new PolicyId(Guid.NewGuid());
-        var userIdExpected = new UserId(Guid.NewGuid());
-        var smartMeter = SmartMeter.Create(new SmartMeterId(Guid.NewGuid()), "Smart Meter 1", userIdExpected);
+        var smartMeter = SmartMeter.Create(new SmartMeterId(Guid.NewGuid()), "Smart Meter 1");
         var policyCreateDto =
             new PolicyCreateDto(MeasurementResolution.Hour, LocationResolution.City, 100, smartMeter.Id.Id);
 
-        _userValidationServiceMock.Setup(service => service.ValidateUserAsync(userIdExpected.Id.ToString()))
-            .ReturnsAsync(userIdExpected);
         _policyRepositoryMock.Setup(repo => repo.NextIdentity()).Returns(policyIdExpected);
-        _smartMeterRepositoryMock.Setup(repo => repo.GetSmartMeterByIdAndUserIdAsync(smartMeter.Id, userIdExpected))
+        _smartMeterRepositoryMock.Setup(repo => repo.GetSmartMeterByIdAsync(smartMeter.Id))
             .ReturnsAsync(smartMeter);
 
         // When ... Then
         Assert.ThrowsAsync<InsufficientLocationDataException>(() =>
-            _policyCreateService.CreatePolicyAsync(policyCreateDto, userIdExpected.Id.ToString()));
+            _policyCreateService.CreatePolicyAsync(policyCreateDto));
     }
 
     [Test]
@@ -128,22 +95,19 @@ public class PolicyCreateServiceTests
     {
         // Given
         var policyIdExpected = new PolicyId(Guid.NewGuid());
-        var userIdExpected = new UserId(Guid.NewGuid());
-        var smartMeter = SmartMeter.Create(new SmartMeterId(Guid.NewGuid()), "Smart Meter 1", userIdExpected);
+        var smartMeter = SmartMeter.Create(new SmartMeterId(Guid.NewGuid()), "Smart Meter 1");
         var metadata = Metadata.Create(new MetadataId(Guid.NewGuid()), DateTime.UtcNow,
             new Location(null, null, "Some State", null, null), 4, smartMeter.Id);
         smartMeter.AddMetadata(metadata);
         var policyCreateDto =
             new PolicyCreateDto(MeasurementResolution.Hour, LocationResolution.City, 100, smartMeter.Id.Id);
 
-        _userValidationServiceMock.Setup(service => service.ValidateUserAsync(userIdExpected.Id.ToString()))
-            .ReturnsAsync(userIdExpected);
         _policyRepositoryMock.Setup(repo => repo.NextIdentity()).Returns(policyIdExpected);
-        _smartMeterRepositoryMock.Setup(repo => repo.GetSmartMeterByIdAndUserIdAsync(smartMeter.Id, userIdExpected))
+        _smartMeterRepositoryMock.Setup(repo => repo.GetSmartMeterByIdAsync(smartMeter.Id))
             .ReturnsAsync(smartMeter);
 
         // When ... Then
         Assert.ThrowsAsync<InsufficientLocationDataException>(() =>
-            _policyCreateService.CreatePolicyAsync(policyCreateDto, userIdExpected.Id.ToString()));
+            _policyCreateService.CreatePolicyAsync(policyCreateDto));
     }
 }

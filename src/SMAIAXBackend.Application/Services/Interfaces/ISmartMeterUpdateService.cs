@@ -4,8 +4,5 @@ namespace SMAIAXBackend.Application.Services.Interfaces;
 
 public interface ISmartMeterUpdateService
 {
-    Task<Guid> UpdateSmartMeterAsync(
-        Guid smartMeterIdExpected,
-        SmartMeterUpdateDto smartMeterUpdateDto,
-        string? userId);
+    Task<Guid> UpdateSmartMeterAsync(Guid smartMeterIdExpected, SmartMeterUpdateDto smartMeterUpdateDto);
 }

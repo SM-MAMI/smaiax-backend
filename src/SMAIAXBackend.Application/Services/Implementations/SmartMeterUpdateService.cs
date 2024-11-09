@@ -10,13 +10,11 @@ namespace SMAIAXBackend.Application.Services.Implementations;
 
 public class SmartMeterUpdateService(
     ISmartMeterRepository smartMeterRepository,
-    IUserValidationService userValidationService,
     ILogger<SmartMeterUpdateService> logger) : ISmartMeterUpdateService
 {
     public async Task<Guid> UpdateSmartMeterAsync(
         Guid smartMeterIdExpected,
-        SmartMeterUpdateDto smartMeterUpdateDto,
-        string? userId)
+        SmartMeterUpdateDto smartMeterUpdateDto)
     {
         if (smartMeterIdExpected != smartMeterUpdateDto.Id)
         {
@@ -26,17 +24,13 @@ public class SmartMeterUpdateService(
             throw new SmartMeterIdMismatchException(smartMeterIdExpected, smartMeterUpdateDto.Id);
         }
 
-        var validatedUserId = await userValidationService.ValidateUserAsync(userId);
-
         var smartMeter =
-            await smartMeterRepository.GetSmartMeterByIdAndUserIdAsync(new SmartMeterId(smartMeterIdExpected),
-                validatedUserId);
+            await smartMeterRepository.GetSmartMeterByIdAsync(new SmartMeterId(smartMeterIdExpected));
 
         if (smartMeter == null)
         {
-            logger.LogWarning("SmartMeter not found for id `{SmartMeterId}` and userId `{validatedUserId}`",
-                smartMeterIdExpected, validatedUserId);
-            throw new SmartMeterNotFoundException(smartMeterIdExpected, validatedUserId.Id);
+            logger.LogError("Smart meter with id '{SmartMeterId} not found.", smartMeterIdExpected);
+            throw new SmartMeterNotFoundException(smartMeterIdExpected);
         }
 
         smartMeter.Update(smartMeterUpdateDto.Name);

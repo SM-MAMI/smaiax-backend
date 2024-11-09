@@ -16,8 +16,7 @@ public static class AddMetadataEndpoint
         [FromBody] MetadataCreateDto metadataCreateDto,
         ClaimsPrincipal user)
     {
-        var userIdClaim = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-        var smartMeterId = await smartMeterCreateService.AddMetadataAsync(id, metadataCreateDto, userIdClaim);
+        var smartMeterId = await smartMeterCreateService.AddMetadataAsync(id, metadataCreateDto);
         return TypedResults.Ok(smartMeterId);
     }
 }

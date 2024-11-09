@@ -2,10 +2,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace SMAIAXBackend.Application.DTOs;
 
-public class LoginDto(string username, string password)
+public class LoginDto(string userName, string password)
 {
-    [Required]
-    public string Username { get; set; } = username;
+    public string UserName { get; set; } = userName;
 
     [Required]
     public string Password { get; set; } = password;

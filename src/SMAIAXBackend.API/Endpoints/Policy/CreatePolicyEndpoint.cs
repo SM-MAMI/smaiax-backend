@@ -1,5 +1,3 @@
-using System.Security.Claims;
-
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,11 +10,9 @@ public static class CreatePolicyEndpoint
 {
     public static async Task<Ok<Guid>> Handle(
         IPolicyCreateService policyCreateService,
-        [FromBody] PolicyCreateDto policyCreateDto,
-        ClaimsPrincipal user)
+        [FromBody] PolicyCreateDto policyCreateDto)
     {
-        var userIdClaim = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-        var policyId = await policyCreateService.CreatePolicyAsync(policyCreateDto, userIdClaim);
+        var policyId = await policyCreateService.CreatePolicyAsync(policyCreateDto);
 
         return TypedResults.Ok(policyId);
     }

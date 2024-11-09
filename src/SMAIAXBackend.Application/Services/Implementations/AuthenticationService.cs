@@ -13,6 +13,7 @@ using SMAIAXBackend.Domain.Repositories.Transactions;
 namespace SMAIAXBackend.Application.Services.Implementations;
 
 public class AuthenticationService(
+    ITenantRepository tenantRepository,
     IUserRepository userRepository,
     ITokenRepository tokenRepository,
     UserManager<IdentityUser> userManager,
@@ -22,15 +23,23 @@ public class AuthenticationService(
     public async Task<Guid> RegisterAsync(RegisterDto registerDto)
     {
         var userId = userRepository.NextIdentity();
-        IdentityUser identityUser = new IdentityUser
-        {
-            Id = userId.Id.ToString(),
-            UserName = registerDto.Email,
-            Email = registerDto.Email
-        };
+
+        var tenantId = tenantRepository.NextIdentity();
+        var databaseName = $"tenant_{tenantId.Id.ToString().Replace("-", "_")}_db";
+
+        IdentityUser? identityUser = null;
+        Tenant? tenant = null;
+        User? domainUser = null;
 
         await transactionManager.ReadCommittedTransactionScope(async () =>
         {
+            identityUser = new IdentityUser
+            {
+                Id = userId.Id.ToString(),
+                UserName = registerDto.UserName,
+                Email = registerDto.Email
+            };
+
             var result = await userManager.CreateAsync(identityUser, registerDto.Password);
 
             if (!result.Succeeded)
@@ -40,21 +49,50 @@ public class AuthenticationService(
                 throw new RegistrationException(errorMessages);
             }
 
+            tenant = Tenant.Create(tenantId, registerDto.UserName, registerDto.Password, databaseName);
+            await tenantRepository.AddAsync(tenant);
+
             var name = new Name(registerDto.Name.FirstName, registerDto.Name.LastName);
-            var domainUser = User.Create(userId, name, registerDto.Email);
+            domainUser = User.Create(userId, name, registerDto.UserName, registerDto.Email, tenantId);
             await userRepository.AddAsync(domainUser);
         });
+
+        try
+        {
+            // Needs to be done outside of transaction
+            await tenantRepository.CreateDatabaseForTenantAsync(databaseName, registerDto.UserName,
+                registerDto.Password);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to create database for tenant: {TenantId}", tenantId.Id);
+            if (domainUser != null)
+            {
+                await userRepository.DeleteAsync(domainUser);
+            }
+            if (tenant != null)
+            {
+                await tenantRepository.DeleteAsync(tenant);
+            }
+            if (identityUser != null)
+            {
+                await userManager.DeleteAsync(identityUser);
+            }
+
+            throw new TenantDatabaseCreationException();
+        }
 
         return userId.Id;
     }
 
     public async Task<TokenDto> LoginAsync(LoginDto loginDto)
     {
-        var user = await userManager.FindByNameAsync(loginDto.Username);
+        var user = await userManager.FindByNameAsync(loginDto.UserName) ??
+                   await userManager.FindByEmailAsync(loginDto.UserName);
 
         if (user == null)
         {
-            logger.LogError("User with `{Username}` not found.", loginDto.Username);
+            logger.LogError("User with `{Username}` not found.", loginDto.UserName);
             throw new InvalidLoginException();
         }
 
@@ -62,7 +100,7 @@ public class AuthenticationService(
 
         if (!isPasswordCorrect)
         {
-            logger.LogError("Invalid password for user `{Username}`.", loginDto.Username);
+            logger.LogError("Invalid password for user `{Username}`.", loginDto.UserName);
             throw new InvalidLoginException();
         }
 

@@ -1,5 +1,3 @@
-using System.Security.Claims;
-
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,12 +9,10 @@ namespace SMAIAXBackend.API.Endpoints.PolicyRequest;
 public static class CreatePolicyRequestEndpoint
 {
     public static async Task<Ok<Guid>> Handle(
-        IPolicyRequestCreateService policyRequestCreateService, [
-        FromBody] PolicyRequestCreateDto policyRequestCreateDto,
-        ClaimsPrincipal user)
+        IPolicyRequestCreateService policyRequestCreateService,
+        [FromBody] PolicyRequestCreateDto policyRequestCreateDto)
     {
-        var userIdClaim = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-        var policyRequestId = await policyRequestCreateService.CreatePolicyRequestAsync(policyRequestCreateDto, userIdClaim);
+        var policyRequestId = await policyRequestCreateService.CreatePolicyRequestAsync(policyRequestCreateDto);
 
         return TypedResults.Ok(policyRequestId);
     }
