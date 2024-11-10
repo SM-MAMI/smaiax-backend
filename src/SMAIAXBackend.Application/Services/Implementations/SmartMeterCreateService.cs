@@ -28,7 +28,7 @@ public class SmartMeterCreateService(
                 smartMeterCreateDto.Metadata.Location.Continent);
             var metadata = Metadata.Create(metadataId, smartMeterCreateDto.Metadata.ValidFrom, location,
                 smartMeterCreateDto.Metadata.HouseholdSize, smartMeterId);
-            
+
             metadataList.Add(metadata);
         }
 

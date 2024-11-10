@@ -52,13 +52,13 @@ public class SmartMeterCreateServiceTests
         var smartMeterCreateDto = new SmartMeterCreateDto("Test Smart Meter",
             new MetadataCreateDto(DateTime.Now,
                 new LocationDto("Test Street", "Test City", "Test State", "Test Country", Continent.Europe), 1));
-        
+
         _smartMeterRepositoryMock.Setup(repo => repo.NextIdentity()).Returns(smartMeterIdExpected);
-        
+
         // When
         var smartMeterIdActual =
             await _smartMeterCreateService.AddSmartMeterAsync(smartMeterCreateDto);
-        
+
         // Then
         Assert.That(smartMeterIdActual, Is.EqualTo(smartMeterIdExpected.Id));
     }

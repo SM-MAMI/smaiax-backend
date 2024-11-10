@@ -37,10 +37,10 @@ public class SmartMeterTests
         var metadata = Metadata.Create(new MetadataId(Guid.NewGuid()), DateTime.UtcNow,
             new Location("Some street", "Some city", "Some state", "Some country", Continent.Europe),
             4, smartMeterId);
-        
+
         // When
         var smartMeter = SmartMeter.Create(smartMeterId, name, [metadata]);
-        
+
         // Then
         Assert.Multiple(() =>
         {
