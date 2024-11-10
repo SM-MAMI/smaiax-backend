@@ -122,14 +122,13 @@ public class TestBase
             expirationDate1
         );
 
-        var smartMeter1 = SmartMeter.Create(new SmartMeterId(Guid.Parse("5e9db066-1b47-46cc-bbde-0b54c30167cd")),
-            "Smart Meter 1");
-        var smartMeter2 = SmartMeter.Create(new SmartMeterId(Guid.Parse("f4c70232-6715-4c15-966f-bf4bcef46d39")),
-            "Smart Meter 2");
+        var smartMeter2Id = new SmartMeterId(Guid.Parse("f4c70232-6715-4c15-966f-bf4bcef46d39"));
         var smartMeter2Metadata = Metadata.Create(new MetadataId(Guid.Parse("1c8c8313-6fc4-4ebd-9ca8-8a1267441e06")),
             DateTime.UtcNow, new Location("Some Streetname", "Some city", "Some state", "Some county", Continent.Asia),
-            4, smartMeter2.Id);
-        smartMeter2.AddMetadata(smartMeter2Metadata);
+            4, smartMeter2Id);
+        var smartMeter1 = SmartMeter.Create(new SmartMeterId(Guid.Parse("5e9db066-1b47-46cc-bbde-0b54c30167cd")),
+            "Smart Meter 1", []);
+        var smartMeter2 = SmartMeter.Create(smartMeter2Id, "Smart Meter 2", [smartMeter2Metadata]);
 
         await _applicationDbContext.Tenants.AddAsync(tenant);
         await _applicationDbContext.Users.AddAsync(testUser);

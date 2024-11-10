@@ -10,9 +10,8 @@ public sealed class SmartMeter : IEquatable<SmartMeter>
     public string Name { get; private set; } = null!;
     public List<Metadata> Metadata { get; }
 
-    public static SmartMeter Create(SmartMeterId smartMeterId, string name)
+    public static SmartMeter Create(SmartMeterId smartMeterId, string name, List<Metadata> metadata)
     {
-        var metadata = new List<Metadata>();
         return new SmartMeter(smartMeterId, name, metadata);
     }
 

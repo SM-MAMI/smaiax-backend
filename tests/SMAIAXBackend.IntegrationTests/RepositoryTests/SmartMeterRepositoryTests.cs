@@ -12,7 +12,7 @@ public class SmartMeterRepositoryTests : TestBase
     public async Task GivenSmartMeter_WhenAdd_ThenExpectedSmartMeterIsPersisted()
     {
         // Given
-        var smartMeterExpected = SmartMeter.Create(new SmartMeterId(Guid.NewGuid()), "Test");
+        var smartMeterExpected = SmartMeter.Create(new SmartMeterId(Guid.NewGuid()), "Test", []);
 
         // When
         await _smartMeterRepository.AddAsync(smartMeterExpected);
@@ -35,8 +35,8 @@ public class SmartMeterRepositoryTests : TestBase
         // Given
         var smartMetersExpected = new List<SmartMeter>()
         {
-            SmartMeter.Create(new SmartMeterId(Guid.Parse("5e9db066-1b47-46cc-bbde-0b54c30167cd")), "Smart Meter 1"),
-            SmartMeter.Create(new SmartMeterId(Guid.Parse("f4c70232-6715-4c15-966f-bf4bcef46d39")), "Smart Meter 2")
+            SmartMeter.Create(new SmartMeterId(Guid.Parse("5e9db066-1b47-46cc-bbde-0b54c30167cd")), "Smart Meter 1", []),
+            SmartMeter.Create(new SmartMeterId(Guid.Parse("f4c70232-6715-4c15-966f-bf4bcef46d39")), "Smart Meter 2", [])
         };
 
         // When
@@ -61,7 +61,7 @@ public class SmartMeterRepositoryTests : TestBase
     {
         // Given
         var smartMeterExpected = SmartMeter.Create(new SmartMeterId(Guid.Parse("5e9db066-1b47-46cc-bbde-0b54c30167cd")),
-            "Smart Meter 1");
+            "Smart Meter 1", []);
 
         // When
         var smartMeterActual = await _smartMeterRepository.GetSmartMeterByIdAsync(smartMeterExpected.Id);
@@ -81,7 +81,7 @@ public class SmartMeterRepositoryTests : TestBase
         // Given
         const string name = "Smart Meter 1";
         var smartMeterExpected = SmartMeter.Create(new SmartMeterId(Guid.Parse("5e9db066-1b47-46cc-bbde-0b54c30167cd")),
-            "Smart Meter 1 Updated");
+            "Smart Meter 1 Updated", []);
 
         // When
         await _smartMeterRepository.UpdateAsync(smartMeterExpected);

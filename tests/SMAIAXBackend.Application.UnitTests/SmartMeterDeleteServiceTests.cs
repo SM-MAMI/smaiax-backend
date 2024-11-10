@@ -31,7 +31,7 @@ public class SmartMeterDeleteServiceTests
     public async Task GivenSmartMeterIdAndMetadataIdAndUserId_WhenRemoveMetadataFromSmartMeter_ThenMetadataIsDeleted()
     {
         // Given
-        var smartMeter = SmartMeter.Create(new SmartMeterId(Guid.NewGuid()), "Smart Meter");
+        var smartMeter = SmartMeter.Create(new SmartMeterId(Guid.NewGuid()), "Smart Meter", []);
         var metadata = Metadata.Create(new MetadataId(Guid.NewGuid()), DateTime.UtcNow,
             new Location("Some Streetnaame", "Some City", "Some State", "Some Country", Continent.Africa), 4,
             smartMeter.Id);

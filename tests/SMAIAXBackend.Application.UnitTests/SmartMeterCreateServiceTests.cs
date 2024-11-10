@@ -28,11 +28,11 @@ public class SmartMeterCreateServiceTests
     }
 
     [Test]
-    public async Task GivenSmartMeterCreateDtoAndExistentUserId_WhenAddSmartMeter_ThenSmartMeterIdIsReturned()
+    public async Task GivenSmartMeterCreateDto_WhenAddSmartMeter_ThenSmartMeterIdIsReturned()
     {
         // Given
         var smartMeterIdExpected = new SmartMeterId(Guid.NewGuid());
-        var smartMeterCreateDto = new SmartMeterCreateDto("Test Smart Meter");
+        var smartMeterCreateDto = new SmartMeterCreateDto("Test Smart Meter", null);
 
         _smartMeterRepositoryMock.Setup(repo => repo.NextIdentity()).Returns(smartMeterIdExpected);
 
@@ -45,15 +45,34 @@ public class SmartMeterCreateServiceTests
     }
 
     [Test]
+    public async Task GivenSmartMeterCreateDtoWithMetadata_WhenAddSmartMeter_ThenSmartMeterIdIsReturned()
+    {
+        // Given
+        var smartMeterIdExpected = new SmartMeterId(Guid.NewGuid());
+        var smartMeterCreateDto = new SmartMeterCreateDto("Test Smart Meter",
+            new MetadataCreateDto(DateTime.Now,
+                new LocationDto("Test Street", "Test City", "Test State", "Test Country", Continent.Europe), 1));
+        
+        _smartMeterRepositoryMock.Setup(repo => repo.NextIdentity()).Returns(smartMeterIdExpected);
+        
+        // When
+        var smartMeterIdActual =
+            await _smartMeterCreateService.AddSmartMeterAsync(smartMeterCreateDto);
+        
+        // Then
+        Assert.That(smartMeterIdActual, Is.EqualTo(smartMeterIdExpected.Id));
+    }
+
+    [Test]
     public async Task
-        GivenSmartMeterIdAndMetadataCreateDtoAndExistentUserId_WhenAddMetadata_ThenSmartMeterIdIsReturned()
+        GivenSmartMeterIdAndMetadataCreateDto_WhenAddMetadata_ThenSmartMeterIdIsReturned()
     {
         // Given
         var smartMeterId = new SmartMeterId(Guid.NewGuid());
         var metadataIdExpected = new MetadataId(Guid.NewGuid());
         var metadataCreateDto = new MetadataCreateDto(DateTime.Now,
             new LocationDto("Test Street", "Test City", "Test State", "Test Country", Continent.Europe), 1);
-        var smartMeter = SmartMeter.Create(smartMeterId, "Test Smart Meter");
+        var smartMeter = SmartMeter.Create(smartMeterId, "Test Smart Meter", []);
 
         _smartMeterRepositoryMock.Setup(repo => repo.GetSmartMeterByIdAsync(smartMeterId))
             .ReturnsAsync(smartMeter);
@@ -69,7 +88,7 @@ public class SmartMeterCreateServiceTests
 
     [Test]
     public void
-        GivenSmartMeterIdAndMetadataCreateDtoAndNonexistentUserId_WhenAddMetadata_ThenSmartMeterNotFoundExceptionIsThrown()
+        GivenSmartMeterIdAndMetadataCreateDto_WhenAddMetadata_ThenSmartMeterNotFoundExceptionIsThrown()
     {
         // Given
         var smartMeterId = new SmartMeterId(Guid.NewGuid());

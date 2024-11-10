@@ -17,7 +17,22 @@ public class SmartMeterCreateService(
     public async Task<Guid> AddSmartMeterAsync(SmartMeterCreateDto smartMeterCreateDto)
     {
         var smartMeterId = smartMeterRepository.NextIdentity();
-        var smartMeter = SmartMeter.Create(smartMeterId, smartMeterCreateDto.Name);
+
+        var metadataList = new List<Metadata>();
+        if (smartMeterCreateDto.Metadata != null)
+        {
+            var metadataId = smartMeterRepository.NextMetadataIdentity();
+            var location = new Location(smartMeterCreateDto.Metadata.Location.StreetName,
+                smartMeterCreateDto.Metadata.Location.City,
+                smartMeterCreateDto.Metadata.Location.State, smartMeterCreateDto.Metadata.Location.Country,
+                smartMeterCreateDto.Metadata.Location.Continent);
+            var metadata = Metadata.Create(metadataId, smartMeterCreateDto.Metadata.ValidFrom, location,
+                smartMeterCreateDto.Metadata.HouseholdSize, smartMeterId);
+            
+            metadataList.Add(metadata);
+        }
+
+        var smartMeter = SmartMeter.Create(smartMeterId, smartMeterCreateDto.Name, metadataList);
         await smartMeterRepository.AddAsync(smartMeter);
 
         return smartMeterId.Id;
@@ -37,7 +52,8 @@ public class SmartMeterCreateService(
         var metadataId = smartMeterRepository.NextMetadataIdentity();
         var location = new Location(metadataCreateDto.Location.StreetName, metadataCreateDto.Location.City,
             metadataCreateDto.Location.State, metadataCreateDto.Location.Country, metadataCreateDto.Location.Continent);
-        var metadata = Metadata.Create(metadataId, metadataCreateDto.ValidFrom, location, metadataCreateDto.HouseholdSize, smartMeter.Id);
+        var metadata = Metadata.Create(metadataId, metadataCreateDto.ValidFrom, location,
+            metadataCreateDto.HouseholdSize, smartMeter.Id);
         smartMeter.AddMetadata(metadata);
 
         await smartMeterRepository.UpdateAsync(smartMeter);
