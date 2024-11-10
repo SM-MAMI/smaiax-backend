@@ -68,7 +68,7 @@ public class AuthenticationServiceTests
         // Then
         _userManagerMock.Verify(
             um => um.CreateAsync(
-                It.Is<IdentityUser>(iu => iu.UserName == registerDto.UserName && iu.Email == registerDto.Email),
+                It.Is<IdentityUser>(iu => iu.UserName == registerDto.Username && iu.Email == registerDto.Email),
                 registerDto.Password),
             Times.Once);
         _userRepositoryMock.Verify(repo => repo.AddAsync(It.IsAny<User>()), Times.Once);
@@ -110,7 +110,7 @@ public class AuthenticationServiceTests
     {
         // Given
         var loginDto = new LoginDto("valid@example.com", "validPassword");
-        var user = new IdentityUser { Id = Guid.NewGuid().ToString(), UserName = loginDto.UserName };
+        var user = new IdentityUser { Id = Guid.NewGuid().ToString(), UserName = loginDto.Username };
         var expectedJwtId = Guid.NewGuid();
         var expectedRefreshTokenId = new RefreshTokenId(Guid.NewGuid());
         var expectedAccessToken = "accessToken123";
@@ -119,7 +119,7 @@ public class AuthenticationServiceTests
             DateTime.UtcNow.AddMinutes(1));
 
         _userManagerMock
-            .Setup(um => um.FindByNameAsync(loginDto.UserName))
+            .Setup(um => um.FindByNameAsync(loginDto.Username))
             .ReturnsAsync(user);
 
         _userManagerMock
@@ -147,7 +147,7 @@ public class AuthenticationServiceTests
             Assert.That(tokenDto.AccessToken, Is.EqualTo(expectedAccessToken));
             Assert.That(tokenDto.RefreshToken, Is.EqualTo(expectedRefreshToken.Token));
         });
-        _userManagerMock.Verify(um => um.FindByNameAsync(loginDto.UserName), Times.Once);
+        _userManagerMock.Verify(um => um.FindByNameAsync(loginDto.Username), Times.Once);
         _userManagerMock.Verify(um => um.CheckPasswordAsync(user, loginDto.Password), Times.Once);
         _tokenRepositoryMock.Verify(ts => ts.GenerateAccessTokenAsync(expectedJwtId.ToString(), user.Id, user.UserName),
             Times.Once);
@@ -160,7 +160,7 @@ public class AuthenticationServiceTests
         var loginDto = new LoginDto("invalid@example.com", "validPassword");
 
         _userManagerMock
-            .Setup(um => um.FindByNameAsync(loginDto.UserName))
+            .Setup(um => um.FindByNameAsync(loginDto.Username))
             .ReturnsAsync((IdentityUser)null!);
 
         // When
@@ -168,7 +168,7 @@ public class AuthenticationServiceTests
 
         // Then
         Assert.That(exception.Message, Does.Contain("Username or password is wrong"));
-        _userManagerMock.Verify(um => um.FindByNameAsync(loginDto.UserName), Times.Once);
+        _userManagerMock.Verify(um => um.FindByNameAsync(loginDto.Username), Times.Once);
         _userManagerMock.Verify(um => um.CheckPasswordAsync(It.IsAny<IdentityUser>(), loginDto.Password), Times.Never);
         _tokenRepositoryMock.Verify(
             ts => ts.GenerateAccessTokenAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
@@ -179,10 +179,10 @@ public class AuthenticationServiceTests
     {
         // Given
         var loginDto = new LoginDto("valid@example.com", "invalidPassword");
-        var user = new IdentityUser { Id = "user123", UserName = loginDto.UserName };
+        var user = new IdentityUser { Id = "user123", UserName = loginDto.Username };
 
         _userManagerMock
-            .Setup(um => um.FindByNameAsync(loginDto.UserName))
+            .Setup(um => um.FindByNameAsync(loginDto.Username))
             .ReturnsAsync(user);
         _userManagerMock
             .Setup(um => um.CheckPasswordAsync(user, loginDto.Password))
@@ -193,7 +193,7 @@ public class AuthenticationServiceTests
 
         // Then
         Assert.That(exception.Message, Does.Contain("Username or password is wrong"));
-        _userManagerMock.Verify(um => um.FindByNameAsync(loginDto.UserName), Times.Once);
+        _userManagerMock.Verify(um => um.FindByNameAsync(loginDto.Username), Times.Once);
         _userManagerMock.Verify(um => um.CheckPasswordAsync(user, loginDto.Password), Times.Once);
         _tokenRepositoryMock.Verify(
             ts => ts.GenerateAccessTokenAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()),
