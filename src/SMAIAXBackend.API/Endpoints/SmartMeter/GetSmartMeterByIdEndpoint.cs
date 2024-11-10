@@ -8,7 +8,7 @@ namespace SMAIAXBackend.API.Endpoints.SmartMeter;
 
 public static class GetSmartMeterByIdEndpoint
 {
-    public static async Task<Ok<SmartMeterOverviewDto>> Handle(
+    public static async Task<Ok<SmartMeterDto>> Handle(
         ISmartMeterListService smartMeterListService,
         [FromRoute] Guid id)
     {

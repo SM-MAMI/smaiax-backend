@@ -20,7 +20,7 @@ public static class SmartMeterEndpoints
 
         group.MapGet("/{id:guid}", GetSmartMeterByIdEndpoint.Handle)
             .WithName("getSmartMeterById")
-            .Produces<SmartMeterOverviewDto>(StatusCodes.Status200OK, contentType)
+            .Produces<SmartMeterDto>(StatusCodes.Status200OK, contentType)
             .ProducesProblem(StatusCodes.Status401Unauthorized)
             .ProducesProblem(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status500InternalServerError);
