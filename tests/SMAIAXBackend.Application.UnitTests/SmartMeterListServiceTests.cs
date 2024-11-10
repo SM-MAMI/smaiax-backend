@@ -6,6 +6,7 @@ using SMAIAXBackend.Application.Exceptions;
 using SMAIAXBackend.Application.Services.Implementations;
 using SMAIAXBackend.Domain.Model.Entities;
 using SMAIAXBackend.Domain.Model.Enums;
+using SMAIAXBackend.Domain.Model.ValueObjects;
 using SMAIAXBackend.Domain.Model.ValueObjects.Ids;
 using SMAIAXBackend.Domain.Repositories;
 
@@ -26,7 +27,8 @@ public class SmartMeterListServiceTests
         _policyRepositoryMock = new Mock<IPolicyRepository>();
         _loggerMock = new Mock<ILogger<SmartMeterListService>>();
         _smartMeterListService =
-            new SmartMeterListService(_smartMeterRepositoryMock.Object, _policyRepositoryMock.Object, _loggerMock.Object);
+            new SmartMeterListService(_smartMeterRepositoryMock.Object, _policyRepositoryMock.Object,
+                _loggerMock.Object);
     }
 
     [Test]
@@ -71,16 +73,13 @@ public class SmartMeterListServiceTests
         // Given
         var smartMeterId = Guid.NewGuid();
         var smartMeterExpected = SmartMeter.Create(new SmartMeterId(smartMeterId), "Smart Meter 1");
-        var policies = new List<Policy>
-        {
-            Policy.Create(new PolicyId(Guid.NewGuid()), MeasurementResolution.Day, LocationResolution.City, 1000,
-                smartMeterExpected.Id)
-        };
+        var metadata = Metadata.Create(new MetadataId(Guid.NewGuid()), DateTime.Now,
+            new Location("Street name", "City", "State", "Country", Continent.Antarctica), 1,
+            smartMeterExpected.Id);
+        smartMeterExpected.AddMetadata(metadata);
 
         _smartMeterRepositoryMock.Setup(repo => repo.GetSmartMeterByIdAsync(smartMeterExpected.Id))
             .ReturnsAsync(smartMeterExpected);
-        _policyRepositoryMock.Setup(repo => repo.GetPoliciesBySmartMeterIdAsync(smartMeterExpected.Id))
-            .ReturnsAsync(policies);
 
         // When
         var smartMeterActual =
@@ -92,8 +91,7 @@ public class SmartMeterListServiceTests
         {
             Assert.That(smartMeterActual.Id, Is.EqualTo(smartMeterExpected.Id.Id));
             Assert.That(smartMeterActual.Name, Is.EqualTo(smartMeterExpected.Name));
-            Assert.That(smartMeterActual.MetadataCount, Is.EqualTo(smartMeterExpected.Metadata.Count));
-            Assert.That(smartMeterActual.PolicyCount, Is.EqualTo(policies.Count));
+            Assert.That(smartMeterActual.Metadata, Has.Count.EqualTo(smartMeterExpected.Metadata.Count));
         });
     }
 

@@ -30,7 +30,7 @@ public class SmartMeterListService(
         return smartMeterOverviewDtos;
     }
 
-    public async Task<SmartMeterOverviewDto> GetSmartMeterByIdAsync(Guid smartMeterId)
+    public async Task<SmartMeterDto> GetSmartMeterByIdAsync(Guid smartMeterId)
     {
         var smartMeter =
             await smartMeterRepository.GetSmartMeterByIdAsync(new SmartMeterId(smartMeterId));
@@ -41,9 +41,8 @@ public class SmartMeterListService(
             throw new SmartMeterNotFoundException(smartMeterId);
         }
 
-        var policies = await policyRepository.GetPoliciesBySmartMeterIdAsync(smartMeter.Id);
-        var smartMeterOverviewDto = SmartMeterOverviewDto.FromSmartMeter(smartMeter, policies);
+        var smartMeterDto = SmartMeterDto.FromSmartMeter(smartMeter);
 
-        return smartMeterOverviewDto;
+        return smartMeterDto;
     }
 }
