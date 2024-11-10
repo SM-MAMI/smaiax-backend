@@ -3,13 +3,13 @@ using System.ComponentModel.DataAnnotations;
 namespace SMAIAXBackend.Application.DTOs;
 
 public class RegisterDto(
-    string userName,
+    string username,
     string email,
     string password,
     NameDto name)
 {
     [Required]
-    public string UserName { get; set; } = userName;
+    public string Username { get; set; } = username;
 
     [Required]
     [EmailAddress]

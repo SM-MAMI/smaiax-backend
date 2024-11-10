@@ -36,7 +36,7 @@ public class AuthenticationService(
             identityUser = new IdentityUser
             {
                 Id = userId.Id.ToString(),
-                UserName = registerDto.UserName,
+                UserName = registerDto.Username,
                 Email = registerDto.Email
             };
 
@@ -49,18 +49,18 @@ public class AuthenticationService(
                 throw new RegistrationException(errorMessages);
             }
 
-            tenant = Tenant.Create(tenantId, registerDto.UserName, registerDto.Password, databaseName);
+            tenant = Tenant.Create(tenantId, registerDto.Username, registerDto.Password, databaseName);
             await tenantRepository.AddAsync(tenant);
 
             var name = new Name(registerDto.Name.FirstName, registerDto.Name.LastName);
-            domainUser = User.Create(userId, name, registerDto.UserName, registerDto.Email, tenantId);
+            domainUser = User.Create(userId, name, registerDto.Username, registerDto.Email, tenantId);
             await userRepository.AddAsync(domainUser);
         });
 
         try
         {
             // Needs to be done outside of transaction
-            await tenantRepository.CreateDatabaseForTenantAsync(databaseName, registerDto.UserName,
+            await tenantRepository.CreateDatabaseForTenantAsync(databaseName, registerDto.Username,
                 registerDto.Password);
         }
         catch (Exception ex)
@@ -87,12 +87,12 @@ public class AuthenticationService(
 
     public async Task<TokenDto> LoginAsync(LoginDto loginDto)
     {
-        var user = await userManager.FindByNameAsync(loginDto.UserName) ??
-                   await userManager.FindByEmailAsync(loginDto.UserName);
+        var user = await userManager.FindByNameAsync(loginDto.Username) ??
+                   await userManager.FindByEmailAsync(loginDto.Username);
 
         if (user == null)
         {
-            logger.LogError("User with `{Username}` not found.", loginDto.UserName);
+            logger.LogError("User with `{Username}` not found.", loginDto.Username);
             throw new InvalidLoginException();
         }
 
@@ -100,7 +100,7 @@ public class AuthenticationService(
 
         if (!isPasswordCorrect)
         {
-            logger.LogError("Invalid password for user `{Username}`.", loginDto.UserName);
+            logger.LogError("Invalid password for user `{Username}`.", loginDto.Username);
             throw new InvalidLoginException();
         }
 
