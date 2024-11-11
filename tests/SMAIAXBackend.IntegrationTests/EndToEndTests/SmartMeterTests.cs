@@ -112,8 +112,10 @@ public class SmartMeterTests : TestBase
     public async Task GivenSmartMeterIdAndAccessToken_WhenGetSmartMeterById_ThenExpectedSmartMetersAreReturned()
     {
         // Given
+        var locationDto = new LocationDto("Some Streetname", "Some city", "Some state", "Some county", Continent.Asia);
+        var metadataDto = new MetadataDto(Guid.Parse("1c8c8313-6fc4-4ebd-9ca8-8a1267441e06"), DateTime.UtcNow, locationDto, 4);
         var smartMeterExpected =
-            new SmartMeterOverviewDto(Guid.Parse("5e9db066-1b47-46cc-bbde-0b54c30167cd"), "Smart Meter 1", 0, 0);
+            new SmartMeterDto(Guid.Parse("f4c70232-6715-4c15-966f-bf4bcef46d39"), "Smart Meter 2", [metadataDto]);
         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _accessToken);
 
         // When
@@ -124,14 +126,13 @@ public class SmartMeterTests : TestBase
         var responseContent = await response.Content.ReadAsStringAsync();
         Assert.That(responseContent, Is.Not.Null);
 
-        var smartMeterActual = JsonConvert.DeserializeObject<SmartMeterOverviewDto>(responseContent);
+        var smartMeterActual = JsonConvert.DeserializeObject<SmartMeterDto>(responseContent);
         Assert.That(smartMeterActual, Is.Not.Null);
         Assert.Multiple(() =>
         {
             Assert.That(smartMeterActual.Id, Is.EqualTo(smartMeterExpected.Id));
             Assert.That(smartMeterActual.Name, Is.EqualTo(smartMeterExpected.Name));
-            Assert.That(smartMeterActual.MetadataCount, Is.EqualTo(smartMeterExpected.MetadataCount));
-            Assert.That(smartMeterActual.PolicyCount, Is.EqualTo(smartMeterExpected.PolicyCount));
+            Assert.That(smartMeterActual.Metadata, Has.Count.EqualTo(smartMeterExpected.Metadata.Count));
         });
     }
 
