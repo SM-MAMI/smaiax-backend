@@ -36,7 +36,7 @@ public class PolicyCreateServiceTests
     {
         // Given
         var policyIdExpected = new PolicyId(Guid.NewGuid());
-        var smartMeter = SmartMeter.Create(new SmartMeterId(Guid.NewGuid()), "Smart Meter 1");
+        var smartMeter = SmartMeter.Create(new SmartMeterId(Guid.NewGuid()), "Smart Meter 1", []);
         var policyCreateDto =
             new PolicyCreateDto(MeasurementResolution.Hour, LocationResolution.None, 100, smartMeter.Id.Id);
 
@@ -76,7 +76,7 @@ public class PolicyCreateServiceTests
     {
         // Given
         var policyIdExpected = new PolicyId(Guid.NewGuid());
-        var smartMeter = SmartMeter.Create(new SmartMeterId(Guid.NewGuid()), "Smart Meter 1");
+        var smartMeter = SmartMeter.Create(new SmartMeterId(Guid.NewGuid()), "Smart Meter 1", []);
         var policyCreateDto =
             new PolicyCreateDto(MeasurementResolution.Hour, LocationResolution.City, 100, smartMeter.Id.Id);
 
@@ -95,7 +95,7 @@ public class PolicyCreateServiceTests
     {
         // Given
         var policyIdExpected = new PolicyId(Guid.NewGuid());
-        var smartMeter = SmartMeter.Create(new SmartMeterId(Guid.NewGuid()), "Smart Meter 1");
+        var smartMeter = SmartMeter.Create(new SmartMeterId(Guid.NewGuid()), "Smart Meter 1", []);
         var metadata = Metadata.Create(new MetadataId(Guid.NewGuid()), DateTime.UtcNow,
             new Location(null, null, "Some State", null, null), 4, smartMeter.Id);
         smartMeter.AddMetadata(metadata);

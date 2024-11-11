@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 
 using SMAIAXBackend.Domain.Model.Entities;
+using SMAIAXBackend.Domain.Model.Enums;
+using SMAIAXBackend.Domain.Model.ValueObjects;
 using SMAIAXBackend.Domain.Model.ValueObjects.Ids;
 using SMAIAXBackend.Infrastructure.EntityConfigurations;
 
@@ -30,8 +32,12 @@ public class TenantDbContext(DbContextOptions<TenantDbContext> options) : DbCont
 
     public async Task SeedTestData()
     {
-        var smartMeter1 = SmartMeter.Create(new SmartMeterId(Guid.NewGuid()), "Smart Meter 1");
-        var smartMeter2 = SmartMeter.Create(new SmartMeterId(Guid.NewGuid()), "Smart Meter 2");
+        var smartMeter1Id = new SmartMeterId(Guid.NewGuid());
+        var metadata = Metadata.Create(new MetadataId(Guid.NewGuid()), DateTime.Now,
+            new Location("Hochschulstraße 1", "Dornbirn", "Vorarlberg", "Österreich", Continent.Oceania),
+            4, smartMeter1Id);
+        var smartMeter1 = SmartMeter.Create(smartMeter1Id, "Smart Meter 1", [metadata]);
+        var smartMeter2 = SmartMeter.Create(new SmartMeterId(Guid.NewGuid()), "Smart Meter 2", []);
 
         await SmartMeters.AddAsync(smartMeter1);
         await SmartMeters.AddAsync(smartMeter2);

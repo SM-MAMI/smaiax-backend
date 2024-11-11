@@ -21,7 +21,7 @@ public class SmartMeterTests : TestBase
     public async Task GivenSmartMeterCreateDtoAndAccessToken_WhenCreateSmartMeter_ThenSmartMeterIsCreated()
     {
         // Given
-        var smartMeterCreateDto = new SmartMeterCreateDto("Test Smart Meter");
+        var smartMeterCreateDto = new SmartMeterCreateDto("Test Smart Meter", null);
         var httpContent = new StringContent(JsonConvert.SerializeObject(smartMeterCreateDto), Encoding.UTF8,
             "application/json");
         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _accessToken);
@@ -48,7 +48,7 @@ public class SmartMeterTests : TestBase
     public async Task GivenSmartMeterCreateDtoAndNoAccessToken_WhenCreateSmartMeter_ThenUnauthorizedIsReturned()
     {
         // Given
-        var smartMeterCreateDto = new SmartMeterCreateDto("Test Smart Meter");
+        var smartMeterCreateDto = new SmartMeterCreateDto("Test Smart Meter", null);
         var httpContent = new StringContent(JsonConvert.SerializeObject(smartMeterCreateDto), Encoding.UTF8,
             "application/json");
         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "");
