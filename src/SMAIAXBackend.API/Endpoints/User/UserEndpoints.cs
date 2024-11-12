@@ -1,8 +1,4 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Builder;
-
-using SMAIAXBackend.Application.DTOs;
+﻿using SMAIAXBackend.Application.DTOs;
 
 namespace SMAIAXBackend.API.Endpoints.User;
 
@@ -21,7 +17,7 @@ public static class UserEndpoints
             .ProducesProblem(StatusCodes.Status401Unauthorized)
             .ProducesProblem(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status500InternalServerError);
-        
+
         return app;
     }
 }

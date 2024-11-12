@@ -14,15 +14,15 @@ public class UserService(IUserRepository userRepository,
     public async Task<UserDto> GetUserByIdAsync(Guid userId)
     {
         var user = await userRepository.GetUserByIdAsync(new UserId(userId));
-        
+
         if (user == null)
         {
             logger.LogError("User with id '{UserId} not found.", userId);
             throw new UserNotFoundException(userId);
         }
-        
+
         var userDto = UserDto.FromUser(user);
-        
+
         return userDto;
     }
 }

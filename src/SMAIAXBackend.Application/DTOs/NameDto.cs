@@ -11,7 +11,7 @@ public class NameDto(string firstName, string lastName)
 
     [Required]
     public string LastName { get; set; } = lastName;
-    
+
     public static NameDto FromName(Name name)
     {
         return new NameDto(name.FirstName, name.LastName);
