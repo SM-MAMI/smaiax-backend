@@ -25,10 +25,10 @@ public class DomainUserConfiguration : IEntityTypeConfiguration<User>
             name.Property(fn => fn.LastName).HasColumnName("lastName").IsRequired();
         });
 
-        builder.Property(u => u.UserName)
+        builder.Property(u => u.Username)
             .IsRequired();
 
-        builder.HasIndex(u => u.UserName)
+        builder.HasIndex(u => u.Username)
             .IsUnique();
 
         builder.Property(u => u.Email)

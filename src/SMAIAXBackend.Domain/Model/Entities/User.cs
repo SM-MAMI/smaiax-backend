@@ -9,7 +9,7 @@ public sealed class User : IEquatable<User>
 {
     public UserId Id { get; } = null!;
     public Name Name { get; } = null!;
-    public string UserName { get; } = null!;
+    public string Username { get; } = null!;
     public string Email { get; } = null!;
     public TenantId TenantId { get; } = null!;
 
@@ -24,11 +24,11 @@ public sealed class User : IEquatable<User>
     {
     }
 
-    private User(UserId id, Name name, string userName, string email, TenantId tenantId)
+    private User(UserId id, Name name, string username, string email, TenantId tenantId)
     {
         Id = id;
         Name = name;
-        UserName = userName;
+        Username = username;
         Email = email;
         TenantId = tenantId;
     }
