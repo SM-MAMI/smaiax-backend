@@ -18,7 +18,7 @@ public class PolicyMatchesRequestSpecificationTests
         var specification = new PolicyMatchesRequestSpecification(policyRequest);
         var policy = Policy.Create(new PolicyId(Guid.NewGuid()), MeasurementResolution.Hour, LocationResolution.Country,
             90, new SmartMeterId(Guid.NewGuid()));
-        
+
         // When
         var result = specification.IsSatisfiedBy(policy);
 

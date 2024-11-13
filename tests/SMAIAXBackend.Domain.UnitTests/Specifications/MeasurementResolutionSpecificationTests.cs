@@ -15,14 +15,14 @@ public class MeasurementResolutionSpecificationTests
         var specification = new MeasurementResolutionSpecification(MeasurementResolution.Day);
         var policy = Policy.Create(new PolicyId(Guid.NewGuid()), MeasurementResolution.Day, LocationResolution.Country,
             100, new SmartMeterId(Guid.NewGuid()));
-        
+
         // When
         var result = specification.IsSatisfiedBy(policy);
-        
+
         // Then
         Assert.That(result, Is.True);
     }
-    
+
     [Test]
     public void Given_MeasurementResolutionIsLower_When_IsSatisfiedByIsCalled_Then_ReturnsTrue()
     {
@@ -37,7 +37,7 @@ public class MeasurementResolutionSpecificationTests
         // Then
         Assert.That(result, Is.True);
     }
-    
+
     [Test]
     public void Given_MeasurementResolutionIsHigher_When_IsSatisfiedByIsCalled_Then_ReturnsFalse()
     {

@@ -1,13 +1,18 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 using SMAIAXBackend.Domain.Model.Entities;
 using SMAIAXBackend.Domain.Model.ValueObjects.Ids;
 using SMAIAXBackend.Domain.Repositories;
+using SMAIAXBackend.Infrastructure.Configurations;
 using SMAIAXBackend.Infrastructure.DbContexts;
 
 namespace SMAIAXBackend.Infrastructure.Repositories;
 
-public class PolicyRepository(TenantDbContext tenantDbContext) : IPolicyRepository
+public class PolicyRepository(
+    TenantDbContext tenantDbContext,
+    ITenantDbContextFactory tenantDbContextFactory,
+    IOptions<DatabaseConfiguration> databaseConfigOptions) : IPolicyRepository
 {
     public PolicyId NextIdentity()
     {
@@ -25,5 +30,13 @@ public class PolicyRepository(TenantDbContext tenantDbContext) : IPolicyReposito
         return tenantDbContext.Policies
             .Where(p => p.SmartMeterId.Equals(smartMeterId))
             .ToListAsync();
+    }
+
+    public async Task<List<Policy>> GetPoliciesByTenantAsync(Tenant tenant)
+    {
+        var tenantSpecificDbContext = tenantDbContextFactory.CreateDbContext(tenant.DatabaseName,
+            databaseConfigOptions.Value.SuperUsername, databaseConfigOptions.Value.SuperUserPassword);
+
+        return await tenantSpecificDbContext.Policies.ToListAsync();
     }
 }

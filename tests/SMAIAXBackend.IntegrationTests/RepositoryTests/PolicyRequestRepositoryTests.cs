@@ -21,7 +21,7 @@ public class PolicyRequestRepositoryTests : TestBase
 
         // When
         await _policyRequestRepository.AddAsync(policyRequestExpected);
-        var policyRequestActual = await _tenantDbContext.PolicyRequests
+        var policyRequestActual = await _tenant1DbContext.PolicyRequests
             .AsNoTracking()
             .FirstOrDefaultAsync(pr => pr.Id.Equals(policyRequestExpected.Id));
 
