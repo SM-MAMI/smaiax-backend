@@ -11,7 +11,7 @@ public class ContractTests
     {
         // Given
         var contractId = new ContractId(Guid.NewGuid());
-        var createdAt = DateTime.Now;
+        var createdAt = DateTime.UtcNow;
         var policyId = new PolicyId(Guid.NewGuid());
         var policyRequestId = new PolicyRequestId(Guid.NewGuid());
 
