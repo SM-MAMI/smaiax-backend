@@ -154,6 +154,9 @@ public class TestBase
         var smartMeter1 = SmartMeter.Create(new SmartMeterId(Guid.Parse("5e9db066-1b47-46cc-bbde-0b54c30167cd")),
             "Smart Meter 1", []);
         var smartMeter2 = SmartMeter.Create(smartMeter2Id, "Smart Meter 2", [smartMeter2Metadata]);
+        var policyRequest = PolicyRequest.Create(new PolicyRequestId(Guid.Parse("58af578c-9975-4633-8dfe-ff8b70b83661")),
+            false, new PolicyFilter(MeasurementResolution.Hour, 1, 10, [],
+                LocationResolution.State, 500));
 
         // Jane Doe
         var smartMeter3Id = new SmartMeterId(Guid.Parse("f4c70232-6715-4c15-966f-bf4bcef46d39"));
@@ -180,6 +183,7 @@ public class TestBase
         await _applicationDbContext.RefreshTokens.AddAsync(refreshToken4);
         await _tenant1DbContext.SmartMeters.AddAsync(smartMeter1);
         await _tenant1DbContext.SmartMeters.AddAsync(smartMeter2);
+        await _tenant1DbContext.PolicyRequests.AddAsync(policyRequest);
         await _tenant2DbContext.SmartMeters.AddAsync(smartMeter3);
         await _tenant2DbContext.Policies.AddAsync(policy1);
         await _tenant2DbContext.Policies.AddAsync(policy2);

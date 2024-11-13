@@ -3,19 +3,15 @@ using SMAIAXBackend.Application.Services.Interfaces;
 using SMAIAXBackend.Domain.Model.Entities;
 using SMAIAXBackend.Domain.Model.ValueObjects;
 using SMAIAXBackend.Domain.Repositories;
-using SMAIAXBackend.Domain.Specifications;
 
 namespace SMAIAXBackend.Application.Services.Implementations;
 
 public class PolicyRequestCreateService(
     IPolicyRequestRepository policyRequestRepository,
-    ITenantRepository tenantRepository,
-    IPolicyRepository policyRepository,
-    ITenantContextService tenantContextService) : IPolicyRequestCreateService
+    IPolicyMatchingService policyMatchingService) : IPolicyRequestCreateService
 {
     public async Task<List<PolicyDto>> CreatePolicyRequestAsync(PolicyRequestCreateDto policyRequestCreateDto)
     {
-        var matchingPolices = new List<PolicyDto>();
         var policyRequestId = policyRequestRepository.NextIdentity();
 
         var locations = new List<Location>();
@@ -38,20 +34,8 @@ public class PolicyRequestCreateService(
             policyFilter);
         await policyRequestRepository.AddAsync(policyRequest);
 
-        var currentTenant = await tenantContextService.GetCurrentTenantAsync();
-        var tenants = await tenantRepository.GetAllAsync();
-        var specification = new PolicyMatchesRequestSpecification(policyRequest);
-        foreach (var tenant in tenants)
-        {
-            if (currentTenant.Equals(tenant))
-            {
-                continue;
-            }
+        var matchingPolicies = await policyMatchingService.GetMatchingPoliciesAsync(policyRequest.Id.Id);
 
-            var policies = await policyRepository.GetPoliciesByTenantAsync(tenant);
-            matchingPolices.AddRange(from policy in policies where specification.IsSatisfiedBy(policy) select PolicyDto.FromPolicy(policy));
-        }
-
-        return matchingPolices;
+        return matchingPolicies;
     }
 }

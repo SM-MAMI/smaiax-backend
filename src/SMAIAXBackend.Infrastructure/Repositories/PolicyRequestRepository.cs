@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+
 using SMAIAXBackend.Domain.Model.Entities;
 using SMAIAXBackend.Domain.Model.ValueObjects.Ids;
 using SMAIAXBackend.Domain.Repositories;
@@ -16,5 +18,11 @@ public class PolicyRequestRepository(TenantDbContext tenantDbContext) : IPolicyR
     {
         await tenantDbContext.PolicyRequests.AddAsync(policyRequest);
         await tenantDbContext.SaveChangesAsync();
+    }
+
+    public async Task<PolicyRequest?> GetPolicyRequestByIdAsync(PolicyRequestId id)
+    {
+        return await tenantDbContext.PolicyRequests
+            .FirstOrDefaultAsync(pr => pr.Id.Equals(id));
     }
 }

@@ -50,4 +50,32 @@ public class PolicyRequestTests : TestBase
         Assert.That(policyDto, Is.Not.Null);
         Assert.That(policyDto.Id, Is.EqualTo(policyIdExpected));
     }
+
+    [Test]
+    public async Task GivenPolicyRequestIdAndAccessToken_WhenCreatePolicyRequest_ThenMatchingPoliciesAreReturned()
+    {
+        // Given
+        const int policyCountExpected = 1;
+        var policyIdExpected = Guid.Parse("f4c70232-6715-4c15-966f-bf4bcef46d39");
+        var policyRequestId = Guid.Parse("58af578c-9975-4633-8dfe-ff8b70b83661");
+
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _accessToken);
+
+        // When
+        var response = await _httpClient.GetAsync($"{BaseUrl}/{policyRequestId}/policies");
+
+        // Then
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+
+        var responseContent = await response.Content.ReadAsStringAsync();
+        Assert.That(responseContent, Is.Not.Null);
+
+        var policyDtos = JsonConvert.DeserializeObject<List<PolicyDto>>(responseContent);
+        Assert.That(policyDtos, Is.Not.Null);
+        Assert.That(policyDtos, Has.Count.EqualTo(policyCountExpected));
+
+        var policyDto = policyDtos[0];
+        Assert.That(policyDto, Is.Not.Null);
+        Assert.That(policyDto.Id, Is.EqualTo(policyIdExpected));
+    }
 }

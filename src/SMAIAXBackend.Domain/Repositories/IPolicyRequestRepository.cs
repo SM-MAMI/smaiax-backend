@@ -7,4 +7,5 @@ public interface IPolicyRequestRepository
 {
     PolicyRequestId NextIdentity();
     Task AddAsync(PolicyRequest policyRequest);
+    Task<PolicyRequest?> GetPolicyRequestByIdAsync(PolicyRequestId id);
 }

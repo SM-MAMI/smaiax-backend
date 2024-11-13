@@ -19,6 +19,15 @@ public static class PolicyRequestEndpoints
             .ProducesProblem(StatusCodes.Status401Unauthorized)
             .ProducesProblem(StatusCodes.Status500InternalServerError);
 
+        group.MapGet("/{id:guid}/policies", GetMatchingPoliciesEndpoint.Handle)
+            .WithName("getMatchingPolicies")
+            .Accepts<Guid>(contentType)
+            .Produces<List<PolicyDto>>(StatusCodes.Status200OK, contentType)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .Produces(StatusCodes.Status404NotFound)
+            .ProducesProblem(StatusCodes.Status500InternalServerError);
+
         return app;
     }
 }
