@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization;
 
 using Microsoft.EntityFrameworkCore;
 
@@ -27,7 +28,8 @@ builder.Services.AddHttpContextAccessor();
 
 builder.Services.ConfigureHttpJsonOptions(options =>
 {
-    options.SerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+    options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    options.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
 });
 
 // Add Swagger if in development environment
@@ -36,7 +38,8 @@ if (builder.Environment.IsDevelopment() || builder.Environment.IsEnvironment("Do
     // only used for api generation
     builder.Services.AddControllers().AddJsonOptions(options =>
     {
-        options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
     });
     
     builder.Configuration.AddJsonFile("Properties/launchSettings.json", optional: true, reloadOnChange: true);
