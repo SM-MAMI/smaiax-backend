@@ -8,10 +8,10 @@ public class SmartMeterDto(Guid id, string name, List<MetadataDto> metadata)
 {
     [Required]
     public Guid Id { get; set; } = id;
-    
+
     [Required]
     public string Name { get; set; } = name;
-    
+
     [Required]
     public List<MetadataDto> Metadata { get; set; } = metadata;
 
