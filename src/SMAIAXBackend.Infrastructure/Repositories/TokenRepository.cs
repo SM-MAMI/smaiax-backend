@@ -24,7 +24,7 @@ public class TokenRepository(IOptions<JwtConfiguration> jwtConfigOptions, Applic
         return Guid.NewGuid();
     }
 
-    public Task<string> GenerateAccessTokenAsync(string jwtTokenId, string userId, string username)
+    public Task<string> GenerateAccessTokenAsync(string jwtTokenId, string userId, string username, string email)
     {
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtConfig.Secret));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -32,8 +32,11 @@ public class TokenRepository(IOptions<JwtConfiguration> jwtConfigOptions, Applic
 
         var claims = new[]
         {
-            new Claim(JwtRegisteredClaimNames.Sub, userId), new Claim(JwtRegisteredClaimNames.UniqueName, username),
-            new Claim(JwtRegisteredClaimNames.Jti, jwtTokenId), new Claim(JwtRegisteredClaimNames.Iat,
+            new Claim(JwtRegisteredClaimNames.Sub, userId),
+            new Claim(JwtRegisteredClaimNames.UniqueName, username),
+            new Claim(JwtRegisteredClaimNames.Email, email),
+            new Claim(JwtRegisteredClaimNames.Jti, jwtTokenId),
+            new Claim(JwtRegisteredClaimNames.Iat,
                 DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(),
                 ClaimValueTypes.Integer64)
         };

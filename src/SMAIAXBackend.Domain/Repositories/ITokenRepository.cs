@@ -6,7 +6,7 @@ namespace SMAIAXBackend.Domain.Repositories;
 public interface ITokenRepository
 {
     Guid NextIdentity();
-    Task<string> GenerateAccessTokenAsync(string jwtTokenId, string userId, string username);
+    Task<string> GenerateAccessTokenAsync(string jwtTokenId, string userId, string username, string email);
     Task<RefreshToken> GenerateRefreshTokenAsync(RefreshTokenId refreshTokenId, string jwtTokenId, string userId);
     Task<RefreshToken?> GetRefreshTokenByTokenAsync(string token);
     bool ValidateAccessToken(string accessToken, UserId expectedUserId, string expectedJwtTokenId);
