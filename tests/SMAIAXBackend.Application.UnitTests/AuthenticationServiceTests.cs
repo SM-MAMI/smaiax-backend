@@ -109,8 +109,10 @@ public class AuthenticationServiceTests
     public async Task GivenValidUsernameAndPassword_WhenLogin_ThenTokenDtoIsReturned()
     {
         // Given
-        var loginDto = new LoginDto("valid@example.com", "validPassword");
-        var user = new IdentityUser { Id = Guid.NewGuid().ToString(), UserName = loginDto.Username };
+        const string username = "test";
+        const string email = "valid@example.com";
+        var loginDto = new LoginDto(username, "validPassword");
+        var user = new IdentityUser { Id = Guid.NewGuid().ToString(), UserName = loginDto.Username, Email = email };
         var expectedJwtId = Guid.NewGuid();
         var expectedRefreshTokenId = new RefreshTokenId(Guid.NewGuid());
         var expectedAccessToken = "accessToken123";
@@ -131,7 +133,7 @@ public class AuthenticationServiceTests
             .Returns(expectedRefreshTokenId.Id);
 
         _tokenRepositoryMock
-            .Setup(ts => ts.GenerateAccessTokenAsync(expectedJwtId.ToString(), user.Id, user.UserName))
+            .Setup(ts => ts.GenerateAccessTokenAsync(expectedJwtId.ToString(), user.Id, username, email))
             .ReturnsAsync(expectedAccessToken);
 
         _tokenRepositoryMock
@@ -149,7 +151,7 @@ public class AuthenticationServiceTests
         });
         _userManagerMock.Verify(um => um.FindByNameAsync(loginDto.Username), Times.Once);
         _userManagerMock.Verify(um => um.CheckPasswordAsync(user, loginDto.Password), Times.Once);
-        _tokenRepositoryMock.Verify(ts => ts.GenerateAccessTokenAsync(expectedJwtId.ToString(), user.Id, user.UserName),
+        _tokenRepositoryMock.Verify(ts => ts.GenerateAccessTokenAsync(expectedJwtId.ToString(), user.Id, username, email),
             Times.Once);
     }
 
@@ -171,7 +173,7 @@ public class AuthenticationServiceTests
         _userManagerMock.Verify(um => um.FindByNameAsync(loginDto.Username), Times.Once);
         _userManagerMock.Verify(um => um.CheckPasswordAsync(It.IsAny<IdentityUser>(), loginDto.Password), Times.Never);
         _tokenRepositoryMock.Verify(
-            ts => ts.GenerateAccessTokenAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+            ts => ts.GenerateAccessTokenAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
     }
 
     [Test]
@@ -196,7 +198,7 @@ public class AuthenticationServiceTests
         _userManagerMock.Verify(um => um.FindByNameAsync(loginDto.Username), Times.Once);
         _userManagerMock.Verify(um => um.CheckPasswordAsync(user, loginDto.Password), Times.Once);
         _tokenRepositoryMock.Verify(
-            ts => ts.GenerateAccessTokenAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()),
+            ts => ts.GenerateAccessTokenAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()),
             Times.Never);
     }
 
@@ -205,7 +207,7 @@ public class AuthenticationServiceTests
     {
         // Given
         var userId = new UserId(Guid.NewGuid());
-        var identityUser = new IdentityUser { Id = userId.ToString(), UserName = "john.doe@example.com" };
+        var identityUser = new IdentityUser { Id = userId.ToString(), UserName = "johndoe", Email = "john.doe@example.com" };
         const string validAccessToken = "validAccessToken";
         const string validRefreshToken = "validRefreshToken";
         var refreshTokenId = new RefreshTokenId(Guid.NewGuid());
@@ -249,7 +251,7 @@ public class AuthenticationServiceTests
                 ts.GenerateRefreshTokenAsync(newRefreshTokenId, newJwtId.ToString(), userId.ToString()))
             .ReturnsAsync(newRefreshToken);
         _tokenRepositoryMock.Setup(ts =>
-                ts.GenerateAccessTokenAsync(It.IsAny<string>(), userId.ToString(), identityUser.UserName))
+                ts.GenerateAccessTokenAsync(It.IsAny<string>(), userId.ToString(), identityUser.UserName, identityUser.Email))
             .ReturnsAsync(newAccessToken);
 
         // When
@@ -270,7 +272,7 @@ public class AuthenticationServiceTests
             ts => ts.GenerateRefreshTokenAsync(newRefreshTokenId, newJwtId.ToString(), userId.ToString()),
             Times.Once);
         _tokenRepositoryMock.Verify(
-            ts => ts.GenerateAccessTokenAsync(It.IsAny<string>(), userId.ToString(), identityUser.UserName),
+            ts => ts.GenerateAccessTokenAsync(It.IsAny<string>(), userId.ToString(), identityUser.UserName, identityUser.Email),
             Times.Once);
         _userManagerMock.Verify(um => um.FindByIdAsync(userId.ToString()), Times.Once);
     }

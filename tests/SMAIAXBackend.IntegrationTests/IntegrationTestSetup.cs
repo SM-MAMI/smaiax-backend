@@ -61,7 +61,7 @@ internal static class IntegrationTestSetup
 
         var tokenRepository = _webAppFactory.Services.GetRequiredService<ITokenRepository>();
         AccessToken = await tokenRepository.GenerateAccessTokenAsync($"{Guid.NewGuid()}-{Guid.NewGuid()}",
-            "3c07065a-b964-44a9-9cdf-fbd49d755ea7", "john.doe@example.com");
+            "3c07065a-b964-44a9-9cdf-fbd49d755ea7", "johndoe", "john.doe@example.com");
     }
 
     [OneTimeTearDown]
