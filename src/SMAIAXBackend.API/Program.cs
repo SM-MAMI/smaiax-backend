@@ -41,7 +41,7 @@ if (builder.Environment.IsDevelopment() || builder.Environment.IsEnvironment("Do
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
         options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
     });
-    
+
     builder.Configuration.AddJsonFile("Properties/launchSettings.json", optional: true, reloadOnChange: true);
     builder.Services.AddSwaggerConfigurations(builder.Configuration);
 
