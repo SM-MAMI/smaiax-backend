@@ -50,7 +50,7 @@ public class SmartMeterCreateServiceTests
         // Given
         var smartMeterIdExpected = new SmartMeterId(Guid.NewGuid());
         var smartMeterCreateDto = new SmartMeterCreateDto("Test Smart Meter",
-            new MetadataCreateDto(DateTime.Now,
+            new MetadataCreateDto(DateTime.UtcNow,
                 new LocationDto("Test Street", "Test City", "Test State", "Test Country", Continent.Europe), 1));
 
         _smartMeterRepositoryMock.Setup(repo => repo.NextIdentity()).Returns(smartMeterIdExpected);
@@ -70,7 +70,7 @@ public class SmartMeterCreateServiceTests
         // Given
         var smartMeterId = new SmartMeterId(Guid.NewGuid());
         var metadataIdExpected = new MetadataId(Guid.NewGuid());
-        var metadataCreateDto = new MetadataCreateDto(DateTime.Now,
+        var metadataCreateDto = new MetadataCreateDto(DateTime.UtcNow,
             new LocationDto("Test Street", "Test City", "Test State", "Test Country", Continent.Europe), 1);
         var smartMeter = SmartMeter.Create(smartMeterId, "Test Smart Meter", []);
 
@@ -92,7 +92,7 @@ public class SmartMeterCreateServiceTests
     {
         // Given
         var smartMeterId = new SmartMeterId(Guid.NewGuid());
-        var metadataCreateDto = new MetadataCreateDto(DateTime.Now,
+        var metadataCreateDto = new MetadataCreateDto(DateTime.UtcNow,
             new LocationDto("Test Street", "Test City", "Test State", "Test Country", Continent.Europe), 1);
 
         _smartMeterRepositoryMock.Setup(repo => repo.GetSmartMeterByIdAsync(smartMeterId))
