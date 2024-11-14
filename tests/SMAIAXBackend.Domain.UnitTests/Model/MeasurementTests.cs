@@ -12,7 +12,7 @@ public class MeasurementTests
     {
         // Given
         var measurementId = new MeasurementId(Guid.NewGuid());
-        var timestamp = DateTime.Now;
+        var timestamp = DateTime.UtcNow;
         var measurementData = new MeasurementData(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "", timestamp);
         var smartMeterId = new SmartMeterId(Guid.NewGuid());
 

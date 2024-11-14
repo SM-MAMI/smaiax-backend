@@ -13,7 +13,7 @@ public class MetadataTests
     {
         // Given
         var metadataId = new MetadataId(Guid.NewGuid());
-        var validFrom = DateTime.Now;
+        var validFrom = DateTime.UtcNow;
         var location = new Location("StreetName", "City", "State", "Country", Continent.Europe);
         const int householdSize = 1;
         var smartMeterId = new SmartMeterId(Guid.NewGuid());

@@ -104,10 +104,8 @@ public class AuthenticationService(
             throw new InvalidLoginException();
         }
 
-        // To avoid the null reference warning
-        var userName = user.UserName ?? string.Empty;
         var jwtId = tokenRepository.NextIdentity();
-        var accessToken = await tokenRepository.GenerateAccessTokenAsync(jwtId.ToString(), user.Id, userName);
+        var accessToken = await tokenRepository.GenerateAccessTokenAsync(jwtId.ToString(), user.Id, user.UserName!, user.Email!);
         var refreshTokenId = new RefreshTokenId(tokenRepository.NextIdentity());
         var refreshToken = await tokenRepository.GenerateRefreshTokenAsync(refreshTokenId, jwtId.ToString(), user.Id);
         var tokenDto = new TokenDto(accessToken, refreshToken.Token);
@@ -162,7 +160,7 @@ public class AuthenticationService(
         var newRefreshToken = await tokenRepository.GenerateRefreshTokenAsync(refreshTokenId, jwtId.ToString(),
             identityUser.Id);
         var newAccessToken = await tokenRepository.GenerateAccessTokenAsync(jwtId.ToString(),
-            identityUser.Id, identityUser.UserName!);
+            identityUser.Id, identityUser.UserName!, identityUser.Email!);
         var refreshedTokens = new TokenDto(newAccessToken, newRefreshToken.Token);
 
         return refreshedTokens;

@@ -25,6 +25,12 @@ builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<ExceptionHandlerMiddleware>();
 builder.Services.AddHttpContextAccessor();
 
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+    });
+
 // Add Swagger if in development environment
 if (builder.Environment.IsDevelopment() || builder.Environment.IsEnvironment("DockerDevelopment"))
 {
