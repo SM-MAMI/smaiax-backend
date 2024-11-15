@@ -8,6 +8,7 @@ using SMAIAXBackend.API.Endpoints.Authentication;
 using SMAIAXBackend.API.Endpoints.Policy;
 using SMAIAXBackend.API.Endpoints.PolicyRequest;
 using SMAIAXBackend.API.Endpoints.SmartMeter;
+using SMAIAXBackend.API.Endpoints.User;
 using SMAIAXBackend.API.Middlewares;
 using SMAIAXBackend.Domain.Repositories;
 using SMAIAXBackend.Infrastructure.Configurations;
@@ -103,6 +104,7 @@ app.UseHttpsRedirection();
 app.UseExceptionHandler();
 app.MapAuthenticationEndpoints()
     .MapSmartMeterEndpoints()
+    .MapUserEndpoints()
     .MapPolicyEndpoints()
     .MapPolicyRequestEndpoints();
 

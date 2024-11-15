@@ -18,5 +18,6 @@ public static class ServiceExtensions
         services.AddScoped<ITenantContextService, TenantContextService>();
         services.AddScoped<IPolicyCreateService, PolicyCreateService>();
         services.AddScoped<IPolicyRequestCreateService, PolicyRequestCreateService>();
+        services.AddScoped<IUserService, UserService>();
     }
 }
