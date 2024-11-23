@@ -18,6 +18,7 @@ public class AuthenticationService(
     ITokenRepository tokenRepository,
     UserManager<IdentityUser> userManager,
     ITransactionManager transactionManager,
+    IVaultService vaultService,
     ILogger<AuthenticationService> logger) : IAuthenticationService
 {
     public async Task<Guid> RegisterAsync(RegisterDto registerDto)
@@ -48,8 +49,11 @@ public class AuthenticationService(
                 logger.LogError("Registration failed with the following errors: {ErrorMessages}", errorMessages);
                 throw new RegistrationException(errorMessages);
             }
-
-            tenant = Tenant.Create(tenantId, registerDto.Username, registerDto.Password, databaseName);
+            
+            var vaultRoleName = $"tenant_{tenantId.Id}_role";
+            await vaultService.CreateDatabaseRoleAsync(vaultRoleName, databaseName);
+            
+            tenant = Tenant.Create(tenantId, vaultRoleName, databaseName);
             await tenantRepository.AddAsync(tenant);
 
             var name = new Name(registerDto.Name.FirstName, registerDto.Name.LastName);
@@ -60,8 +64,7 @@ public class AuthenticationService(
         try
         {
             // Needs to be done outside of transaction
-            await tenantRepository.CreateDatabaseForTenantAsync(databaseName, registerDto.Username,
-                registerDto.Password);
+            await tenantRepository.CreateDatabaseForTenantAsync(databaseName);
         }
         catch (Exception ex)
         {

@@ -28,12 +28,13 @@ public class TenantDbContextFactory(IOptions<DatabaseConfiguration> databaseConf
 
     public string GetConnectionStringForTenant(Tenant tenant)
     {
+        // TODO: Credentials are retrieved from vault
         var connectionStringBuilder = new NpgsqlConnectionStringBuilder
         {
             Host = databaseConfigOptions.Value.Host,
             Port = databaseConfigOptions.Value.Port,
-            Username = tenant.DatabaseUsername,
-            Password = tenant.DatabasePassword,
+            Username = "tenant.DatabaseUsername",
+            Password = "tenant.DatabasePassword",
             Database = tenant.DatabaseName
         };
 

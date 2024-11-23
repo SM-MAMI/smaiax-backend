@@ -20,6 +20,7 @@ builder.Services.AddRepositoryConfigurations();
 builder.Services.AddServiceConfigurations();
 builder.Services.AddIdentityConfigurations();
 builder.Services.AddJwtAuthentication(builder.Configuration);
+builder.Services.AddExternalServiceConfigurations(builder.Configuration);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddProblemDetails();
@@ -71,6 +72,7 @@ if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("DockerDeve
     var applicationDbContext = services.GetRequiredService<ApplicationDbContext>();
     var tenantRepository = services.GetRequiredService<ITenantRepository>();
     var tenantDbContextFactory = services.GetRequiredService<ITenantDbContextFactory>();
+    var vaultService = services.GetRequiredService<IVaultService>();
 
     await applicationDbContext.Database.EnsureDeletedAsync();
     await applicationDbContext.Database.EnsureCreatedAsync();
@@ -78,23 +80,14 @@ if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("DockerDeve
 
     // Create a database for the test user with test data for development
     var dbConfig = app.Configuration.GetSection("DatabaseConfiguration").Get<DatabaseConfiguration>();
-    var testUsername = app.Configuration.GetValue<string>("TestUser:Username");
-    var testUserPassword = app.Configuration.GetValue<string>("TestUser:Password");
     var testUserDatabase = app.Configuration.GetValue<string>("TestUser:Database");
 
     var tenantDbContext =
         tenantDbContextFactory.CreateDbContext("tenant_1_db", dbConfig!.SuperUsername, dbConfig.SuperUserPassword);
     await tenantDbContext.Database.EnsureDeletedAsync();
-    await using (var deleteUserCommand = applicationDbContext.Database.GetDbConnection().CreateCommand())
-    {
-        deleteUserCommand.CommandText = "DROP ROLE IF EXISTS johndoe;";
-        await applicationDbContext.Database.OpenConnectionAsync();
-        await deleteUserCommand.ExecuteNonQueryAsync();
-        await applicationDbContext.Database.CloseConnectionAsync();
-    }
-
-    await tenantRepository.CreateDatabaseForTenantAsync(testUserDatabase!, testUsername!, testUserPassword!);
+    await tenantRepository.CreateDatabaseForTenantAsync(testUserDatabase!);
     await tenantDbContext.SeedTestData();
+    await vaultService.CreateDatabaseRoleAsync("tenant_1_role", "tenant_1_db");
 }
 
 app.UseAuthorization();

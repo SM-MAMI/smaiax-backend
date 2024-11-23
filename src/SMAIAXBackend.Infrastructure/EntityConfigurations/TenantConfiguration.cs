@@ -19,10 +19,7 @@ public class TenantConfiguration : IEntityTypeConfiguration<Tenant>
                 v => new TenantId(v))
             .IsRequired();
 
-        builder.Property(t => t.DatabaseUsername)
-            .IsRequired();
-
-        builder.Property(t => t.DatabasePassword)
+        builder.Property(t => t.VaultRoleName)
             .IsRequired();
 
         builder.Property(t => t.DatabaseName)
