@@ -6,16 +6,14 @@ set -e
 vault server -dev -dev-listen-address="0.0.0.0:8200" &
 sleep 5s
 
-export VAULT_ADDR='http://0.0.0.0:8200'
-
 vault secrets enable database
 
 vault write database/config/postgresql \
      plugin_name=postgresql-database-plugin \
-     connection_url="postgresql://{{username}}:{{password}}@smaiax-backend-db/smaiax-db?sslmode=disable" \
+     connection_url="postgresql://{{username}}:{{password}}@smaiax-backend-db/${POSTGRES_DB}?sslmode=disable" \
      allowed_roles=readonly \
-     username="user" \
-     password="password"
+     username="${POSTGRES_USER}" \
+     password="${POSTGRES_PASSWORD}"
 
 # This container is now healthy
 touch /tmp/healthy
