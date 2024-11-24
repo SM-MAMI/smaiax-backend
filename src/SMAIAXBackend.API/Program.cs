@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization;
 
 using Microsoft.EntityFrameworkCore;
 
@@ -25,15 +26,22 @@ builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<ExceptionHandlerMiddleware>();
 builder.Services.AddHttpContextAccessor();
 
-builder.Services.AddControllers()
-    .AddJsonOptions(options =>
-    {
-        options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
-    });
+builder.Services.ConfigureHttpJsonOptions(options =>
+{
+    options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    options.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+});
 
 // Add Swagger if in development environment
 if (builder.Environment.IsDevelopment() || builder.Environment.IsEnvironment("DockerDevelopment"))
 {
+    // only used for api generation
+    builder.Services.AddControllers().AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+    });
+
     builder.Configuration.AddJsonFile("Properties/launchSettings.json", optional: true, reloadOnChange: true);
     builder.Services.AddSwaggerConfigurations(builder.Configuration);
 
@@ -84,6 +92,7 @@ if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("DockerDeve
         await deleteUserCommand.ExecuteNonQueryAsync();
         await applicationDbContext.Database.CloseConnectionAsync();
     }
+
     await tenantRepository.CreateDatabaseForTenantAsync(testUserDatabase!, testUsername!, testUserPassword!);
     await tenantDbContext.SeedTestData();
 }
