@@ -27,7 +27,8 @@ public class AuthenticationService(
 
         var tenantId = tenantRepository.NextIdentity();
         var databaseName = $"tenant_{tenantId.Id.ToString().Replace("-", "_")}_db";
-
+        var vaultRoleName = $"tenant_{tenantId.Id}_role";
+        
         IdentityUser? identityUser = null;
         Tenant? tenant = null;
         User? domainUser = null;
@@ -49,9 +50,6 @@ public class AuthenticationService(
                 logger.LogError("Registration failed with the following errors: {ErrorMessages}", errorMessages);
                 throw new RegistrationException(errorMessages);
             }
-            
-            var vaultRoleName = $"tenant_{tenantId.Id}_role";
-            await vaultService.CreateDatabaseRoleAsync(vaultRoleName, databaseName);
             
             tenant = Tenant.Create(tenantId, vaultRoleName, databaseName);
             await tenantRepository.AddAsync(tenant);
@@ -83,6 +81,19 @@ public class AuthenticationService(
             }
 
             throw new TenantDatabaseCreationException();
+        }
+
+        try
+        {
+            await vaultService.CreateDatabaseRoleAsync(vaultRoleName, databaseName);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to create role for tenant: {TenantId}", tenantId.Id);
+            
+            // TODO: Cleanup
+            
+            throw new VaultRoleCreationException();
         }
 
         return userId.Id;

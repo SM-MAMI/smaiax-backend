@@ -25,10 +25,11 @@ public class TestBase
     public async Task Setup()
     {
         await IntegrationTestSetup.ApplicationDbContext.Database.EnsureCreatedAsync();
-        await IntegrationTestSetup.TenantRepository.CreateDatabaseForTenantAsync("tenant_1_db", "johndoe", "P@ssw0rd");
+        await IntegrationTestSetup.TenantRepository.CreateDatabaseForTenantAsync("tenant_1_db");
         await InsertTestData();
         IntegrationTestSetup.ApplicationDbContext.ChangeTracker.Clear();
         IntegrationTestSetup.TenantDbContext.ChangeTracker.Clear();
+        await IntegrationTestSetup.VaultService.CreateDatabaseRoleAsync("tenant_1_role", "tenant_1_db");
     }
 
     [TearDown]
@@ -37,17 +38,7 @@ public class TestBase
         IntegrationTestSetup.ApplicationDbContext.ChangeTracker.Clear();
         IntegrationTestSetup.TenantDbContext.ChangeTracker.Clear();
         await IntegrationTestSetup.TenantDbContext.Database.EnsureDeletedAsync();
-        await CleanupTenantDatabase();
         await IntegrationTestSetup.ApplicationDbContext.Database.EnsureDeletedAsync();
-    }
-
-    private static async Task CleanupTenantDatabase()
-    {
-        await using var deleteUserCommand = IntegrationTestSetup.ApplicationDbContext.Database.GetDbConnection().CreateCommand();
-        deleteUserCommand.CommandText = "DROP ROLE IF EXISTS johndoe;";
-        await IntegrationTestSetup.ApplicationDbContext.Database.OpenConnectionAsync();
-        await deleteUserCommand.ExecuteNonQueryAsync();
-        await IntegrationTestSetup.ApplicationDbContext.Database.CloseConnectionAsync();
     }
 
     private async Task InsertTestData()
@@ -70,7 +61,7 @@ public class TestBase
         testUser.PasswordHash = passwordHash;
 
         var tenantId = new TenantId(Guid.Parse("f4c70232-6715-4c15-966f-bf4bcef46d39"));
-        var tenant = Tenant.Create(tenantId, userName, password, "tenant_1_db");
+        var tenant = Tenant.Create(tenantId, "tenant_1_role", "tenant_1_db");
         var domainUser = User.Create(userId, new Name("John", "Doe"), userName, email, tenantId);
 
         // Valid refresh token
