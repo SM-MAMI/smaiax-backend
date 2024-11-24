@@ -24,11 +24,10 @@ public class AuthenticationService(
     public async Task<Guid> RegisterAsync(RegisterDto registerDto)
     {
         var userId = userRepository.NextIdentity();
-
         var tenantId = tenantRepository.NextIdentity();
         var databaseName = $"tenant_{tenantId.Id.ToString().Replace("-", "_")}_db";
         var vaultRoleName = $"tenant_{tenantId.Id}_role";
-        
+
         IdentityUser? identityUser = null;
         Tenant? tenant = null;
         User? domainUser = null;
@@ -43,14 +42,13 @@ public class AuthenticationService(
             };
 
             var result = await userManager.CreateAsync(identityUser, registerDto.Password);
-
             if (!result.Succeeded)
             {
                 var errorMessages = string.Join(", ", result.Errors.Select(e => e.Description));
                 logger.LogError("Registration failed with the following errors: {ErrorMessages}", errorMessages);
                 throw new RegistrationException(errorMessages);
             }
-            
+
             tenant = Tenant.Create(tenantId, vaultRoleName, databaseName);
             await tenantRepository.AddAsync(tenant);
 
@@ -59,42 +57,9 @@ public class AuthenticationService(
             await userRepository.AddAsync(domainUser);
         });
 
-        try
-        {
-            // Needs to be done outside of transaction
-            await tenantRepository.CreateDatabaseForTenantAsync(databaseName);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Failed to create database for tenant: {TenantId}", tenantId.Id);
-            if (domainUser != null)
-            {
-                await userRepository.DeleteAsync(domainUser);
-            }
-            if (tenant != null)
-            {
-                await tenantRepository.DeleteAsync(tenant);
-            }
-            if (identityUser != null)
-            {
-                await userManager.DeleteAsync(identityUser);
-            }
-
-            throw new TenantDatabaseCreationException();
-        }
-
-        try
-        {
-            await vaultService.CreateDatabaseRoleAsync(vaultRoleName, databaseName);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Failed to create role for tenant: {TenantId}", tenantId.Id);
-            
-            // TODO: Cleanup
-            
-            throw new VaultRoleCreationException();
-        }
+        // Database creation needs to be outside of the transaction
+        await CreateTenantDatabaseAsync(databaseName, tenantId, domainUser, identityUser, tenant);
+        await CreateVaultRoleAsync(vaultRoleName, databaseName, tenantId);
 
         return userId.Id;
     }
@@ -192,5 +157,49 @@ public class AuthenticationService(
 
         token.Invalidate();
         await tokenRepository.UpdateAsync(token);
+    }
+
+    private async Task CreateTenantDatabaseAsync(string databaseName, TenantId tenantId, User? domainUser, IdentityUser? identityUser, Tenant? tenant)
+    {
+        try
+        {
+            // Create database for the tenant
+            await tenantRepository.CreateDatabaseForTenantAsync(databaseName);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to create database for tenant: {TenantId}", tenantId.Id);
+            await CleanupFailedRegistration(domainUser, identityUser, tenant);
+            throw new TenantDatabaseCreationException();
+        }
+    }
+
+    private async Task CreateVaultRoleAsync(string vaultRoleName, string databaseName, TenantId tenantId)
+    {
+        try
+        {
+            await vaultService.CreateDatabaseRoleAsync(vaultRoleName, databaseName);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to create role for tenant: {TenantId}", tenantId.Id);
+            throw new VaultRoleCreationException();
+        }
+    }
+
+    private async Task CleanupFailedRegistration(User? domainUser, IdentityUser? identityUser, Tenant? tenant)
+    {
+        if (domainUser != null)
+        {
+            await userRepository.DeleteAsync(domainUser);
+        }
+        if (identityUser != null)
+        {
+            await userManager.DeleteAsync(identityUser);
+        }
+        if (tenant != null)
+        {
+            await tenantRepository.DeleteAsync(tenant);
+        }
     }
 }

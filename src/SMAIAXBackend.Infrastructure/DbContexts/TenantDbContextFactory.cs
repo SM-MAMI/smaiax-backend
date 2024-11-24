@@ -30,7 +30,7 @@ public class TenantDbContextFactory(IOptions<DatabaseConfiguration> databaseConf
     public async Task<string> GetConnectionStringForTenant(Tenant tenant)
     {
         var credentials = await vaultService.GetDatabaseCredentialsAsync(tenant.VaultRoleName);
-       
+
         var connectionStringBuilder = new NpgsqlConnectionStringBuilder
         {
             Host = databaseConfigOptions.Value.Host,

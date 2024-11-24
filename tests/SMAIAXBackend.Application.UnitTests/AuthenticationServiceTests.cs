@@ -41,7 +41,7 @@ public class AuthenticationServiceTests
         _vaultServiceMock = new Mock<IVaultService>();
         _loggerMock = new Mock<ILogger<AuthenticationService>>();
         _authenticationService = new AuthenticationService(_tenantRepositoryMock.Object, _userRepositoryMock.Object,
-            _tokenRepositoryMock.Object, _userManagerMock.Object, _transactionManagerMock.Object, 
+            _tokenRepositoryMock.Object, _userManagerMock.Object, _transactionManagerMock.Object,
             _vaultServiceMock.Object, _loggerMock.Object);
     }
 

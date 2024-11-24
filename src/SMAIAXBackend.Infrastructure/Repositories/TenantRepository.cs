@@ -39,11 +39,11 @@ public class TenantRepository(
     public async Task CreateDatabaseForTenantAsync(string databaseName)
     {
         await applicationDbContext.Database.OpenConnectionAsync();
-        
+
         await using var createDbCommand = applicationDbContext.Database.GetDbConnection().CreateCommand();
         createDbCommand.CommandText = $"CREATE DATABASE {databaseName};";
         await createDbCommand.ExecuteNonQueryAsync();
-        
+
         await applicationDbContext.Database.CloseConnectionAsync();
 
         var tenantDbContext = tenantDbContextFactory.CreateDbContext(databaseName,

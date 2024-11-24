@@ -44,7 +44,7 @@ public class TenantContextServiceTests
         var tenantId = Guid.NewGuid();
         var user = User.Create(new UserId(userId), new Name("John", "Doe"), "johndoe", "john.doe@example.com",
             new TenantId(tenantId));
-        var tenant = Tenant.Create(new TenantId(tenantId), "test","test");
+        var tenant = Tenant.Create(new TenantId(tenantId), "test", "test");
 
         _httpContextAccessorMock.Setup(httpContextAccessor => httpContextAccessor.HttpContext!.Items["UserId"])
             .Returns(userId.ToString());

@@ -63,10 +63,9 @@ public class VaultService : IVaultService
 
         await _vaultClient.V1.Secrets.Database.CreateRoleAsync(roleName, role);
     }
-    
+
     public async Task<(string Username, string Password)> GetDatabaseCredentialsAsync(string roleName)
     {
-        // TODO: Implement caching the credentials until the ttl passed so that it does not create a new database user each time
         try
         {
             var secrets = await _vaultClient.V1.Secrets.Database.GetCredentialsAsync(roleName);
