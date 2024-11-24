@@ -16,32 +16,35 @@ public class VaultService : IVaultService
     private readonly IVaultClient _vaultClient;
     private readonly string _databaseHost;
     private readonly int _databasePort;
-    private readonly string _databaseUsername;
-    private readonly string _databasePassword;
+    private readonly string _databaseSuperUsername;
+    private readonly string _databaseSuperUserPassword;
 
-    public VaultService(IOptions<VaultConfiguration> vaultConfigOptions, IOptions<DatabaseConfiguration> databaseConfigOptions)
+    public VaultService(
+        IOptions<VaultConfiguration> vaultConfigOptions,
+        IOptions<DatabaseConfiguration> databaseConfigOptions)
     {
         var authMethod = new TokenAuthMethodInfo(vaultConfigOptions.Value.Token);
         _vaultClient = new VaultClient(new VaultClientSettings(vaultConfigOptions.Value.Address, authMethod));
         _databaseHost = vaultConfigOptions.Value.DatabaseHost;
         _databasePort = vaultConfigOptions.Value.DatabasePort;
-        _databaseUsername = databaseConfigOptions.Value.SuperUsername;
-        _databasePassword = databaseConfigOptions.Value.SuperUserPassword;
+        _databaseSuperUsername = databaseConfigOptions.Value.SuperUsername;
+        _databaseSuperUserPassword = databaseConfigOptions.Value.SuperUserPassword;
     }
-    
+
     public async Task CreateDatabaseRoleAsync(string roleName, string databaseName)
     {
         var databaseConnectionConfig = new PostgreSQLConnectionConfigModel
         {
             UsernameTemplate = "",
-            AllowedRoles = [ roleName ],
-            ConnectionUrl = $"postgresql://{{{{username}}}}:{{{{password}}}}@{_databaseHost}:{_databasePort}/{databaseName}",
-            Username = _databaseUsername,
-            Password = _databasePassword
+            AllowedRoles = [roleName],
+            ConnectionUrl =
+                $"postgresql://{{{{username}}}}:{{{{password}}}}@{_databaseHost}:{_databasePort}/{databaseName}",
+            Username = _databaseSuperUsername,
+            Password = _databaseSuperUserPassword
         };
-        
+
         await _vaultClient.V1.Secrets.Database.ConfigureConnectionAsync(databaseName, databaseConnectionConfig);
-        
+
         var role = new Role
         {
             DatabaseProviderType = new DatabaseProviderType(databaseName),
@@ -59,5 +62,20 @@ public class VaultService : IVaultService
         };
 
         await _vaultClient.V1.Secrets.Database.CreateRoleAsync(roleName, role);
+    }
+
+    public async Task<(string Username, string Password)> GetDatabaseCredentialsAsync(string roleName)
+    {
+        // TODO: Implement caching the credentials until the ttl passed so that it does not create a new database user each time
+        try
+        {
+            var secrets = await _vaultClient.V1.Secrets.Database.GetCredentialsAsync(roleName);
+            return (secrets.Data.Username, secrets.Data.Password);
+        }
+        catch (Exception)
+        {
+            // In case vault is not available return the superuser credentials
+            return (_databaseSuperUsername, _databaseSuperUserPassword);
+        }
     }
 }
