@@ -7,9 +7,10 @@ using SMAIAXBackend.Domain.Repositories;
 namespace SMAIAXBackend.Application.Services.Implementations;
 
 public class PolicyRequestCreateService(
-    IPolicyRequestRepository policyRequestRepository) : IPolicyRequestCreateService
+    IPolicyRequestRepository policyRequestRepository,
+    IPolicyMatchingService policyMatchingService) : IPolicyRequestCreateService
 {
-    public async Task<Guid> CreatePolicyRequestAsync(PolicyRequestCreateDto policyRequestCreateDto)
+    public async Task<List<PolicyDto>> CreatePolicyRequestAsync(PolicyRequestCreateDto policyRequestCreateDto)
     {
         var policyRequestId = policyRequestRepository.NextIdentity();
 
@@ -31,9 +32,10 @@ public class PolicyRequestCreateService(
 
         var policyRequest = PolicyRequest.Create(policyRequestId, policyRequestCreateDto.IsAutomaticContractingEnabled,
             policyFilter);
-
         await policyRequestRepository.AddAsync(policyRequest);
 
-        return policyRequestId.Id;
+        var matchingPolicies = await policyMatchingService.GetMatchingPoliciesAsync(policyRequest.Id.Id);
+
+        return matchingPolicies;
     }
 }

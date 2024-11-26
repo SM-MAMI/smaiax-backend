@@ -8,12 +8,12 @@ namespace SMAIAXBackend.API.Endpoints.PolicyRequest;
 
 public static class CreatePolicyRequestEndpoint
 {
-    public static async Task<Ok<Guid>> Handle(
+    public static async Task<Ok<List<PolicyDto>>> Handle(
         IPolicyRequestCreateService policyRequestCreateService,
         [FromBody] PolicyRequestCreateDto policyRequestCreateDto)
     {
-        var policyRequestId = await policyRequestCreateService.CreatePolicyRequestAsync(policyRequestCreateDto);
+        var matchedPolicies = await policyRequestCreateService.CreatePolicyRequestAsync(policyRequestCreateDto);
 
-        return TypedResults.Ok(policyRequestId);
+        return TypedResults.Ok(matchedPolicies);
     }
 }
