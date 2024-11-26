@@ -40,7 +40,7 @@ public class TenantRepository(
     {
         return await applicationDbContext.Tenants.ToListAsync();
     }
-    
+
     public async Task CreateDatabaseForTenantAsync(string databaseName)
     {
         await applicationDbContext.Database.OpenConnectionAsync();

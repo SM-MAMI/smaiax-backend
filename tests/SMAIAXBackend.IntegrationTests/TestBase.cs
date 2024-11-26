@@ -83,9 +83,9 @@ public class TestBase
         };
         var janeDoePasswordHash = hasher.HashPassword(janeDoeTestUser, janeDoePassword);
         janeDoeTestUser.PasswordHash = janeDoePasswordHash;
-        
+
         var janeDoeTenantId = new TenantId(Guid.Parse("e4c70232-6715-4c15-966f-bf4bcef46d40"));
-        var janeDoeTenant = Tenant.Create(janeDoeTenantId, "tenant_2_role","tenant_2_db");
+        var janeDoeTenant = Tenant.Create(janeDoeTenantId, "tenant_2_role", "tenant_2_db");
         var janeDoeDomainUser = User.Create(janeDoeUserId, new Name("Jane", "Doe"), janeDoeUserName, janeDoeEmail, janeDoeTenantId);
 
         // Valid refresh token
