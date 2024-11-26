@@ -18,6 +18,8 @@ public class VaultService : IVaultService
     private readonly int _databasePort;
     private readonly string _databaseSuperUsername;
     private readonly string _databaseSuperUserPassword;
+    private readonly string _credentialsDefaultTimeToLive;
+    private readonly string _credentialsMaximumTimeToLive;
 
     public VaultService(
         IOptions<VaultConfiguration> vaultConfigOptions,
@@ -27,6 +29,8 @@ public class VaultService : IVaultService
         _vaultClient = new VaultClient(new VaultClientSettings(vaultConfigOptions.Value.Address, authMethod));
         _databaseHost = vaultConfigOptions.Value.DatabaseHost;
         _databasePort = vaultConfigOptions.Value.DatabasePort;
+        _credentialsDefaultTimeToLive = vaultConfigOptions.Value.CredentialsDefaultTimeToLive;
+        _credentialsMaximumTimeToLive = vaultConfigOptions.Value.CredentialsMaximumTimeToLive;
         _databaseSuperUsername = databaseConfigOptions.Value.SuperUsername;
         _databaseSuperUserPassword = databaseConfigOptions.Value.SuperUserPassword;
     }
@@ -48,8 +52,8 @@ public class VaultService : IVaultService
         var role = new Role
         {
             DatabaseProviderType = new DatabaseProviderType(databaseName),
-            DefaultTimeToLive = "1h",
-            MaximumTimeToLive = "24h",
+            DefaultTimeToLive = _credentialsDefaultTimeToLive,
+            MaximumTimeToLive = _credentialsMaximumTimeToLive,
             CreationStatements =
             [
                 "CREATE ROLE \"{{name}}\" WITH LOGIN PASSWORD '{{password}}' VALID UNTIL '{{expiration}}';",

@@ -9,4 +9,6 @@ public class VaultConfiguration
     // Vault is running in a container and needs the container name of the database host.
     public required string DatabaseHost { get; init; }
     public required int DatabasePort { get; init; }
+    public required string CredentialsDefaultTimeToLive { get; init; }
+    public required string CredentialsMaximumTimeToLive { get; init; }
 }
