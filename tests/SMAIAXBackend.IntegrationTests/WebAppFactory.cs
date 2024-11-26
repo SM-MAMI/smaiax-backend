@@ -4,7 +4,8 @@ using Microsoft.Extensions.Configuration;
 
 namespace SMAIAXBackend.IntegrationTests;
 
-public class WebAppFactory(int postgresMappedPublicPort) : WebApplicationFactory<Program>
+public class WebAppFactory(int postgresMappedPublicPort, int postgresInternalPort, string postgresContainerName, int vaultMappedPublicPort)
+    : WebApplicationFactory<Program>
 {
     private readonly Dictionary<string, string> _testAppSettings = new()
     {
@@ -17,7 +18,11 @@ public class WebAppFactory(int postgresMappedPublicPort) : WebApplicationFactory
         ["JwtConfiguration:Issuer"] = "SMAIAX",
         ["JwtConfiguration:Audience"] = "SomeAudience",
         ["JwtConfiguration:AccessTokenExpirationMinutes"] = "60",
-        ["JwtConfiguration:RefreshTokenExpirationMinutes"] = "10080"
+        ["JwtConfiguration:RefreshTokenExpirationMinutes"] = "10080",
+        ["Vault:Address"] = $"http://localhost:{vaultMappedPublicPort}",
+        ["Vault:Token"] = "00000000-0000-0000-0000-000000000000",
+        ["Vault:DatabaseHost"] = postgresContainerName,
+        ["Vault:DatabasePort"] = $"{postgresInternalPort}"
     };
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)

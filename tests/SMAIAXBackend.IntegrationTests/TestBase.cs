@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 
 using SMAIAXBackend.Domain.Model.Entities;
 using SMAIAXBackend.Domain.Model.Enums;
@@ -26,12 +25,14 @@ public class TestBase
     public async Task Setup()
     {
         await IntegrationTestSetup.ApplicationDbContext.Database.EnsureCreatedAsync();
-        await IntegrationTestSetup.TenantRepository.CreateDatabaseForTenantAsync("tenant_1_db", "johndoe", "P@ssw0rd");
-        await IntegrationTestSetup.TenantRepository.CreateDatabaseForTenantAsync("tenant_2_db", "janedoe", "P@ssw0rd");
+        await IntegrationTestSetup.TenantRepository.CreateDatabaseForTenantAsync("tenant_1_db");
+        await IntegrationTestSetup.TenantRepository.CreateDatabaseForTenantAsync("tenant_2_db");
         await InsertTestData();
         IntegrationTestSetup.ApplicationDbContext.ChangeTracker.Clear();
         IntegrationTestSetup.Tenant1DbContext.ChangeTracker.Clear();
         IntegrationTestSetup.Tenant2DbContext.ChangeTracker.Clear();
+        await IntegrationTestSetup.VaultService.CreateDatabaseRoleAsync("tenant_1_role", "tenant_1_db");
+        await IntegrationTestSetup.VaultService.CreateDatabaseRoleAsync("tenant_2_role", "tenant_2_db");
     }
 
     [TearDown]
@@ -42,17 +43,7 @@ public class TestBase
         IntegrationTestSetup.Tenant2DbContext.ChangeTracker.Clear();
         await IntegrationTestSetup.Tenant1DbContext.Database.EnsureDeletedAsync();
         await IntegrationTestSetup.Tenant2DbContext.Database.EnsureDeletedAsync();
-        await CleanupTenantDatabases();
         await IntegrationTestSetup.ApplicationDbContext.Database.EnsureDeletedAsync();
-    }
-
-    private static async Task CleanupTenantDatabases()
-    {
-        await using var deleteUserCommand = IntegrationTestSetup.ApplicationDbContext.Database.GetDbConnection().CreateCommand();
-        deleteUserCommand.CommandText = "DROP ROLE IF EXISTS johndoe; DROP ROLE IF EXISTS janedoe;";
-        await IntegrationTestSetup.ApplicationDbContext.Database.OpenConnectionAsync();
-        await deleteUserCommand.ExecuteNonQueryAsync();
-        await IntegrationTestSetup.ApplicationDbContext.Database.CloseConnectionAsync();
     }
 
     private async Task InsertTestData()
@@ -75,7 +66,7 @@ public class TestBase
         johnDoeTestUser.PasswordHash = johnDoePasswordHash;
 
         var johnDoeTenantId = new TenantId(Guid.Parse("f4c70232-6715-4c15-966f-bf4bcef46d39"));
-        var johnDoeTenant = Tenant.Create(johnDoeTenantId, johnDoeUserName, johnDoePassword, "tenant_1_db");
+        var johnDoeTenant = Tenant.Create(johnDoeTenantId, "tenant_1_role", "tenant_1_db");
         var johnDoeDomainUser = User.Create(johnDoeUserId, new Name("John", "Doe"), johnDoeUserName, johnDoeEmail, johnDoeTenantId);
 
         var janeDoeUserId = new UserId(Guid.Parse("4d07065a-b964-44a9-9cdf-fbd49d755ea8"));
@@ -94,7 +85,7 @@ public class TestBase
         janeDoeTestUser.PasswordHash = janeDoePasswordHash;
 
         var janeDoeTenantId = new TenantId(Guid.Parse("e4c70232-6715-4c15-966f-bf4bcef46d40"));
-        var janeDoeTenant = Tenant.Create(janeDoeTenantId, janeDoeUserName, janeDoePassword, "tenant_2_db");
+        var janeDoeTenant = Tenant.Create(janeDoeTenantId, "tenant_2_role", "tenant_2_db");
         var janeDoeDomainUser = User.Create(janeDoeUserId, new Name("Jane", "Doe"), janeDoeUserName, janeDoeEmail, janeDoeTenantId);
 
         // Valid refresh token

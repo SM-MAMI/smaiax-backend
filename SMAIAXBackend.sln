@@ -19,6 +19,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 		.editorconfig = .editorconfig
 		.github\workflows\ci.yml = .github\workflows\ci.yml
+		vault\config\entrypoint.sh = vault\config\entrypoint.sh
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SMAIAXBackend.Application.UnitTests", "tests\SMAIAXBackend.Application.UnitTests\SMAIAXBackend.Application.UnitTests.csproj", "{EEDBD571-1267-427B-B4F3-55F26BF243D3}"

@@ -9,6 +9,6 @@ public interface ITenantRepository
     Task AddAsync(Tenant tenant);
     Task DeleteAsync(Tenant tenant);
     Task<Tenant?> GetByIdAsync(TenantId tenantId);
+    Task CreateDatabaseForTenantAsync(string databaseName);
     Task<List<Tenant>> GetAllAsync();
-    Task CreateDatabaseForTenantAsync(string databaseName, string databaseUserName, string databasePassword);
 }

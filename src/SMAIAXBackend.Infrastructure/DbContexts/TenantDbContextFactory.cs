@@ -4,11 +4,12 @@ using Microsoft.Extensions.Options;
 using Npgsql;
 
 using SMAIAXBackend.Domain.Model.Entities;
+using SMAIAXBackend.Domain.Repositories;
 using SMAIAXBackend.Infrastructure.Configurations;
 
 namespace SMAIAXBackend.Infrastructure.DbContexts;
 
-public class TenantDbContextFactory(IOptions<DatabaseConfiguration> databaseConfigOptions) : ITenantDbContextFactory
+public class TenantDbContextFactory(IOptions<DatabaseConfiguration> databaseConfigOptions, IVaultService vaultService) : ITenantDbContextFactory
 {
     public TenantDbContext CreateDbContext(string databaseName, string databaseUserName, string databasePassword)
     {
@@ -26,14 +27,16 @@ public class TenantDbContextFactory(IOptions<DatabaseConfiguration> databaseConf
         return new TenantDbContext(optionsBuilder.Options);
     }
 
-    public string GetConnectionStringForTenant(Tenant tenant)
+    public async Task<string> GetConnectionStringForTenant(Tenant tenant)
     {
+        var credentials = await vaultService.GetDatabaseCredentialsAsync(tenant.VaultRoleName);
+
         var connectionStringBuilder = new NpgsqlConnectionStringBuilder
         {
             Host = databaseConfigOptions.Value.Host,
             Port = databaseConfigOptions.Value.Port,
-            Username = tenant.DatabaseUsername,
-            Password = tenant.DatabasePassword,
+            Username = credentials.Username,
+            Password = credentials.Password,
             Database = tenant.DatabaseName
         };
 

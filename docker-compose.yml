@@ -16,6 +16,28 @@
     networks:
       - smaiax-frontend-network
       - smaiax-backend-network
+  
+  vault:
+    image: vault:1.13.3
+    container_name: "smaiax-vault"
+    restart: always
+    ports:
+      - "8200:8200"
+    environment:
+      VAULT_ADDR: 'http://0.0.0.0:8200'
+      VAULT_DEV_ROOT_TOKEN_ID: '00000000-0000-0000-0000-000000000000'
+      VAULT_TOKEN: '00000000-0000-0000-0000-000000000000'
+    cap_add:
+      - IPC_LOCK
+    volumes:
+      - ./vault/:/vault/
+    command:
+      - ./vault/config/entrypoint.sh
+    networks:
+      - smaiax-backend-network
+    depends_on:
+      - postgres
+
   postgres:
     image: postgres:16-bullseye
     container_name: "smaiax-backend-db"

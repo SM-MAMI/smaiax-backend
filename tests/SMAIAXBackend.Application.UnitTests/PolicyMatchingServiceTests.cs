@@ -48,35 +48,30 @@ public class PolicyMatchingServiceTests
         var policyRequest = PolicyRequest.Create(policyRequestId, false, policyFilter);
         var tenants = new List<Tenant>
         {
-            Tenant.Create(
-                id: new TenantId(Guid.NewGuid()),
-                databaseUsername: "test",
-                databasePassword: "test",
-                databaseName: "test"
+            Tenant.Create(new TenantId(Guid.NewGuid()), "test", "test"
             ),
             Tenant.Create(
-                id: new TenantId(Guid.NewGuid()),
-                databaseUsername: "test2",
-                databasePassword: "test2",
-                databaseName: "test2"
+                new TenantId(Guid.NewGuid()),
+                "test2",
+                "test2"
             )
         };
 
         var policies = new List<Policy>
         {
             Policy.Create(
-                id: new PolicyId(Guid.NewGuid()),
-                measurementResolution: MeasurementResolution.Hour,
-                locationResolution: LocationResolution.State,
-                price: 50,
-                smartMeterId: new SmartMeterId(Guid.NewGuid())
+                new PolicyId(Guid.NewGuid()),
+                MeasurementResolution.Hour,
+                LocationResolution.State,
+                50,
+                new SmartMeterId(Guid.NewGuid())
             ),
             Policy.Create(
-                id: new PolicyId(Guid.NewGuid()),
-                measurementResolution: MeasurementResolution.Hour,
-                locationResolution: LocationResolution.State,
-                price: 150,
-                smartMeterId: new SmartMeterId(Guid.NewGuid())
+                new PolicyId(Guid.NewGuid()),
+                MeasurementResolution.Hour,
+                LocationResolution.State,
+                150,
+                new SmartMeterId(Guid.NewGuid())
             )
         };
 

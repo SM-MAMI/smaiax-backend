@@ -1,4 +1,7 @@
 using DotNet.Testcontainers.Builders;
+using DotNet.Testcontainers.Configurations;
+using DotNet.Testcontainers.Containers;
+using DotNet.Testcontainers.Networks;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -15,7 +18,9 @@ namespace SMAIAXBackend.IntegrationTests;
 [SetUpFixture]
 internal static class IntegrationTestSetup
 {
+    private static INetwork _testNetwork = null!;
     private static PostgreSqlContainer _postgresContainer = null!;
+    private static IContainer _vaultContainer = null!;
     private static WebAppFactory _webAppFactory = null!;
     public static ApplicationDbContext ApplicationDbContext { get; private set; } = null!;
     public static TenantDbContext Tenant1DbContext { get; private set; } = null!;
@@ -25,28 +30,57 @@ internal static class IntegrationTestSetup
     public static IPolicyRequestRepository PolicyRequestRepository { get; private set; } = null!;
     public static IUserRepository UserRepository { get; private set; } = null!;
     public static ITenantRepository TenantRepository { get; private set; } = null!;
+    public static IVaultService VaultService { get; private set; } = null!;
     public static HttpClient HttpClient { get; private set; } = null!;
     public static string AccessToken { get; private set; } = null!;
 
     [OneTimeSetUp]
     public static async Task OneTimeSetup()
     {
+        const string networkName = "shared-test-network";
+        _testNetwork = new NetworkBuilder()
+            .WithName(networkName)
+            .Build();
+
+        await _testNetwork.CreateAsync();
+
+        const string postgresContainerName = "postgres-test";
         const int postgresPort = 5432;
         const string superUserName = "user";
         const string superUserPassword = "password";
+        const string databaseName = "smaiax-db";
         _postgresContainer = new PostgreSqlBuilder()
             .WithImage("postgres:16-bullseye")
+            .WithName(postgresContainerName)
             .WithUsername(superUserName)
             .WithPassword(superUserPassword)
-            .WithDatabase("smaiax-db")
+            .WithDatabase(databaseName)
             .WithPortBinding(postgresPort, true)
+            .WithNetwork(_testNetwork)
             .WithWaitStrategy(Wait.ForUnixContainer().UntilPortIsAvailable(postgresPort))
             .Build();
 
         await _postgresContainer.StartAsync();
 
+        const int vaultPort = 8200;
+        _vaultContainer = new ContainerBuilder()
+            .WithImage("vault:1.13.3")
+            .WithPortBinding(vaultPort, true)
+            .WithEnvironment("VAULT_ADDR", "http://0.0.0.0:8200")
+            .WithEnvironment("VAULT_DEV_ROOT_TOKEN_ID", "00000000-0000-0000-0000-000000000000")
+            .WithEnvironment("VAULT_TOKEN", "00000000-0000-0000-0000-000000000000")
+            .WithBindMount(Path.GetFullPath("../../../../../vault/"), "/vault/")
+            .WithCommand("./vault/config/entrypoint.sh")
+            .WithNetwork(_testNetwork)
+            .WithWaitStrategy(Wait.ForUnixContainer().UntilFileExists("/tmp/healthy", FileSystem.Container))
+            .Build();
+
+        await _vaultContainer.StartAsync();
+
         var postgresMappedPublicPort = _postgresContainer.GetMappedPublicPort(postgresPort);
-        _webAppFactory = new WebAppFactory(postgresMappedPublicPort);
+        var vaultMappedPublicPort = _vaultContainer.GetMappedPublicPort(vaultPort);
+        _webAppFactory = new WebAppFactory(postgresMappedPublicPort, postgresPort, postgresContainerName,
+            vaultMappedPublicPort);
 
         HttpClient = _webAppFactory.CreateClient();
 
@@ -56,6 +90,7 @@ internal static class IntegrationTestSetup
         Tenant2DbContext = tenantDbContextFactory.CreateDbContext("tenant_2_db", superUserName, superUserPassword);
         TenantRepository = _webAppFactory.Services.GetRequiredService<ITenantRepository>();
         UserRepository = _webAppFactory.Services.GetRequiredService<IUserRepository>();
+        VaultService = _webAppFactory.Services.GetRequiredService<IVaultService>();
         var databaseConfigOptions = _webAppFactory.Services.GetRequiredService<IOptions<DatabaseConfiguration>>();
 
         // Repositories that are using the TenantDatabase need to be instantiated because
@@ -72,8 +107,12 @@ internal static class IntegrationTestSetup
     [OneTimeTearDown]
     public static async Task OneTimeTearDown()
     {
+        await _vaultContainer.StopAsync();
+        await _vaultContainer.DisposeAsync();
         await _postgresContainer.StopAsync();
         await _postgresContainer.DisposeAsync();
+        await _testNetwork.DeleteAsync();
+        await _testNetwork.DisposeAsync();
         HttpClient.Dispose();
         await _webAppFactory.DisposeAsync();
     }
