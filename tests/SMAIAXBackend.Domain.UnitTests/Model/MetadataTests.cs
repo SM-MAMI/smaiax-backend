@@ -3,7 +3,7 @@ using SMAIAXBackend.Domain.Model.Enums;
 using SMAIAXBackend.Domain.Model.ValueObjects;
 using SMAIAXBackend.Domain.Model.ValueObjects.Ids;
 
-namespace SMAIAXBackend.Domain.UnitTests;
+namespace SMAIAXBackend.Domain.UnitTests.Model;
 
 [TestFixture]
 public class MetadataTests

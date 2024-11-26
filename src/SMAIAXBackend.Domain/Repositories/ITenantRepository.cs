@@ -10,4 +10,5 @@ public interface ITenantRepository
     Task DeleteAsync(Tenant tenant);
     Task<Tenant?> GetByIdAsync(TenantId tenantId);
     Task CreateDatabaseForTenantAsync(string databaseName);
+    Task<List<Tenant>> GetAllAsync();
 }

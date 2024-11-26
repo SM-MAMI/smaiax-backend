@@ -8,4 +8,5 @@ public interface IPolicyRepository
     PolicyId NextIdentity();
     Task AddAsync(Policy policy);
     Task<List<Policy>> GetPoliciesBySmartMeterIdAsync(SmartMeterId smartMeterId);
+    Task<List<Policy>> GetPoliciesByTenantAsync(Tenant tenant);
 }

@@ -36,6 +36,11 @@ public class TenantRepository(
         return await applicationDbContext.Tenants.FindAsync(tenantId);
     }
 
+    public async Task<List<Tenant>> GetAllAsync()
+    {
+        return await applicationDbContext.Tenants.ToListAsync();
+    }
+    
     public async Task CreateDatabaseForTenantAsync(string databaseName)
     {
         await applicationDbContext.Database.OpenConnectionAsync();

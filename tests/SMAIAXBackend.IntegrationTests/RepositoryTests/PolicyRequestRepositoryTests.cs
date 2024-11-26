@@ -21,7 +21,7 @@ public class PolicyRequestRepositoryTests : TestBase
 
         // When
         await _policyRequestRepository.AddAsync(policyRequestExpected);
-        var policyRequestActual = await _tenantDbContext.PolicyRequests
+        var policyRequestActual = await _tenant1DbContext.PolicyRequests
             .AsNoTracking()
             .FirstOrDefaultAsync(pr => pr.Id.Equals(policyRequestExpected.Id));
 
@@ -45,6 +45,30 @@ public class PolicyRequestRepositoryTests : TestBase
             Assert.That(policyRequestActual.PolicyFilter.MaxPrice,
                 Is.EqualTo(policyRequestExpected.PolicyFilter.MaxPrice));
             Assert.That(policyRequestActual.State, Is.EqualTo(policyRequestExpected.State));
+        });
+    }
+
+    [Test]
+    public async Task GivenPolicyRequestId_WhenGetById_ThenExpectedPolicyRequestIsReturned()
+    {
+        // Given
+        var policyRequestId = new PolicyRequestId(Guid.Parse("58af578c-9975-4633-8dfe-ff8b70b83661"));
+
+        // When
+        var policyRequestActual = await _policyRequestRepository.GetPolicyRequestByIdAsync(policyRequestId);
+
+        // Then
+        Assert.That(policyRequestActual, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(policyRequestActual.Id, Is.EqualTo(policyRequestId));
+            Assert.That(policyRequestActual.IsAutomaticContractingEnabled, Is.False);
+            Assert.That(policyRequestActual.PolicyFilter.MeasurementResolution, Is.EqualTo(MeasurementResolution.Hour));
+            Assert.That(policyRequestActual.PolicyFilter.MinHouseHoldSize, Is.EqualTo(1));
+            Assert.That(policyRequestActual.PolicyFilter.MaxHouseHoldSize, Is.EqualTo(10));
+            Assert.That(policyRequestActual.PolicyFilter.Locations, Is.Empty);
+            Assert.That(policyRequestActual.PolicyFilter.LocationResolution, Is.EqualTo(LocationResolution.State));
+            Assert.That(policyRequestActual.PolicyFilter.MaxPrice, Is.EqualTo(500));
         });
     }
 }

@@ -2,13 +2,10 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
 
-using Microsoft.EntityFrameworkCore;
-
 using Newtonsoft.Json;
 
 using SMAIAXBackend.Application.DTOs;
 using SMAIAXBackend.Domain.Model.Enums;
-using SMAIAXBackend.Domain.Model.ValueObjects.Ids;
 
 namespace SMAIAXBackend.IntegrationTests.EndToEndTests;
 
@@ -18,26 +15,19 @@ public class PolicyRequestTests : TestBase
     private const string BaseUrl = "/api/policyRequests";
 
     [Test]
-    public async Task GivenPolicyRequestCreateDtoAndAccessToken_WhenCreatePolicyRequest_ThenPolicyRequestIsCreated()
+    public async Task GivenPolicyRequestCreateDtoAndAccessToken_WhenCreatePolicyRequest_ThenMatchingPoliciesAreReturned()
     {
         // Given
+        const int policyCountExpected = 1;
+        var policyIdExpected = Guid.Parse("f4c70232-6715-4c15-966f-bf4bcef46d39");
         var policyRequestCreateDto = new PolicyRequestCreateDto(
             isAutomaticContractingEnabled: true,
             measurementResolution: MeasurementResolution.Hour,
             minHouseHoldSize: 1,
             maxHouseHoldSize: 5,
-            locations:
-            [
-                new LocationDto(
-                    streetName: "Test Street",
-                    city: "Test City",
-                    state: "Test State",
-                    country: "Test Country",
-                    continent: Continent.Africa
-                )
-            ],
-            locationResolution: LocationResolution.State,
-            maxPrice: 100);
+            locations: [],
+            locationResolution: LocationResolution.Country,
+            maxPrice: 500);
 
         var httpContent = new StringContent(JsonConvert.SerializeObject(policyRequestCreateDto), Encoding.UTF8,
             "application/json");
@@ -52,19 +42,40 @@ public class PolicyRequestTests : TestBase
         var responseContent = await response.Content.ReadAsStringAsync();
         Assert.That(responseContent, Is.Not.Null);
 
-        var returnedId = Guid.Parse(responseContent.Trim('"'));
-        var policyRequestActual = await _tenantDbContext.PolicyRequests
-            .AsNoTracking()
-            .FirstOrDefaultAsync(x => x.Id.Equals(new PolicyRequestId(returnedId)));
+        var policyDtos = JsonConvert.DeserializeObject<List<PolicyDto>>(responseContent);
+        Assert.That(policyDtos, Is.Not.Null);
+        Assert.That(policyDtos, Has.Count.EqualTo(policyCountExpected));
 
-        Assert.That(policyRequestActual, Is.Not.Null);
-        Assert.Multiple(() =>
-        {
-            Assert.That(policyRequestActual.IsAutomaticContractingEnabled, Is.EqualTo(policyRequestCreateDto.IsAutomaticContractingEnabled));
-            Assert.That(policyRequestActual.PolicyFilter.MeasurementResolution, Is.EqualTo(policyRequestCreateDto.MeasurementResolution));
-            Assert.That(policyRequestActual.PolicyFilter.MinHouseHoldSize, Is.EqualTo(policyRequestCreateDto.MinHouseHoldSize));
-            Assert.That(policyRequestActual.PolicyFilter.MaxHouseHoldSize, Is.EqualTo(policyRequestCreateDto.MaxHouseHoldSize));
-            Assert.That(policyRequestActual.PolicyFilter.Locations, Has.Count.EqualTo(policyRequestCreateDto.Locations.Count));
-        });
+        var policyDto = policyDtos[0];
+        Assert.That(policyDto, Is.Not.Null);
+        Assert.That(policyDto.Id, Is.EqualTo(policyIdExpected));
+    }
+
+    [Test]
+    public async Task GivenPolicyRequestIdAndAccessToken_WhenCreatePolicyRequest_ThenMatchingPoliciesAreReturned()
+    {
+        // Given
+        const int policyCountExpected = 1;
+        var policyIdExpected = Guid.Parse("f4c70232-6715-4c15-966f-bf4bcef46d39");
+        var policyRequestId = Guid.Parse("58af578c-9975-4633-8dfe-ff8b70b83661");
+
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _accessToken);
+
+        // When
+        var response = await _httpClient.GetAsync($"{BaseUrl}/{policyRequestId}/policies");
+
+        // Then
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+
+        var responseContent = await response.Content.ReadAsStringAsync();
+        Assert.That(responseContent, Is.Not.Null);
+
+        var policyDtos = JsonConvert.DeserializeObject<List<PolicyDto>>(responseContent);
+        Assert.That(policyDtos, Is.Not.Null);
+        Assert.That(policyDtos, Has.Count.EqualTo(policyCountExpected));
+
+        var policyDto = policyDtos[0];
+        Assert.That(policyDto, Is.Not.Null);
+        Assert.That(policyDto.Id, Is.EqualTo(policyIdExpected));
     }
 }
