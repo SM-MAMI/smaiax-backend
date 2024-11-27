@@ -30,7 +30,7 @@
     cap_add:
       - IPC_LOCK
     volumes:
-      - ./vault/:/vault/
+      - ./vault/:/vault/:rwx
     command:
       - ./vault/config/entrypoint.sh
     networks:
