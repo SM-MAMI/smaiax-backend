@@ -31,7 +31,7 @@ internal static class IntegrationTestSetup
     public static IPolicyRequestRepository PolicyRequestRepository { get; private set; } = null!;
     public static IUserRepository UserRepository { get; private set; } = null!;
     public static ITenantRepository TenantRepository { get; private set; } = null!;
-    public static IVaultService VaultService { get; private set; } = null!;
+    public static IVaultRepository VaultRepository { get; private set; } = null!;
     public static HttpClient HttpClient { get; private set; } = null!;
     public static string AccessToken { get; private set; } = null!;
 
@@ -109,7 +109,7 @@ internal static class IntegrationTestSetup
         Tenant2DbContext = tenantDbContextFactory.CreateDbContext("tenant_2_db", superUserName, superUserPassword);
         TenantRepository = _webAppFactory.Services.GetRequiredService<ITenantRepository>();
         UserRepository = _webAppFactory.Services.GetRequiredService<IUserRepository>();
-        VaultService = _webAppFactory.Services.GetRequiredService<IVaultService>();
+        VaultRepository = _webAppFactory.Services.GetRequiredService<IVaultRepository>();
         var databaseConfigOptions = _webAppFactory.Services.GetRequiredService<IOptions<DatabaseConfiguration>>();
 
         // Repositories that are using the TenantDatabase need to be instantiated because

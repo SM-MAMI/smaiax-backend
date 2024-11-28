@@ -18,7 +18,7 @@ public class SmartMeterCreateServiceTests
 {
     private Mock<ISmartMeterRepository> _smartMeterRepositoryMock;
     private Mock<IMqttBrokerRepository> _mqttBrokerRepositoryMock;
-    private Mock<IVaultService> _vaultServiceMock;
+    private Mock<IVaultRepository> _vaultRepositoryMock;
     private Mock<ITransactionManager> _transactionManagerMock;
     private Mock<ILogger<SmartMeterCreateService>> _loggerMock;
     private SmartMeterCreateService _smartMeterCreateService;
@@ -28,11 +28,11 @@ public class SmartMeterCreateServiceTests
     {
         _smartMeterRepositoryMock = new Mock<ISmartMeterRepository>();
         _mqttBrokerRepositoryMock = new Mock<IMqttBrokerRepository>();
-        _vaultServiceMock = new Mock<IVaultService>();
+        _vaultRepositoryMock = new Mock<IVaultRepository>();
         _transactionManagerMock = new Mock<ITransactionManager>();
         _loggerMock = new Mock<ILogger<SmartMeterCreateService>>();
         _smartMeterCreateService = new SmartMeterCreateService(_smartMeterRepositoryMock.Object,
-            _mqttBrokerRepositoryMock.Object, _vaultServiceMock.Object, _transactionManagerMock.Object,
+            _mqttBrokerRepositoryMock.Object, _vaultRepositoryMock.Object, _transactionManagerMock.Object,
             _loggerMock.Object);
     }
 

@@ -12,7 +12,7 @@ using VaultSharp.V1.SecretsEngines.Database.Models.PostgreSQL;
 
 namespace SMAIAXBackend.Infrastructure.Repositories;
 
-public class VaultService : IVaultService
+public class VaultRepository : IVaultRepository
 {
     private readonly IVaultClient _vaultClient;
     private readonly string _databaseHost;
@@ -23,7 +23,7 @@ public class VaultService : IVaultService
     private readonly string _credentialsMaximumTimeToLive;
     private const string KeyValueSecretsMountPoint = "secret";
 
-    public VaultService(
+    public VaultRepository(
         IOptions<VaultConfiguration> vaultConfigOptions,
         IOptions<DatabaseConfiguration> databaseConfigOptions)
     {
@@ -93,7 +93,7 @@ public class VaultService : IVaultService
             ["username"] = username,
             ["password"] = password
         };
-        
+
         await _vaultClient.V1.Secrets.KeyValue.V2.WriteSecretAsync(path, secrets, mountPoint: KeyValueSecretsMountPoint);
     }
 }

@@ -14,7 +14,7 @@ namespace SMAIAXBackend.Application.Services.Implementations;
 public class SmartMeterCreateService(
     ISmartMeterRepository smartMeterRepository,
     IMqttBrokerRepository mqttBrokerRepository,
-    IVaultService vaultService,
+    IVaultRepository vaultRepository,
     ITransactionManager transactionManager,
     ILogger<SmartMeterCreateService> logger) : ISmartMeterCreateService
 {
@@ -35,7 +35,7 @@ public class SmartMeterCreateService(
 
             metadataList.Add(metadata);
         }
-        
+
         await transactionManager.ReadCommittedTransactionScope(async () =>
         {
             var smartMeter = SmartMeter.Create(smartMeterId, smartMeterCreateDto.Name, metadataList);
@@ -44,11 +44,11 @@ public class SmartMeterCreateService(
             string topic = $"smartmeter/{smartMeterId}";
             string username = $"smartmeter-{smartMeterId}";
             string password = $"{Guid.NewGuid()}-{Guid.NewGuid()}";
-            await vaultService.SaveMqttBrokerCredentialsAsync(smartMeterId, topic, username, password);
+            await vaultRepository.SaveMqttBrokerCredentialsAsync(smartMeterId, topic, username, password);
             await mqttBrokerRepository.CreateMqttUserAsync(topic, username, password);
         });
-       
-        
+
+
         return smartMeterId.Id;
     }
 

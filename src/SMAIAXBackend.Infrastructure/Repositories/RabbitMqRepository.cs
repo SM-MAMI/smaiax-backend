@@ -31,7 +31,7 @@ public class RabbitMqRepository : IMqttBrokerRepository
             JsonConvert.SerializeObject(new { password, tags = "" }), Encoding.UTF8, "application/json"));
 
         createUserResponse.EnsureSuccessStatusCode();
-        
+
         // TODO: Restrict permissions to topic
         var permissionsPayload = new
         {
@@ -39,11 +39,11 @@ public class RabbitMqRepository : IMqttBrokerRepository
             write = ".*",
             read = ".*"
         };
-        
+
         var permissionsResponse = await _httpClient.PutAsync(
             $"permissions/%2F/{username}",
             new StringContent(JsonConvert.SerializeObject(permissionsPayload), Encoding.UTF8, "application/json"));
-        
+
         permissionsResponse.EnsureSuccessStatusCode();
     }
 }

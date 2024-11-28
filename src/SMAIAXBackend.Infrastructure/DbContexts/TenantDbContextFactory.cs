@@ -9,7 +9,7 @@ using SMAIAXBackend.Infrastructure.Configurations;
 
 namespace SMAIAXBackend.Infrastructure.DbContexts;
 
-public class TenantDbContextFactory(IOptions<DatabaseConfiguration> databaseConfigOptions, IVaultService vaultService) : ITenantDbContextFactory
+public class TenantDbContextFactory(IOptions<DatabaseConfiguration> databaseConfigOptions, IVaultRepository vaultRepository) : ITenantDbContextFactory
 {
     public TenantDbContext CreateDbContext(string databaseName, string databaseUserName, string databasePassword)
     {
@@ -29,7 +29,7 @@ public class TenantDbContextFactory(IOptions<DatabaseConfiguration> databaseConf
 
     public async Task<string> GetConnectionStringForTenant(Tenant tenant)
     {
-        var credentials = await vaultService.GetDatabaseCredentialsAsync(tenant.VaultRoleName);
+        var credentials = await vaultRepository.GetDatabaseCredentialsAsync(tenant.VaultRoleName);
 
         var connectionStringBuilder = new NpgsqlConnectionStringBuilder
         {
