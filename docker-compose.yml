@@ -40,7 +40,7 @@
 
   postgres:
     image: postgres:16-bullseye
-    container_name: "smaiax-backend-db"
+    container_name: "smaiax-postgres"
     restart: always
     ports:
       - "5432:5432"
@@ -50,6 +50,23 @@
       POSTGRES_DB: smaiax-db
     networks:
       - smaiax-backend-network
+  
+  rabbitmq:
+    image: rabbitmq:4.0.2-management-alpine
+    container_name: smaiax-mqtt-broker
+    ports:
+      - "15672:15672"  # RabbitMQ Management UI port
+      - "1883:1883"  # MQTT port
+    environment:
+      RABBITMQ_DEFAULT_USER: user
+      RABBITMQ_DEFAULT_PASS: password
+    healthcheck:
+      test: [ "CMD", "rabbitmq-diagnostics", "status" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    command: >
+      sh -c "rabbitmq-plugins enable rabbitmq_management rabbitmq_mqtt && rabbitmq-server"
 
 networks:
   smaiax-backend-network:

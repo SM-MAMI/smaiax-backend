@@ -9,6 +9,7 @@ using SMAIAXBackend.Domain.Model.Entities;
 using SMAIAXBackend.Domain.Model.Enums;
 using SMAIAXBackend.Domain.Model.ValueObjects.Ids;
 using SMAIAXBackend.Domain.Repositories;
+using SMAIAXBackend.Domain.Repositories.Transactions;
 
 namespace SMAIAXBackend.Application.UnitTests;
 
@@ -16,6 +17,9 @@ namespace SMAIAXBackend.Application.UnitTests;
 public class SmartMeterCreateServiceTests
 {
     private Mock<ISmartMeterRepository> _smartMeterRepositoryMock;
+    private Mock<IMqttBrokerRepository> _mqttBrokerRepositoryMock;
+    private Mock<IVaultService> _vaultServiceMock;
+    private Mock<ITransactionManager> _transactionManagerMock;
     private Mock<ILogger<SmartMeterCreateService>> _loggerMock;
     private SmartMeterCreateService _smartMeterCreateService;
 
@@ -23,8 +27,13 @@ public class SmartMeterCreateServiceTests
     public void Setup()
     {
         _smartMeterRepositoryMock = new Mock<ISmartMeterRepository>();
+        _mqttBrokerRepositoryMock = new Mock<IMqttBrokerRepository>();
+        _vaultServiceMock = new Mock<IVaultService>();
+        _transactionManagerMock = new Mock<ITransactionManager>();
         _loggerMock = new Mock<ILogger<SmartMeterCreateService>>();
-        _smartMeterCreateService = new SmartMeterCreateService(_smartMeterRepositoryMock.Object, _loggerMock.Object);
+        _smartMeterCreateService = new SmartMeterCreateService(_smartMeterRepositoryMock.Object,
+            _mqttBrokerRepositoryMock.Object, _vaultServiceMock.Object, _transactionManagerMock.Object,
+            _loggerMock.Object);
     }
 
     [Test]

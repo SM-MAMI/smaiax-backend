@@ -21,6 +21,7 @@ internal static class IntegrationTestSetup
     private static INetwork _testNetwork = null!;
     private static PostgreSqlContainer _postgresContainer = null!;
     private static IContainer _vaultContainer = null!;
+    private static IContainer _rabbitMqContainer = null!;
     private static WebAppFactory _webAppFactory = null!;
     public static ApplicationDbContext ApplicationDbContext { get; private set; } = null!;
     public static TenantDbContext Tenant1DbContext { get; private set; } = null!;
@@ -77,10 +78,28 @@ internal static class IntegrationTestSetup
 
         await _vaultContainer.StartAsync();
 
+        const int mqttPort = 1883;
+        const int managementPort = 15672;
+        const string rabbitMqUsername = "user";
+        const string rabbitMqPassword = "password";
+        _rabbitMqContainer = new ContainerBuilder()
+            .WithImage("rabbitmq:4.0.2-management-alpine")
+            .WithPortBinding(mqttPort, true)
+            .WithPortBinding(managementPort, true)
+            .WithEnvironment("RABBITMQ_DEFAULT_USER", rabbitMqUsername)
+            .WithEnvironment("RABBITMQ_DEFAULT_PASS", rabbitMqPassword)
+            .WithNetwork(_testNetwork)
+            .WithWaitStrategy(Wait.ForUnixContainer().UntilPortIsAvailable(mqttPort))
+            .WithWaitStrategy(Wait.ForUnixContainer().UntilPortIsAvailable(managementPort))
+            .Build();
+
+        await _rabbitMqContainer.StartAsync();
+
         var postgresMappedPublicPort = _postgresContainer.GetMappedPublicPort(postgresPort);
         var vaultMappedPublicPort = _vaultContainer.GetMappedPublicPort(vaultPort);
+        var mqttBrokerMappedPublicPort = _rabbitMqContainer.GetMappedPublicPort(managementPort);
         _webAppFactory = new WebAppFactory(postgresMappedPublicPort, postgresPort, postgresContainerName,
-            vaultMappedPublicPort);
+            vaultMappedPublicPort, mqttBrokerMappedPublicPort, rabbitMqUsername, rabbitMqPassword);
 
         HttpClient = _webAppFactory.CreateClient();
 
@@ -107,6 +126,8 @@ internal static class IntegrationTestSetup
     [OneTimeTearDown]
     public static async Task OneTimeTearDown()
     {
+        await _rabbitMqContainer.StopAsync();
+        await _rabbitMqContainer.DisposeAsync();
         await _vaultContainer.StopAsync();
         await _vaultContainer.DisposeAsync();
         await _postgresContainer.StopAsync();

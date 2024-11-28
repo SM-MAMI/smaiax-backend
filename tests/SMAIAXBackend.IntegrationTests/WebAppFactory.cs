@@ -4,7 +4,14 @@ using Microsoft.Extensions.Configuration;
 
 namespace SMAIAXBackend.IntegrationTests;
 
-public class WebAppFactory(int postgresMappedPublicPort, int postgresInternalPort, string postgresContainerName, int vaultMappedPublicPort)
+public class WebAppFactory(
+    int postgresMappedPublicPort,
+    int postgresInternalPort,
+    string postgresContainerName,
+    int vaultMappedPublicPort,
+    int mqttBrokerMappedPublicPort,
+    string mqttBrokerUsername,
+    string mqttBrokerPassword)
     : WebApplicationFactory<Program>
 {
     private readonly Dictionary<string, string> _testAppSettings = new()
@@ -22,7 +29,11 @@ public class WebAppFactory(int postgresMappedPublicPort, int postgresInternalPor
         ["Vault:Address"] = $"http://localhost:{vaultMappedPublicPort}",
         ["Vault:Token"] = "00000000-0000-0000-0000-000000000000",
         ["Vault:DatabaseHost"] = postgresContainerName,
-        ["Vault:DatabasePort"] = $"{postgresInternalPort}"
+        ["Vault:DatabasePort"] = $"{postgresInternalPort}",
+        ["MqttBroker:Host"] = "localhost",
+        ["MqttBroker:ManagementPort"] = $"{mqttBrokerMappedPublicPort}",
+        ["MqttBroker:Username"] = mqttBrokerUsername,
+        ["MqttBroker:Password"] = mqttBrokerPassword,
     };
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
