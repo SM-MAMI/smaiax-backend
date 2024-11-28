@@ -32,7 +32,11 @@
     volumes:
       - ./vault/:/vault/:rwx
     command:
-      - ./vault/config/entrypoint.sh
+      - /bin/sh
+      - -c
+      - |
+        dos2unix /vault/config/entrypoint.sh && \
+        /vault/config/entrypoint.sh
     networks:
       - smaiax-backend-network
     depends_on:
