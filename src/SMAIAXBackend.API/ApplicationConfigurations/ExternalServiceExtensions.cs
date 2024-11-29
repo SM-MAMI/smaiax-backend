@@ -9,6 +9,9 @@ public static class ExternalServiceExtensions
     public static void AddExternalServiceConfigurations(this IServiceCollection services, IConfiguration configuration)
     {
         services.Configure<VaultConfiguration>(configuration.GetSection("Vault"));
-        services.AddSingleton<IVaultService, VaultService>();
+        services.AddSingleton<IVaultRepository, VaultRepository>();
+
+        services.Configure<MqttBrokerConfiguration>(configuration.GetSection("MqttBroker"));
+        services.AddScoped<IMqttBrokerRepository, RabbitMqRepository>();
     }
 }

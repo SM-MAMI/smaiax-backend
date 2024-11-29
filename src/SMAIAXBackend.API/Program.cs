@@ -72,7 +72,7 @@ if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("DockerDeve
     var applicationDbContext = services.GetRequiredService<ApplicationDbContext>();
     var tenantRepository = services.GetRequiredService<ITenantRepository>();
     var tenantDbContextFactory = services.GetRequiredService<ITenantDbContextFactory>();
-    var vaultService = services.GetRequiredService<IVaultService>();
+    var vaultRepository = services.GetRequiredService<IVaultRepository>();
 
     await applicationDbContext.Database.EnsureDeletedAsync();
     await applicationDbContext.Database.EnsureCreatedAsync();
@@ -87,7 +87,7 @@ if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("DockerDeve
     await tenantDbContext.Database.EnsureDeletedAsync();
     await tenantRepository.CreateDatabaseForTenantAsync(testUserDatabase!);
     await tenantDbContext.SeedTestData();
-    await vaultService.CreateDatabaseRoleAsync("tenant_1_role", "tenant_1_db");
+    await vaultRepository.CreateDatabaseRoleAsync("tenant_1_role", "tenant_1_db");
 }
 
 app.UseAuthorization();

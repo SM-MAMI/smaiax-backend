@@ -21,7 +21,7 @@ public class AuthenticationServiceTests
     private Mock<ITokenRepository> _tokenRepositoryMock;
     private Mock<UserManager<IdentityUser>> _userManagerMock;
     private Mock<ITransactionManager> _transactionManagerMock;
-    private Mock<IVaultService> _vaultServiceMock;
+    private Mock<IVaultRepository> _vaultRepositoryMock;
     private Mock<ILogger<AuthenticationService>> _loggerMock;
     private AuthenticationService _authenticationService;
 
@@ -38,11 +38,11 @@ public class AuthenticationServiceTests
         _transactionManagerMock
             .Setup(mgr => mgr.ReadCommittedTransactionScope(It.IsAny<Func<Task>>()))
             .Returns((Func<Task> transactionalOperation) => transactionalOperation());
-        _vaultServiceMock = new Mock<IVaultService>();
+        _vaultRepositoryMock = new Mock<IVaultRepository>();
         _loggerMock = new Mock<ILogger<AuthenticationService>>();
         _authenticationService = new AuthenticationService(_tenantRepositoryMock.Object, _userRepositoryMock.Object,
             _tokenRepositoryMock.Object, _userManagerMock.Object, _transactionManagerMock.Object,
-            _vaultServiceMock.Object, _loggerMock.Object);
+            _vaultRepositoryMock.Object, _loggerMock.Object);
     }
 
     [Test]

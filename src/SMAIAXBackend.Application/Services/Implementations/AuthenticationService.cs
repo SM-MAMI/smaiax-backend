@@ -18,7 +18,7 @@ public class AuthenticationService(
     ITokenRepository tokenRepository,
     UserManager<IdentityUser> userManager,
     ITransactionManager transactionManager,
-    IVaultService vaultService,
+    IVaultRepository vaultRepository,
     ILogger<AuthenticationService> logger) : IAuthenticationService
 {
     public async Task<Guid> RegisterAsync(RegisterDto registerDto)
@@ -178,7 +178,7 @@ public class AuthenticationService(
     {
         try
         {
-            await vaultService.CreateDatabaseRoleAsync(vaultRoleName, databaseName);
+            await vaultRepository.CreateDatabaseRoleAsync(vaultRoleName, databaseName);
         }
         catch (Exception ex)
         {

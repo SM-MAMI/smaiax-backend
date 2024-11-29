@@ -31,8 +31,8 @@ public class TestBase
         IntegrationTestSetup.ApplicationDbContext.ChangeTracker.Clear();
         IntegrationTestSetup.Tenant1DbContext.ChangeTracker.Clear();
         IntegrationTestSetup.Tenant2DbContext.ChangeTracker.Clear();
-        await IntegrationTestSetup.VaultService.CreateDatabaseRoleAsync("tenant_1_role", "tenant_1_db");
-        await IntegrationTestSetup.VaultService.CreateDatabaseRoleAsync("tenant_2_role", "tenant_2_db");
+        await IntegrationTestSetup.VaultRepository.CreateDatabaseRoleAsync("tenant_1_role", "tenant_1_db");
+        await IntegrationTestSetup.VaultRepository.CreateDatabaseRoleAsync("tenant_2_role", "tenant_2_db");
     }
 
     [TearDown]
