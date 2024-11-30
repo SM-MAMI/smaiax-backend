@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Options;
 
+using SMAIAXBackend.Domain.Model.ValueObjects.Ids;
 using SMAIAXBackend.Domain.Repositories;
 using SMAIAXBackend.Infrastructure.Configurations;
 
@@ -11,7 +12,7 @@ using VaultSharp.V1.SecretsEngines.Database.Models.PostgreSQL;
 
 namespace SMAIAXBackend.Infrastructure.Repositories;
 
-public class VaultService : IVaultService
+public class VaultRepository : IVaultRepository
 {
     private readonly IVaultClient _vaultClient;
     private readonly string _databaseHost;
@@ -20,8 +21,9 @@ public class VaultService : IVaultService
     private readonly string _databaseSuperUserPassword;
     private readonly string _credentialsDefaultTimeToLive;
     private readonly string _credentialsMaximumTimeToLive;
+    private const string KeyValueSecretsMountPoint = "secret";
 
-    public VaultService(
+    public VaultRepository(
         IOptions<VaultConfiguration> vaultConfigOptions,
         IOptions<DatabaseConfiguration> databaseConfigOptions)
     {
@@ -80,5 +82,18 @@ public class VaultService : IVaultService
             // In case vault is not available return the superuser credentials
             return (_databaseSuperUsername, _databaseSuperUserPassword);
         }
+    }
+
+    public async Task SaveMqttBrokerCredentialsAsync(SmartMeterId smartMeterId, string topic, string username, string password)
+    {
+        var path = $"mqtt/{smartMeterId.Id}";
+        var secrets = new Dictionary<string, object>
+        {
+            ["topic"] = topic,
+            ["username"] = username,
+            ["password"] = password
+        };
+
+        await _vaultClient.V1.Secrets.KeyValue.V2.WriteSecretAsync(path, secrets, mountPoint: KeyValueSecretsMountPoint);
     }
 }
