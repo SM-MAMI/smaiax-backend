@@ -7,7 +7,7 @@ using SMAIAXBackend.Domain.Model.ValueObjects.Ids;
 
 namespace SMAIAXBackend.API.Endpoints.Policy;
 
-public class GetPoliciesBySmartMeterIdEndpoint
+public static class GetPoliciesBySmartMeterIdEndpoint
 {
     public static async Task<Results<Ok<List<PolicyDto>>, NotFound>> Handle(
         IPolicyListService policyListService,
@@ -21,6 +21,7 @@ public class GetPoliciesBySmartMeterIdEndpoint
         }
         else
         {
+            //get all policies for the logged in user
             // policies = await policyListService.GetAllPoliciesAsync();
         }
 

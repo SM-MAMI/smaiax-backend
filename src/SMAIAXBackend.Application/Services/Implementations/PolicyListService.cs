@@ -11,6 +11,7 @@ public class PolicyListService(IPolicyRepository policyRepository, ILogger<Polic
 {
     public async Task<List<PolicyDto>> GetPoliciesBySmartMeterIdAsync(SmartMeterId smartMeterId)
     {
-        return await Task.FromResult(policyRepository.GetPoliciesBySmartMeterIdAsync(smartMeterId).Result.Select(PolicyDto.FromPolicy).ToList());
+        return await Task.FromResult(policyRepository.GetPoliciesBySmartMeterIdAsync(smartMeterId)
+            .Result.Select(PolicyDto.FromPolicy).ToList());
     }
 }
