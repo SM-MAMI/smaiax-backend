@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
 using SMAIAXBackend.Application.DTOs;
+using SMAIAXBackend.Domain.Model.Entities;
 using SMAIAXBackend.Domain.Model.Enums;
 using SMAIAXBackend.Domain.Model.ValueObjects.Ids;
 
@@ -68,5 +69,98 @@ public class PolicyTests : TestBase
 
         // Then
         Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
+    }
+    
+    [Test]
+    public async Task GivenPoliciesExist_WhenGetPolicies_ThenReturnPolicies()
+    {
+        // Given
+        var smartMeterId = new SmartMeterId(Guid.NewGuid());
+        var policy1 = Policy.Create(new PolicyId(Guid.NewGuid()), MeasurementResolution.Hour, LocationResolution.City, 100, smartMeterId);
+        var policy2 = Policy.Create(new PolicyId(Guid.NewGuid()), MeasurementResolution.Hour, LocationResolution.City, 100, smartMeterId);
+        await _tenant1DbContext.Policies.AddRangeAsync(policy1, policy2);
+        await _tenant1DbContext.SaveChangesAsync();
+
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _accessToken);
+
+        // When
+        var response = await _httpClient.GetAsync(BaseUrl);
+
+        // Then
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+
+        var responseContent = await response.Content.ReadAsStringAsync();
+        Assert.That(responseContent, Is.Not.Null);
+
+        var policies = JsonConvert.DeserializeObject<List<PolicyDto>>(responseContent);
+        Assert.That(policies, Is.Not.Null);
+        Assert.That(policies, Has.Count.EqualTo(2));
+    }
+    
+    [Test]
+    public async Task GivenNoPoliciesExist_WhenGetPolicies_ThenReturnEmptyList()
+    {
+        // Given
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _accessToken);
+
+        // When
+        var response = await _httpClient.GetAsync(BaseUrl);
+
+        // Then
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+
+        var responseContent = await response.Content.ReadAsStringAsync();
+        Assert.That(responseContent, Is.Not.Null);
+
+        var policies = JsonConvert.DeserializeObject<List<PolicyDto>>(responseContent);
+        Assert.That(policies, Is.Not.Null);
+        Assert.That(policies, Has.Count.EqualTo(0));
+    }
+    
+    [Test]
+    public async Task GivenPoliciesExist_WhenGetPoliciesBySmartMeterId_ThenReturnPolicies()
+    {
+        // Given
+        var smartMeterId = new SmartMeterId(Guid.NewGuid());
+        var policy1 = Policy.Create(new PolicyId(Guid.NewGuid()), MeasurementResolution.Hour, LocationResolution.City, 100, smartMeterId);
+        var policy2 = Policy.Create(new PolicyId(Guid.NewGuid()), MeasurementResolution.Hour, LocationResolution.City, 100, smartMeterId);
+        await _tenant1DbContext.Policies.AddRangeAsync(policy1, policy2);
+        await _tenant1DbContext.SaveChangesAsync();
+
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _accessToken);
+
+        // When
+        var response = await _httpClient.GetAsync($"{BaseUrl}?smartMeterId={smartMeterId}");
+
+        // Then
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+
+        var responseContent = await response.Content.ReadAsStringAsync();
+        Assert.That(responseContent, Is.Not.Null);
+
+        var policies = JsonConvert.DeserializeObject<List<PolicyDto>>(responseContent);
+        Assert.That(policies, Is.Not.Null);
+        Assert.That(policies, Has.Count.EqualTo(2));
+    }
+    
+    [Test]
+    public async Task GivenNoPoliciesExist_WhenGetPoliciesBySmartMeterId_ThenReturnEmptyList()
+    {
+        // Given
+        var smartMeterId = Guid.NewGuid();
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _accessToken);
+
+        // When
+        var response = await _httpClient.GetAsync($"{BaseUrl}?smartMeterId={smartMeterId}");
+
+        // Then
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+
+        var responseContent = await response.Content.ReadAsStringAsync();
+        Assert.That(responseContent, Is.Not.Null);
+
+        var policies = JsonConvert.DeserializeObject<List<PolicyDto>>(responseContent);
+        Assert.That(policies, Is.Not.Null);
+        Assert.That(policies, Has.Count.EqualTo(0));
     }
 }

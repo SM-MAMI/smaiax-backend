@@ -6,4 +6,5 @@ namespace SMAIAXBackend.Application.Services.Interfaces;
 public interface IPolicyListService
 {
     Task<List<PolicyDto>> GetPoliciesBySmartMeterIdAsync(SmartMeterId smartMeterId);
+    Task<List<PolicyDto>> GetPoliciesAsync();
 }

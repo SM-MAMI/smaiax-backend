@@ -13,7 +13,7 @@ public static class GetPoliciesBySmartMeterIdEndpoint
         IPolicyListService policyListService,
         [FromQuery] Guid? smartMeterId)
     {
-        List<PolicyDto> policies = new List<PolicyDto>();
+        List<PolicyDto> policies;
 
         if (smartMeterId.HasValue)
         {
@@ -21,13 +21,7 @@ public static class GetPoliciesBySmartMeterIdEndpoint
         }
         else
         {
-            //get all policies for the logged in user
-            // policies = await policyListService.GetAllPoliciesAsync();
-        }
-
-        if (policies == null || policies.Count == 0)
-        {
-            return TypedResults.NotFound();
+            policies = await policyListService.GetPoliciesAsync();
         }
 
         return TypedResults.Ok(policies);
