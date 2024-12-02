@@ -156,9 +156,9 @@ public class TestBase
             4, smartMeter3Id);
         var smartMeter3 = SmartMeter.Create(smartMeter3Id,
             "Smart Meter 3", [smartMeter3Metadata]);
-        var policy1 = Policy.Create(new PolicyId(Guid.Parse("f4c70232-6715-4c15-966f-bf4bcef46d39")),
+        var policy1 = Policy.Create(new PolicyId(Guid.Parse("f4c70232-6715-4c15-966f-bf4bcef46d39")),"policy1", 
             MeasurementResolution.Hour, LocationResolution.Country, 500, smartMeter3Id);
-        var policy2 = Policy.Create(new PolicyId(Guid.Parse("a4c70232-6715-4c15-966f-bf4bcef46d40")),
+        var policy2 = Policy.Create(new PolicyId(Guid.Parse("a4c70232-6715-4c15-966f-bf4bcef46d40")),"policy2", 
                 MeasurementResolution.Minute, LocationResolution.City, 1000, smartMeter3Id);
 
 

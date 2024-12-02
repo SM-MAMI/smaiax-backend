@@ -50,8 +50,8 @@ public class PolicyRequestCreateServiceTests
 
         var policies = new List<PolicyDto>
         {
-            new(Guid.NewGuid(), MeasurementResolution.Hour, LocationResolution.State, 50),
-            new(Guid.NewGuid(), MeasurementResolution.Hour, LocationResolution.State, 150),
+            new(Guid.NewGuid(), "policy1", MeasurementResolution.Hour, LocationResolution.State, 50),
+            new(Guid.NewGuid(), "policy2", MeasurementResolution.Hour, LocationResolution.State, 150),
         };
 
         _policyRequestRepositoryMock.Setup(repo => repo.NextIdentity()).Returns(policyRequestIdExpected);

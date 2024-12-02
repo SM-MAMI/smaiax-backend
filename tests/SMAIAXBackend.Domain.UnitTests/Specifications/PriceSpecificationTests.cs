@@ -13,7 +13,7 @@ public class PriceSpecificationTests
     {
         // Given
         var specification = new PriceSpecification(100);
-        var policy = Policy.Create(new PolicyId(Guid.NewGuid()), MeasurementResolution.Day, LocationResolution.Country,
+        var policy = Policy.Create(new PolicyId(Guid.NewGuid()), "policy1", MeasurementResolution.Day, LocationResolution.Country,
             100, new SmartMeterId(Guid.NewGuid()));
 
         // When
@@ -28,7 +28,7 @@ public class PriceSpecificationTests
     {
         // Given
         var specification = new PriceSpecification(100);
-        var policy = Policy.Create(new PolicyId(Guid.NewGuid()), MeasurementResolution.Day, LocationResolution.Country,
+        var policy = Policy.Create(new PolicyId(Guid.NewGuid()), "policy1", MeasurementResolution.Day, LocationResolution.Country,
             90, new SmartMeterId(Guid.NewGuid()));
 
         // When
@@ -43,7 +43,7 @@ public class PriceSpecificationTests
     {
         // Given
         var specification = new PriceSpecification(100);
-        var policy = Policy.Create(new PolicyId(Guid.NewGuid()), MeasurementResolution.Day, LocationResolution.Country,
+        var policy = Policy.Create(new PolicyId(Guid.NewGuid()), "policy1", MeasurementResolution.Day, LocationResolution.Country,
             110, new SmartMeterId(Guid.NewGuid()));
 
         // When

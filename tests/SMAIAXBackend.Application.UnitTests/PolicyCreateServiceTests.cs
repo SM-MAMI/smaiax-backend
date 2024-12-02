@@ -38,7 +38,7 @@ public class PolicyCreateServiceTests
         var policyIdExpected = new PolicyId(Guid.NewGuid());
         var smartMeter = SmartMeter.Create(new SmartMeterId(Guid.NewGuid()), "Smart Meter 1", []);
         var policyCreateDto =
-            new PolicyCreateDto(MeasurementResolution.Hour, LocationResolution.None, 100, smartMeter.Id.Id);
+            new PolicyCreateDto("policy1", MeasurementResolution.Hour, LocationResolution.None, 100, smartMeter.Id.Id);
 
         _policyRepositoryMock.Setup(repo => repo.NextIdentity()).Returns(policyIdExpected);
         _smartMeterRepositoryMock.Setup(repo => repo.GetSmartMeterByIdAsync(smartMeter.Id))
@@ -60,7 +60,7 @@ public class PolicyCreateServiceTests
         // Given
         var smartMeterId = new SmartMeterId(Guid.NewGuid());
         var policyCreateDto =
-            new PolicyCreateDto(MeasurementResolution.Hour, LocationResolution.City, 100, smartMeterId.Id);
+            new PolicyCreateDto("policy1", MeasurementResolution.Hour, LocationResolution.City, 100, smartMeterId.Id);
 
         _smartMeterRepositoryMock.Setup(repo => repo.GetSmartMeterByIdAsync(smartMeterId))
             .ReturnsAsync((SmartMeter)null!);
@@ -78,7 +78,7 @@ public class PolicyCreateServiceTests
         var policyIdExpected = new PolicyId(Guid.NewGuid());
         var smartMeter = SmartMeter.Create(new SmartMeterId(Guid.NewGuid()), "Smart Meter 1", []);
         var policyCreateDto =
-            new PolicyCreateDto(MeasurementResolution.Hour, LocationResolution.City, 100, smartMeter.Id.Id);
+            new PolicyCreateDto("policy1", MeasurementResolution.Hour, LocationResolution.City, 100, smartMeter.Id.Id);
 
         _policyRepositoryMock.Setup(repo => repo.NextIdentity()).Returns(policyIdExpected);
         _smartMeterRepositoryMock.Setup(repo => repo.GetSmartMeterByIdAsync(smartMeter.Id))
@@ -100,7 +100,7 @@ public class PolicyCreateServiceTests
             new Location(null, null, "Some State", null, null), 4, smartMeter.Id);
         smartMeter.AddMetadata(metadata);
         var policyCreateDto =
-            new PolicyCreateDto(MeasurementResolution.Hour, LocationResolution.City, 100, smartMeter.Id.Id);
+            new PolicyCreateDto("policy1", MeasurementResolution.Hour, LocationResolution.City, 100, smartMeter.Id.Id);
 
         _policyRepositoryMock.Setup(repo => repo.NextIdentity()).Returns(policyIdExpected);
         _smartMeterRepositoryMock.Setup(repo => repo.GetSmartMeterByIdAsync(smartMeter.Id))

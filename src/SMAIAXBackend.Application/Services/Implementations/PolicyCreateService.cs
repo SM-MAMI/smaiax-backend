@@ -37,7 +37,7 @@ public class PolicyCreateService(
         }
 
         var policyId = policyRepository.NextIdentity();
-        var policy = Policy.Create(policyId, policyCreateDto.MeasurementResolution, policyCreateDto.LocationResolution,
+        var policy = Policy.Create(policyId, policyCreateDto.Name, policyCreateDto.MeasurementResolution, policyCreateDto.LocationResolution,
             policyCreateDto.Price, smartMeter.Id);
 
         await policyRepository.AddAsync(policy);

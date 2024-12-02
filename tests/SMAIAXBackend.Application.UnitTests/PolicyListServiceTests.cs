@@ -35,9 +35,9 @@ public class PolicyListServiceTests
         
         var policiesExpected = new List<Policy>
         {
-            Policy.Create(policyId1, MeasurementResolution.Hour, LocationResolution.None, 100,
+            Policy.Create(policyId1, "policy1", MeasurementResolution.Hour, LocationResolution.None, 100,
                 smartMeterId),
-            Policy.Create(policyId2, MeasurementResolution.Hour, LocationResolution.None, 100, 
+            Policy.Create(policyId2, "policy2", MeasurementResolution.Hour, LocationResolution.None, 100, 
                 smartMeterId)
         };
 
@@ -75,9 +75,9 @@ public class PolicyListServiceTests
         
         var policiesExpected = new List<Policy>
         {
-            Policy.Create(policyId1, MeasurementResolution.Hour, LocationResolution.None, 100,
+            Policy.Create(policyId1, "policy1", MeasurementResolution.Hour, LocationResolution.None, 100,
                 smartMeterId),
-            Policy.Create(policyId2, MeasurementResolution.Hour, LocationResolution.None, 100, 
+            Policy.Create(policyId2,  "policy2", MeasurementResolution.Hour, LocationResolution.None, 100, 
                 smartMeterId)
         };
 

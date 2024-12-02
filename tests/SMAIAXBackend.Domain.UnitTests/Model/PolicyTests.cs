@@ -18,12 +18,13 @@ public class PolicyTests
         var smartMeterId = new SmartMeterId(Guid.NewGuid());
 
         // When
-        var policy = Policy.Create(policyId, measurementResolution, locationResolution, price, smartMeterId);
+        var policy = Policy.Create(policyId, "policy1", measurementResolution, locationResolution, price, smartMeterId);
 
         // Then
         Assert.Multiple(() =>
         {
             Assert.That(policy.Id, Is.EqualTo(policyId));
+            Assert.That(policy.Name, Is.EqualTo("policy1"));
             Assert.That(policy.MeasurementResolution, Is.EqualTo(measurementResolution));
             Assert.That(policy.LocationResolution, Is.EqualTo(locationResolution));
             Assert.That(policy.Price, Is.EqualTo(price));

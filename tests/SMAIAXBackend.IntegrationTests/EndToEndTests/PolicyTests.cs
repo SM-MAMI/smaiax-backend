@@ -23,7 +23,7 @@ public class PolicyTests : TestBase
     {
         // Given
         var smartMeterId = Guid.Parse("f4c70232-6715-4c15-966f-bf4bcef46d39");
-        var policyCreateDto = new PolicyCreateDto(MeasurementResolution.Minute, LocationResolution.City, 100, smartMeterId);
+        var policyCreateDto = new PolicyCreateDto("policy1", MeasurementResolution.Minute, LocationResolution.City, 100, smartMeterId);
 
         var httpContent = new StringContent(JsonConvert.SerializeObject(policyCreateDto), Encoding.UTF8,
             "application/json");
@@ -58,7 +58,7 @@ public class PolicyTests : TestBase
     {
         // Given
         var smartMeterId = Guid.Parse("f4c70232-6715-4c15-966f-bf4bcef46d39");
-        var policyCreateDto = new PolicyCreateDto(MeasurementResolution.Minute, LocationResolution.City, 100, smartMeterId);
+        var policyCreateDto = new PolicyCreateDto("policy1", MeasurementResolution.Minute, LocationResolution.City, 100, smartMeterId);
 
         var httpContent = new StringContent(JsonConvert.SerializeObject(policyCreateDto), Encoding.UTF8,
             "application/json");
@@ -76,8 +76,8 @@ public class PolicyTests : TestBase
     {
         // Given
         var smartMeterId = new SmartMeterId(Guid.NewGuid());
-        var policy1 = Policy.Create(new PolicyId(Guid.NewGuid()), MeasurementResolution.Hour, LocationResolution.City, 100, smartMeterId);
-        var policy2 = Policy.Create(new PolicyId(Guid.NewGuid()), MeasurementResolution.Hour, LocationResolution.City, 100, smartMeterId);
+        var policy1 = Policy.Create(new PolicyId(Guid.NewGuid()), "policy1", MeasurementResolution.Hour, LocationResolution.City, 100, smartMeterId);
+        var policy2 = Policy.Create(new PolicyId(Guid.NewGuid()), "policy2", MeasurementResolution.Hour, LocationResolution.City, 100, smartMeterId);
         await _tenant1DbContext.Policies.AddRangeAsync(policy1, policy2);
         await _tenant1DbContext.SaveChangesAsync();
 
@@ -122,8 +122,8 @@ public class PolicyTests : TestBase
     {
         // Given
         var smartMeterId = new SmartMeterId(Guid.NewGuid());
-        var policy1 = Policy.Create(new PolicyId(Guid.NewGuid()), MeasurementResolution.Hour, LocationResolution.City, 100, smartMeterId);
-        var policy2 = Policy.Create(new PolicyId(Guid.NewGuid()), MeasurementResolution.Hour, LocationResolution.City, 100, smartMeterId);
+        var policy1 = Policy.Create(new PolicyId(Guid.NewGuid()), "policy1", MeasurementResolution.Hour, LocationResolution.City, 100, smartMeterId);
+        var policy2 = Policy.Create(new PolicyId(Guid.NewGuid()), "policy2", MeasurementResolution.Hour, LocationResolution.City, 100, smartMeterId);
         await _tenant1DbContext.Policies.AddRangeAsync(policy1, policy2);
         await _tenant1DbContext.SaveChangesAsync();
 
