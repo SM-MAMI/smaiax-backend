@@ -61,7 +61,7 @@ public class SmartMeterDeleteServiceTests
         Assert.ThrowsAsync<SmartMeterNotFoundException>(() =>
             _smartMeterDeleteService.DeleteMetadataAsync(smartMeterId.Id, metadataId.Id));
     }
-    
+
     [Test]
     public void GivenSmartMeterIdAndNonExistentMetadataId_WhenRemoveMetadataFromSmartMeter_ThenMetadataNotFoundExceptionIsThrown()
     {

@@ -68,7 +68,7 @@ public static class SmartMeterEndpoints
             .ProducesProblem(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status409Conflict)
             .ProducesProblem(StatusCodes.Status500InternalServerError);
-            
+
         return app;
     }
 }

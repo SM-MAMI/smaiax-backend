@@ -78,7 +78,7 @@ public class SmartMeterCreateService(
             logger.LogError(ex, "Metadata with id '{MetadataId}' already exists", metadataId.Id);
             throw new MetadataAlreadyExistsException(metadataId.Id);
         }
-        
+
         await smartMeterRepository.UpdateAsync(smartMeter);
 
         return smartMeterId;

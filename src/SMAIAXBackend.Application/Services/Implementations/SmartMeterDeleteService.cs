@@ -31,7 +31,7 @@ public class SmartMeterDeleteService(
             logger.LogError(ex, "Metadata with id '{MetadataId}' not found", metadataId);
             throw new MetadataNotFoundException(metadataId);
         }
-        
+
         await smartMeterRepository.UpdateAsync(smartMeter);
     }
 }

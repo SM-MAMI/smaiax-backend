@@ -124,7 +124,7 @@ public class SmartMeterTests
         // When ... Then
         Assert.Throws<ArgumentException>(() => smartMeter.RemoveMetadata(new MetadataId(Guid.NewGuid())));
     }
-    
+
     [Test]
     public void GivenSmartMeterAndUpdatedMetadata_WhenUpdateMetadata_ThenMetadataIsUpdated()
     {

@@ -112,7 +112,7 @@ public class SmartMeterCreateServiceTests
         Assert.ThrowsAsync<SmartMeterNotFoundException>(async () =>
             await _smartMeterCreateService.AddMetadataAsync(smartMeterId.Id, metadataCreateDto));
     }
-    
+
     [Test]
     public void
         GivenSmartMeterIdAndExistingMetadataCreateDto_WhenAddMetadata_ThenMetadataAlreadyExistsExceptionIsThrown()
