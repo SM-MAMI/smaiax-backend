@@ -30,6 +30,16 @@ public class TenantDbContext(DbContextOptions<TenantDbContext> options) : DbCont
         modelBuilder.ApplyConfiguration(new SmartMeterConfiguration());
     }
 
+    public void EnsureHypertable()
+    {
+        var hypertableQuery = @"
+                SELECT create_hypertable('""measurement""', 'timestamp', if_not_exists => TRUE);
+            ";
+
+        // Execute SQL to create hypertable if it doesn’t already exist
+        Database.ExecuteSqlRaw(hypertableQuery);
+    }
+
     public async Task SeedTestData()
     {
         var smartMeter1Id = new SmartMeterId(Guid.NewGuid());
