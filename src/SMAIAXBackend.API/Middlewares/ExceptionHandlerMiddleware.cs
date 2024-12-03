@@ -37,7 +37,7 @@ public class ExceptionHandlerMiddleware : IExceptionHandler
                 problemDetails.Title = "Registration Error";
                 break;
             case ExistingPoliciesException:
-            case ArgumentException:
+            case MetadataAlreadyExistsException:
                 problemDetails.Type = "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.8";
                 problemDetails.Status = StatusCodes.Status409Conflict;
                 problemDetails.Title = "Conflict";
