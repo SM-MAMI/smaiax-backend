@@ -150,7 +150,7 @@ public class SmartMeterUpdateTests
         var smartMeter = SmartMeter.Create(new SmartMeterId(smartMeterId), "SmartMeter", []);
         var policies = new List<Policy>
         {
-            Policy.Create(new PolicyId(Guid.NewGuid()), MeasurementResolution.Hour, LocationResolution.City, 10.0m,
+            Policy.Create(new PolicyId(Guid.NewGuid()), "Policy 1", MeasurementResolution.Hour, LocationResolution.City, 10.0m,
                 new SmartMeterId(smartMeterId))
         };
 
