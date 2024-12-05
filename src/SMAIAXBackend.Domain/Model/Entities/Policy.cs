@@ -8,6 +8,7 @@ namespace SMAIAXBackend.Domain.Model.Entities;
 public sealed class Policy : IEquatable<Policy>
 {
     public PolicyId Id { get; } = null!;
+    public string Name { get; } = null!;
     public MeasurementResolution MeasurementResolution { get; }
     public LocationResolution LocationResolution { get; }
     public decimal Price { get; }
@@ -16,12 +17,13 @@ public sealed class Policy : IEquatable<Policy>
 
     public static Policy Create(
         PolicyId id,
+        string name,
         MeasurementResolution measurementResolution,
         LocationResolution locationResolution,
         decimal price,
         SmartMeterId smartMeterId)
     {
-        return new Policy(id, measurementResolution, locationResolution, price, smartMeterId);
+        return new Policy(id, name, measurementResolution, locationResolution, price, smartMeterId);
     }
 
     // Needed by EF Core
@@ -32,12 +34,14 @@ public sealed class Policy : IEquatable<Policy>
 
     private Policy(
         PolicyId id,
+        string name,
         MeasurementResolution measurementResolution,
         LocationResolution locationResolution,
         decimal price,
         SmartMeterId smartMeterId)
     {
         Id = id;
+        Name = name;
         MeasurementResolution = measurementResolution;
         LocationResolution = locationResolution;
         Price = price;

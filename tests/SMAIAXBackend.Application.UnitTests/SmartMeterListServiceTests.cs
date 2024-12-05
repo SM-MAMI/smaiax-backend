@@ -75,7 +75,7 @@ public class SmartMeterListServiceTests
         var smartMeterExpected = SmartMeter.Create(new SmartMeterId(smartMeterId), "Smart Meter 1", []);
         var policies = new List<Policy>
         {
-            Policy.Create(new PolicyId(Guid.NewGuid()), MeasurementResolution.Day, LocationResolution.City, 1000,
+            Policy.Create(new PolicyId(Guid.NewGuid()), "policy1", MeasurementResolution.Day, LocationResolution.City, 1000,
                 smartMeterExpected.Id)
         };
 

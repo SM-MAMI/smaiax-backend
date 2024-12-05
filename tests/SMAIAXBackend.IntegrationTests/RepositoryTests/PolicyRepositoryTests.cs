@@ -14,7 +14,7 @@ public class PolicyRepositoryTests : TestBase
     {
         // Given
         var smartMeterId = new SmartMeterId(Guid.Parse("f4c70232-6715-4c15-966f-bf4bcef46d39"));
-        var policyExpected = Policy.Create(new PolicyId(Guid.NewGuid()), MeasurementResolution.Hour,
+        var policyExpected = Policy.Create(new PolicyId(Guid.NewGuid()), "policy1", MeasurementResolution.Hour,
             LocationResolution.State, 1000, smartMeterId);
 
         // When

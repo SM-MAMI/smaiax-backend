@@ -9,4 +9,5 @@ public interface IPolicyRepository
     Task AddAsync(Policy policy);
     Task<List<Policy>> GetPoliciesBySmartMeterIdAsync(SmartMeterId smartMeterId);
     Task<List<Policy>> GetPoliciesByTenantAsync(Tenant tenant);
+    Task<List<Policy>> GetPoliciesAsync();
 }

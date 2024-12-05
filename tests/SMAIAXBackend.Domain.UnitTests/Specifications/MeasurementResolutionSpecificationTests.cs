@@ -13,7 +13,7 @@ public class MeasurementResolutionSpecificationTests
     {
         // Given
         var specification = new MeasurementResolutionSpecification(MeasurementResolution.Day);
-        var policy = Policy.Create(new PolicyId(Guid.NewGuid()), MeasurementResolution.Day, LocationResolution.Country,
+        var policy = Policy.Create(new PolicyId(Guid.NewGuid()), "policy1", MeasurementResolution.Day, LocationResolution.Country,
             100, new SmartMeterId(Guid.NewGuid()));
 
         // When
@@ -28,7 +28,7 @@ public class MeasurementResolutionSpecificationTests
     {
         // Given
         var specification = new MeasurementResolutionSpecification(MeasurementResolution.Day);
-        var policy = Policy.Create(new PolicyId(Guid.NewGuid()), MeasurementResolution.Hour, LocationResolution.Country,
+        var policy = Policy.Create(new PolicyId(Guid.NewGuid()), "policy1", MeasurementResolution.Hour, LocationResolution.Country,
             100, new SmartMeterId(Guid.NewGuid()));
 
         // When
@@ -43,7 +43,7 @@ public class MeasurementResolutionSpecificationTests
     {
         // Given
         var specification = new MeasurementResolutionSpecification(MeasurementResolution.Hour);
-        var policy = Policy.Create(new PolicyId(Guid.NewGuid()), MeasurementResolution.Day, LocationResolution.Country,
+        var policy = Policy.Create(new PolicyId(Guid.NewGuid()), "policy1", MeasurementResolution.Day, LocationResolution.Country,
             100, new SmartMeterId(Guid.NewGuid()));
 
         // When
