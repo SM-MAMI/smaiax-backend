@@ -43,6 +43,8 @@ public class MeasurementConfiguration : IEntityTypeConfiguration<Measurement>
             data.Property(d => d.Timestamp).HasColumnName("timestamp").IsRequired();
         });
 
+        builder.HasIndex(m => m.Timestamp);
+
         builder.Property(m => m.SmartMeterId)
             .HasConversion(
                 v => v.Id,
