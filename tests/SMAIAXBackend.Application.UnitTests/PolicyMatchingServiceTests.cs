@@ -61,6 +61,7 @@ public class PolicyMatchingServiceTests
         {
             Policy.Create(
                 new PolicyId(Guid.NewGuid()),
+                "policy1",
                 MeasurementResolution.Hour,
                 LocationResolution.State,
                 50,
@@ -68,6 +69,7 @@ public class PolicyMatchingServiceTests
             ),
             Policy.Create(
                 new PolicyId(Guid.NewGuid()),
+                "policy2",
                 MeasurementResolution.Hour,
                 LocationResolution.State,
                 150,

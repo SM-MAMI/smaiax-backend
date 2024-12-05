@@ -25,12 +25,14 @@ public class PolicyRepository(
         await tenantDbContext.SaveChangesAsync();
     }
 
-    public Task<List<Policy>> GetPoliciesBySmartMeterIdAsync(SmartMeterId smartMeterId)
+    public async Task<List<Policy>> GetPoliciesBySmartMeterIdAsync(SmartMeterId smartMeterId)
     {
-        return tenantDbContext.Policies
+        return await tenantDbContext.Policies
             .Where(p => p.SmartMeterId.Equals(smartMeterId))
             .ToListAsync();
     }
+
+
 
     public async Task<List<Policy>> GetPoliciesByTenantAsync(Tenant tenant)
     {
@@ -38,5 +40,10 @@ public class PolicyRepository(
             databaseConfigOptions.Value.SuperUsername, databaseConfigOptions.Value.SuperUserPassword);
 
         return await tenantSpecificDbContext.Policies.ToListAsync();
+    }
+
+    public async Task<List<Policy>> GetPoliciesAsync()
+    {
+        return await tenantDbContext.Policies.ToListAsync();
     }
 }

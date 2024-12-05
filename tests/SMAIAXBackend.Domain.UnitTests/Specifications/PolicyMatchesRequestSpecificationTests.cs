@@ -16,7 +16,7 @@ public class PolicyMatchesRequestSpecificationTests
         var policyFilter = new PolicyFilter(MeasurementResolution.Hour, 1, 4, [], LocationResolution.Country, 100);
         var policyRequest = PolicyRequest.Create(new PolicyRequestId(Guid.NewGuid()), false, policyFilter);
         var specification = new PolicyMatchesRequestSpecification(policyRequest);
-        var policy = Policy.Create(new PolicyId(Guid.NewGuid()), MeasurementResolution.Hour, LocationResolution.Country,
+        var policy = Policy.Create(new PolicyId(Guid.NewGuid()), "policy1", MeasurementResolution.Hour, LocationResolution.Country,
             90, new SmartMeterId(Guid.NewGuid()));
 
         // When
@@ -33,7 +33,7 @@ public class PolicyMatchesRequestSpecificationTests
         var policyFilter = new PolicyFilter(MeasurementResolution.Hour, 1, 4, [], LocationResolution.Country, 100);
         var policyRequest = PolicyRequest.Create(new PolicyRequestId(Guid.NewGuid()), false, policyFilter);
         var specification = new PolicyMatchesRequestSpecification(policyRequest);
-        var policy = Policy.Create(new PolicyId(Guid.NewGuid()), MeasurementResolution.Hour, LocationResolution.Country,
+        var policy = Policy.Create(new PolicyId(Guid.NewGuid()), "policy1", MeasurementResolution.Hour, LocationResolution.Country,
             110, new SmartMeterId(Guid.NewGuid()));
 
         // When
@@ -50,7 +50,7 @@ public class PolicyMatchesRequestSpecificationTests
         var policyFilter = new PolicyFilter(MeasurementResolution.Hour, 1, 4, [], LocationResolution.Country, 100);
         var policyRequest = PolicyRequest.Create(new PolicyRequestId(Guid.NewGuid()), false, policyFilter);
         var specification = new PolicyMatchesRequestSpecification(policyRequest);
-        var policy = Policy.Create(new PolicyId(Guid.NewGuid()), MeasurementResolution.Day, LocationResolution.Country,
+        var policy = Policy.Create(new PolicyId(Guid.NewGuid()), "policy1", MeasurementResolution.Day, LocationResolution.Country,
             90, new SmartMeterId(Guid.NewGuid()));
 
         // When

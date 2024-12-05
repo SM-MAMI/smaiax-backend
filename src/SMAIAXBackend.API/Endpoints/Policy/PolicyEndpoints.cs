@@ -19,6 +19,15 @@ public static class PolicyEndpoints
             .ProducesProblem(StatusCodes.Status401Unauthorized)
             .ProducesProblem(StatusCodes.Status500InternalServerError);
 
+        // GET: Get policies, optionally filtered by SmartMeterId
+        group.MapGet("/", GetPoliciesBySmartMeterIdEndpoint.Handle)
+            .WithName("getPolicies")
+            .Produces<List<PolicyDto>>(StatusCodes.Status200OK, contentType)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .ProducesProblem(StatusCodes.Status500InternalServerError);
+
         return app;
     }
 }
