@@ -18,7 +18,7 @@ public class PolicyConfiguration : IEntityTypeConfiguration<Policy>
                 v => v.Id,
                 v => new PolicyId(v))
             .IsRequired();
-        
+
         builder.Property(p => p.Name).IsRequired();
 
         builder.Property(p => p.MeasurementResolution).HasConversion<string>().IsRequired();

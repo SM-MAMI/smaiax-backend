@@ -17,7 +17,7 @@ public class PolicyListService(IPolicyRepository policyRepository, ILogger<Polic
 
     public async Task<List<PolicyDto>> GetPoliciesAsync()
     {
-        var policies =  await policyRepository.GetPoliciesAsync();
+        var policies = await policyRepository.GetPoliciesAsync();
         return policies.Select(PolicyDto.FromPolicy).ToList();
     }
 }

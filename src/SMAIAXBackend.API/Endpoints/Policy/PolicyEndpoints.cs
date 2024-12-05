@@ -27,7 +27,7 @@ public static class PolicyEndpoints
             .ProducesProblem(StatusCodes.Status401Unauthorized)
             .ProducesProblem(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status500InternalServerError);
-        
+
         return app;
     }
 }

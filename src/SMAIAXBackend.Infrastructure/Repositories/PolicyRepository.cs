@@ -31,8 +31,8 @@ public class PolicyRepository(
             .Where(p => p.SmartMeterId.Equals(smartMeterId))
             .ToListAsync();
     }
-    
-    
+
+
 
     public async Task<List<Policy>> GetPoliciesByTenantAsync(Tenant tenant)
     {

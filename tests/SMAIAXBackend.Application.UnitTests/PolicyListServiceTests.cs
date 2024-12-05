@@ -16,7 +16,7 @@ public class PolicyListServiceTests
     private Mock<IPolicyRepository> _policyRepositoryMock;
     private Mock<ILogger<PolicyListService>> _loggerMock;
     private PolicyListService _policyListService;
-    
+
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
@@ -32,12 +32,12 @@ public class PolicyListServiceTests
         var smartMeterId = new SmartMeterId(Guid.NewGuid());
         var policyId1 = new PolicyId(Guid.NewGuid());
         var policyId2 = new PolicyId(Guid.NewGuid());
-        
+
         var policiesExpected = new List<Policy>
         {
             Policy.Create(policyId1, "policy1", MeasurementResolution.Hour, LocationResolution.None, 100,
                 smartMeterId),
-            Policy.Create(policyId2, "policy2", MeasurementResolution.Hour, LocationResolution.None, 100, 
+            Policy.Create(policyId2, "policy2", MeasurementResolution.Hour, LocationResolution.None, 100,
                 smartMeterId)
         };
 
@@ -48,9 +48,9 @@ public class PolicyListServiceTests
 
         // Then
         Assert.That(policiesActual, Is.Not.Null);
-        Assert.That(policiesActual, Has.Count.EqualTo(policiesExpected.Count));        
+        Assert.That(policiesActual, Has.Count.EqualTo(policiesExpected.Count));
     }
-    
+
     [Test]
     public async Task GivenNoPolicies_WhenGetPolicies_ThenReturnEmptyList()
     {
@@ -64,7 +64,7 @@ public class PolicyListServiceTests
         Assert.That(policiesActual, Is.Not.Null);
         Assert.That(policiesActual, Has.Count.EqualTo(0));
     }
-    
+
     [Test]
     public async Task GivenExistingPolicies_WhenGetPoliciesBySmartMeterId_ThenReturnPolicies()
     {
@@ -72,12 +72,12 @@ public class PolicyListServiceTests
         var smartMeterId = new SmartMeterId(Guid.NewGuid());
         var policyId1 = new PolicyId(Guid.NewGuid());
         var policyId2 = new PolicyId(Guid.NewGuid());
-        
+
         var policiesExpected = new List<Policy>
         {
             Policy.Create(policyId1, "policy1", MeasurementResolution.Hour, LocationResolution.None, 100,
                 smartMeterId),
-            Policy.Create(policyId2,  "policy2", MeasurementResolution.Hour, LocationResolution.None, 100, 
+            Policy.Create(policyId2,  "policy2", MeasurementResolution.Hour, LocationResolution.None, 100,
                 smartMeterId)
         };
 
@@ -89,15 +89,15 @@ public class PolicyListServiceTests
 
         // Then
         Assert.That(policiesActual, Is.Not.Null);
-        Assert.That(policiesActual, Has.Count.EqualTo(policiesExpected.Count));        
+        Assert.That(policiesActual, Has.Count.EqualTo(policiesExpected.Count));
     }
-    
+
     [Test]
     public async Task GivenNoPolicies_WhenGetPoliciesBySmartMeterId_ThenReturnEmptyList()
     {
         // Given
         var smartMeterId = new SmartMeterId(Guid.NewGuid());
-        
+
         _policyRepositoryMock.Setup(repo => repo.GetPoliciesBySmartMeterIdAsync(smartMeterId))
             .ReturnsAsync(new List<Policy>());
 

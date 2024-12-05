@@ -70,7 +70,7 @@ public class PolicyTests : TestBase
         // Then
         Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
     }
-    
+
     [Test]
     public async Task GivenPoliciesExist_WhenGetPolicies_ThenReturnPolicies()
     {
@@ -96,7 +96,7 @@ public class PolicyTests : TestBase
         Assert.That(policies, Is.Not.Null);
         Assert.That(policies, Has.Count.EqualTo(2));
     }
-    
+
     [Test]
     public async Task GivenNoPoliciesExist_WhenGetPolicies_ThenReturnEmptyList()
     {
@@ -116,7 +116,7 @@ public class PolicyTests : TestBase
         Assert.That(policies, Is.Not.Null);
         Assert.That(policies, Has.Count.EqualTo(0));
     }
-    
+
     [Test]
     public async Task GivenPoliciesExist_WhenGetPoliciesBySmartMeterId_ThenReturnPolicies()
     {
@@ -142,7 +142,7 @@ public class PolicyTests : TestBase
         Assert.That(policies, Is.Not.Null);
         Assert.That(policies, Has.Count.EqualTo(2));
     }
-    
+
     [Test]
     public async Task GivenNoPoliciesExist_WhenGetPoliciesBySmartMeterId_ThenReturnEmptyList()
     {

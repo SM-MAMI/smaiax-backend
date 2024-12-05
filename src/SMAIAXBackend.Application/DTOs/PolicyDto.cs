@@ -18,6 +18,6 @@ public class PolicyDto(
 
     public static PolicyDto FromPolicy(Policy policy)
     {
-        return new PolicyDto(policy.Id.Id,policy.Name, policy.MeasurementResolution, policy.LocationResolution, policy.Price);
+        return new PolicyDto(policy.Id.Id, policy.Name, policy.MeasurementResolution, policy.LocationResolution, policy.Price);
     }
 }
