@@ -12,8 +12,8 @@ using SMAIAXBackend.Infrastructure.DbContexts;
 namespace SMAIAXBackend.Infrastructure.Migrations.TenantDb
 {
     [DbContext(typeof(TenantDbContext))]
-    [Migration("20241205083217_AddIndexOnTimestampInMeasurement")]
-    partial class AddIndexOnTimestampInMeasurement
+    [Migration("20241207230414_AddIndexRemoveDataInMeasurement")]
+    partial class AddIndexRemoveDataInMeasurement
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -27,9 +27,41 @@ namespace SMAIAXBackend.Infrastructure.Migrations.TenantDb
 
             modelBuilder.Entity("SMAIAXBackend.Domain.Model.Entities.Measurement", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
+                    b.Property<double>("CurrentPhase1")
+                        .HasColumnType("double precision")
+                        .HasColumnName("currentPhase1");
+
+                    b.Property<double>("CurrentPhase2")
+                        .HasColumnType("double precision")
+                        .HasColumnName("currentPhase2");
+
+                    b.Property<double>("CurrentPhase3")
+                        .HasColumnType("double precision")
+                        .HasColumnName("currentPhase3");
+
+                    b.Property<double>("NegativeActiveEnergyTotal")
+                        .HasColumnType("double precision")
+                        .HasColumnName("negativeActiveEnergyTotal");
+
+                    b.Property<double>("NegativeActivePower")
+                        .HasColumnType("double precision")
+                        .HasColumnName("negativeActivePower");
+
+                    b.Property<double>("PositiveActiveEnergyTotal")
+                        .HasColumnType("double precision")
+                        .HasColumnName("positiveActiveEnergyTotal");
+
+                    b.Property<double>("PositiveActivePower")
+                        .HasColumnType("double precision")
+                        .HasColumnName("positiveActivePower");
+
+                    b.Property<double>("ReactiveEnergyQuadrant1Total")
+                        .HasColumnType("double precision")
+                        .HasColumnName("reactiveEnergyQuadrant1Total");
+
+                    b.Property<double>("ReactiveEnergyQuadrant3Total")
+                        .HasColumnType("double precision")
+                        .HasColumnName("reactiveEnergyQuadrant3Total");
 
                     b.Property<Guid>("SmartMeterId")
                         .HasColumnType("uuid")
@@ -39,17 +71,32 @@ namespace SMAIAXBackend.Infrastructure.Migrations.TenantDb
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("timestamp");
 
-                    b.HasKey("Id")
-                        .HasName("pK_Measurement");
+                    b.Property<double>("TotalPower")
+                        .HasColumnType("double precision")
+                        .HasColumnName("totalPower");
+
+                    b.Property<string>("Uptime")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("uptime");
+
+                    b.Property<double>("VoltagePhase1")
+                        .HasColumnType("double precision")
+                        .HasColumnName("voltagePhase1");
+
+                    b.Property<double>("VoltagePhase2")
+                        .HasColumnType("double precision")
+                        .HasColumnName("voltagePhase2");
+
+                    b.Property<double>("VoltagePhase3")
+                        .HasColumnType("double precision")
+                        .HasColumnName("voltagePhase3");
 
                     b.HasIndex("Timestamp")
+                        .IsDescending()
                         .HasDatabaseName("iX_Measurement_timestamp");
 
-                    b.ToTable("Measurement", "domain", t =>
-                        {
-                            t.Property("Timestamp")
-                                .HasColumnName("measurement_timestamp");
-                        });
+                    b.ToTable("Measurement", "domain");
                 });
 
             modelBuilder.Entity("SMAIAXBackend.Domain.Model.Entities.Metadata", b =>
@@ -159,88 +206,6 @@ namespace SMAIAXBackend.Infrastructure.Migrations.TenantDb
                         .HasName("pK_SmartMeter");
 
                     b.ToTable("SmartMeter", "domain");
-                });
-
-            modelBuilder.Entity("SMAIAXBackend.Domain.Model.Entities.Measurement", b =>
-                {
-                    b.OwnsOne("SMAIAXBackend.Domain.Model.ValueObjects.MeasurementData", "Data", b1 =>
-                        {
-                            b1.Property<Guid>("MeasurementId")
-                                .HasColumnType("uuid")
-                                .HasColumnName("id");
-
-                            b1.Property<double>("CurrentPhase1")
-                                .HasColumnType("double precision")
-                                .HasColumnName("currentPhase1");
-
-                            b1.Property<double>("CurrentPhase2")
-                                .HasColumnType("double precision")
-                                .HasColumnName("currentPhase2");
-
-                            b1.Property<double>("CurrentPhase3")
-                                .HasColumnType("double precision")
-                                .HasColumnName("currentPhase3");
-
-                            b1.Property<double>("NegativeActiveEnergyTotal")
-                                .HasColumnType("double precision")
-                                .HasColumnName("negativeActiveEnergyTotal");
-
-                            b1.Property<double>("NegativeActivePower")
-                                .HasColumnType("double precision")
-                                .HasColumnName("negativeActivePower");
-
-                            b1.Property<double>("PositiveActiveEnergyTotal")
-                                .HasColumnType("double precision")
-                                .HasColumnName("positiveActiveEnergyTotal");
-
-                            b1.Property<double>("PositiveActivePower")
-                                .HasColumnType("double precision")
-                                .HasColumnName("positiveActivePower");
-
-                            b1.Property<double>("ReactiveEnergyQuadrant1Total")
-                                .HasColumnType("double precision")
-                                .HasColumnName("reactiveEnergyQuadrant1Total");
-
-                            b1.Property<double>("ReactiveEnergyQuadrant3Total")
-                                .HasColumnType("double precision")
-                                .HasColumnName("reactiveEnergyQuadrant3Total");
-
-                            b1.Property<DateTime>("Timestamp")
-                                .HasColumnType("timestamp with time zone")
-                                .HasColumnName("timestamp");
-
-                            b1.Property<double>("TotalPower")
-                                .HasColumnType("double precision")
-                                .HasColumnName("totalPower");
-
-                            b1.Property<string>("Uptime")
-                                .IsRequired()
-                                .HasColumnType("text")
-                                .HasColumnName("uptime");
-
-                            b1.Property<double>("VoltagePhase1")
-                                .HasColumnType("double precision")
-                                .HasColumnName("voltagePhase1");
-
-                            b1.Property<double>("VoltagePhase2")
-                                .HasColumnType("double precision")
-                                .HasColumnName("voltagePhase2");
-
-                            b1.Property<double>("VoltagePhase3")
-                                .HasColumnType("double precision")
-                                .HasColumnName("voltagePhase3");
-
-                            b1.HasKey("MeasurementId");
-
-                            b1.ToTable("Measurement", "domain");
-
-                            b1.WithOwner()
-                                .HasForeignKey("MeasurementId")
-                                .HasConstraintName("fK_Measurement_Measurement_id");
-                        });
-
-                    b.Navigation("Data")
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("SMAIAXBackend.Domain.Model.Entities.Metadata", b =>
