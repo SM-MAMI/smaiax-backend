@@ -51,7 +51,7 @@ internal static class IntegrationTestSetup
         const string superUserPassword = "password";
         const string databaseName = "smaiax-db";
         _postgresContainer = new PostgreSqlBuilder()
-            .WithImage("postgres:16-bullseye")
+            .WithImage("timescale/timescaledb:latest-pg16")
             .WithName(postgresContainerName)
             .WithUsername(superUserName)
             .WithPassword(superUserPassword)

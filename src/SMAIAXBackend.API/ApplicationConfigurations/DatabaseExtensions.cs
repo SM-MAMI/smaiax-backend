@@ -39,10 +39,9 @@ public static class DatabaseExtensions
             var tenantContextService = serviceProvider.GetRequiredService<ITenantContextService>();
             var tenantDbContextFactory = serviceProvider.GetRequiredService<ITenantDbContextFactory>();
             var currentTenant = tenantContextService.GetCurrentTenantAsync().GetAwaiter().GetResult();
-            var connectionString = tenantDbContextFactory.GetConnectionStringForTenant(currentTenant).GetAwaiter().GetResult();
+            var connectionString = tenantDbContextFactory.GetConnectionStringForTenant(currentTenant).GetAwaiter()
+                .GetResult();
             options.UseNpgsql(connectionString);
-            //options.UseNpgsql("Host=localhost:5432;Username=user;Password=password;Database=tenant-template-db");
-
         });
     }
 }

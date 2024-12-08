@@ -1,5 +1,4 @@
 using SMAIAXBackend.Domain.Model.Entities;
-using SMAIAXBackend.Domain.Model.ValueObjects;
 using SMAIAXBackend.Domain.Model.ValueObjects.Ids;
 
 namespace SMAIAXBackend.Domain.UnitTests.Model;
@@ -11,21 +10,32 @@ public class MeasurementTests
     public void GivenMeasurementDetails_WhenCreateMeasurement_ThenDetailsEquals()
     {
         // Given
-        var measurementId = new MeasurementId(Guid.NewGuid());
         var timestamp = DateTime.UtcNow;
-        var measurementData = new MeasurementData(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "", timestamp);
         var smartMeterId = new SmartMeterId(Guid.NewGuid());
 
         // When
-        var measurement = Measurement.Create(measurementId, timestamp, measurementData, smartMeterId);
+        var measurement =
+            Measurement.Create(smartMeterId, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, "test", timestamp);
 
         // Then
         Assert.Multiple(() =>
         {
-            Assert.That(measurement.Id, Is.EqualTo(measurementId));
-            Assert.That(measurement.Timestamp, Is.EqualTo(timestamp));
-            Assert.That(measurement.Data, Is.EqualTo(measurementData));
             Assert.That(measurement.SmartMeterId, Is.EqualTo(smartMeterId));
+            Assert.That(measurement.PositiveActivePower, Is.EqualTo(1));
+            Assert.That(measurement.PositiveActiveEnergyTotal, Is.EqualTo(2));
+            Assert.That(measurement.NegativeActivePower, Is.EqualTo(3));
+            Assert.That(measurement.NegativeActiveEnergyTotal, Is.EqualTo(4));
+            Assert.That(measurement.ReactiveEnergyQuadrant1Total, Is.EqualTo(5));
+            Assert.That(measurement.ReactiveEnergyQuadrant3Total, Is.EqualTo(6));
+            Assert.That(measurement.TotalPower, Is.EqualTo(7));
+            Assert.That(measurement.CurrentPhase1, Is.EqualTo(8));
+            Assert.That(measurement.VoltagePhase1, Is.EqualTo(9));
+            Assert.That(measurement.CurrentPhase2, Is.EqualTo(10));
+            Assert.That(measurement.VoltagePhase2, Is.EqualTo(11));
+            Assert.That(measurement.CurrentPhase3, Is.EqualTo(12));
+            Assert.That(measurement.VoltagePhase3, Is.EqualTo(13));
+            Assert.That(measurement.Uptime, Is.EqualTo("test"));
+            Assert.That(measurement.Timestamp, Is.EqualTo(timestamp));
         });
     }
 }

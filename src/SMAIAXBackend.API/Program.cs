@@ -1,8 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
-using Microsoft.EntityFrameworkCore;
-
 using SMAIAXBackend.API.ApplicationConfigurations;
 using SMAIAXBackend.API.Endpoints.Authentication;
 using SMAIAXBackend.API.Endpoints.Policy;

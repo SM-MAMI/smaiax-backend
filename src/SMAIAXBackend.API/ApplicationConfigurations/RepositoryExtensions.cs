@@ -12,12 +12,13 @@ public static class RepositoryExtensions
 {
     public static void AddRepositoryConfigurations(this IServiceCollection services)
     {
-        services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IMeasurementRepository, MeasurementRepository>();
+        services.AddScoped<IPolicyRepository, PolicyRepository>();
+        services.AddScoped<IPolicyRequestRepository, PolicyRequestRepository>();
+        services.AddScoped<ITenantRepository, TenantRepository>();
         services.AddScoped<ITokenRepository, TokenRepository>();
         services.AddScoped<ITransactionManager, TransactionManager>();
         services.AddScoped<ISmartMeterRepository, SmartMeterRepository>();
-        services.AddScoped<ITenantRepository, TenantRepository>();
-        services.AddScoped<IPolicyRepository, PolicyRepository>();
-        services.AddScoped<IPolicyRequestRepository, PolicyRequestRepository>();
+        services.AddScoped<IUserRepository, UserRepository>();
     }
 }
