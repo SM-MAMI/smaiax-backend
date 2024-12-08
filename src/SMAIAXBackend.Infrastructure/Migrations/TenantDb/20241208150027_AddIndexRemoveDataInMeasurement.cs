@@ -27,6 +27,12 @@ namespace SMAIAXBackend.Infrastructure.Migrations.TenantDb
                 table: "Measurement");
 
             migrationBuilder.CreateIndex(
+                name: "iX_Measurement_smartMeterId",
+                schema: "domain",
+                table: "Measurement",
+                column: "smartMeterId");
+
+            migrationBuilder.CreateIndex(
                 name: "iX_Measurement_timestamp",
                 schema: "domain",
                 table: "Measurement",
@@ -37,6 +43,11 @@ namespace SMAIAXBackend.Infrastructure.Migrations.TenantDb
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropIndex(
+                name: "iX_Measurement_smartMeterId",
+                schema: "domain",
+                table: "Measurement");
+
             migrationBuilder.DropIndex(
                 name: "iX_Measurement_timestamp",
                 schema: "domain",

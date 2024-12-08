@@ -89,6 +89,9 @@ namespace SMAIAXBackend.Infrastructure.Migrations.TenantDb
                         .HasColumnType("double precision")
                         .HasColumnName("voltagePhase3");
 
+                    b.HasIndex("SmartMeterId")
+                        .HasDatabaseName("iX_Measurement_smartMeterId");
+
                     b.HasIndex("Timestamp")
                         .IsDescending()
                         .HasDatabaseName("iX_Measurement_timestamp");

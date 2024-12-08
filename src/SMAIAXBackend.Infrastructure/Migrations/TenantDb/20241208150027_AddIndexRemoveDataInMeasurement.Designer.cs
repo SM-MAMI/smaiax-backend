@@ -12,8 +12,8 @@ using SMAIAXBackend.Infrastructure.DbContexts;
 namespace SMAIAXBackend.Infrastructure.Migrations.TenantDb
 {
     [DbContext(typeof(TenantDbContext))]
-    [Migration("20241207234445_MeasurementToHypertable")]
-    partial class MeasurementToHypertable
+    [Migration("20241208150027_AddIndexRemoveDataInMeasurement")]
+    partial class AddIndexRemoveDataInMeasurement
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -91,6 +91,9 @@ namespace SMAIAXBackend.Infrastructure.Migrations.TenantDb
                     b.Property<double>("VoltagePhase3")
                         .HasColumnType("double precision")
                         .HasColumnName("voltagePhase3");
+
+                    b.HasIndex("SmartMeterId")
+                        .HasDatabaseName("iX_Measurement_smartMeterId");
 
                     b.HasIndex("Timestamp")
                         .IsDescending()

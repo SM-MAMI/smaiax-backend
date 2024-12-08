@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -12,13 +11,16 @@ namespace SMAIAXBackend.Infrastructure.Migrations.TenantDb
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.Sql(
-                "SELECT CREATE_HYPERTABLE('domain.\"Measurement\"', by_range('timestamp'), if_not_exists => TRUE);");
+                "SELECT CREATE_HYPERTABLE('domain.\"Measurement\"', 'timestamp');");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-
+            migrationBuilder.Sql(
+                @"CREATE TABLE domain.""Measurement_New"" AS SELECT * FROM domain.""Measurement"";
+                  DROP TABLE domain.""Measurement"";
+                  ALTER TABLE domain.""Measurement_New"" rename to domain.""Measurement"";");
         }
     }
 }

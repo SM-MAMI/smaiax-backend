@@ -41,5 +41,6 @@ public class MeasurementConfiguration : IEntityTypeConfiguration<Measurement>
                 v => v.Id,
                 v => new SmartMeterId(v))
             .IsRequired();
+        builder.HasIndex(m => m.SmartMeterId);
     }
 }
