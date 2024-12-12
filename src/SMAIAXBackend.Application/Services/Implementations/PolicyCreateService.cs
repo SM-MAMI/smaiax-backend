@@ -26,6 +26,13 @@ public class PolicyCreateService(
             throw new SmartMeterNotFoundException(policyCreateDto.SmartMeterId);
         }
 
+        
+        if (string.IsNullOrEmpty(policyCreateDto.Name))
+        {
+            logger.LogWarning("PolicyCreateDto name is null.");
+            throw new PolicyNameMissingException();
+        }
+        
         var latestMetadata = smartMeter.Metadata.OrderByDescending(m => m.ValidFrom).FirstOrDefault();
 
         if (!IsLocationValidForResolution(latestMetadata, policyCreateDto.LocationResolution))
