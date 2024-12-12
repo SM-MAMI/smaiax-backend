@@ -42,6 +42,7 @@ public class ExceptionHandlerMiddleware : IExceptionHandler
                 problemDetails.Status = StatusCodes.Status409Conflict;
                 problemDetails.Title = "Conflict";
                 break;
+            case ArgumentException:
             case MetadataIdMismatchException:
             case SmartMeterIdMismatchException:
             case InsufficientLocationDataException:

@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 
 using SMAIAXBackend.API.ApplicationConfigurations;
 using SMAIAXBackend.API.Endpoints.Authentication;
+using SMAIAXBackend.API.Endpoints.Measurement;
 using SMAIAXBackend.API.Endpoints.Policy;
 using SMAIAXBackend.API.Endpoints.PolicyRequest;
 using SMAIAXBackend.API.Endpoints.SmartMeter;
@@ -41,7 +42,7 @@ if (builder.Environment.IsDevelopment() || builder.Environment.IsEnvironment("Do
         options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
     });
 
-    builder.Configuration.AddJsonFile("Properties/launchSettings.json", optional: true, reloadOnChange: true);
+    builder.Configuration.AddJsonFile("Properties/launchSettings.json", true, true);
     builder.Services.AddSwaggerConfigurations(builder.Configuration);
 
     builder.Services.AddCors(options =>
@@ -95,7 +96,8 @@ app.UseExceptionHandler();
 app.MapAuthenticationEndpoints()
     .MapSmartMeterEndpoints()
     .MapPolicyEndpoints()
-    .MapPolicyRequestEndpoints();
+    .MapPolicyRequestEndpoints()
+    .MapMeasurementEndpoints();
 
 await app.RunAsync();
 
