@@ -10,7 +10,7 @@ public class MeasurementRepositoryTests : TestBase
     {
         // Given
         var smartMeterId = new SmartMeterId(Guid.Parse("5e9db066-1b47-46cc-bbde-0b54c30167cd"));
-        var startAt = DateTime.UtcNow.AddDays(-1);
+        var startAt = DateTime.UtcNow.AddDays(-2);
         var endAt = DateTime.UtcNow;
 
         // When
