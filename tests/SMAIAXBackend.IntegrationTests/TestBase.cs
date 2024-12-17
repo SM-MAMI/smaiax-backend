@@ -180,7 +180,7 @@ public class TestBase
         await _tenant1DbContext.SmartMeters.AddAsync(smartMeter1);
         await _tenant1DbContext.SmartMeters.AddAsync(smartMeter2);
         // can't be inserted via "AddAsync".
-        await _tenant1DbContext.Database.ExecuteSqlRawAsync(
+        await _tenant1DbContext.Database.ExecuteSqlAsync(
             $@"INSERT INTO domain.""Measurement"" VALUES 
                                        (160, 1137778, 0, 0, 3837, 717727, 160, 1.03, 229.80, 0.42, 229.00, 0.17, 229.60,
                                         '0000:01:49:41', '{DateTime.UtcNow:yyyy-MM-dd HH:mm:ss}', '{smartMeter1.Id}');");
