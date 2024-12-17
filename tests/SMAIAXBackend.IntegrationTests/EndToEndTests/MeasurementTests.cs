@@ -69,8 +69,11 @@ public class MeasurementTests : TestBase
         // Then
         Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
         var responseContent = await response.Content.ReadFromJsonAsync<ProblemDetails>();
-        Assert.That(responseContent?.Detail, Is.Not.Null);
-        Assert.That(responseContent.Detail, Is.EqualTo("StartAt must be less than or equal to endAt."));
+        Assert.Multiple(() =>
+        {
+            Assert.That(responseContent?.Detail, Is.Not.Null);
+            Assert.That(responseContent!.Detail, Is.EqualTo("StartAt must be less than or equal to endAt."));
+        });
     }
 
     [Test]
@@ -90,8 +93,11 @@ public class MeasurementTests : TestBase
         // Then
         Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
         var responseContent = await response.Content.ReadFromJsonAsync<ProblemDetails>();
-        Assert.That(responseContent?.Detail, Is.Not.Null);
-        Assert.That(responseContent.Detail, Is.EqualTo(expectedDetails));
+        Assert.Multiple(() =>
+        {
+            Assert.That(responseContent?.Detail, Is.Not.Null);
+            Assert.That(responseContent!.Detail, Is.EqualTo(expectedDetails));
+        });
     }
 
     [Test]
