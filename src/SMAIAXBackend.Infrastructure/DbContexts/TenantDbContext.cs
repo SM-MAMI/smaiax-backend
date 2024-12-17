@@ -42,6 +42,7 @@ public class TenantDbContext(DbContextOptions<TenantDbContext> options) : DbCont
 
         await SmartMeters.AddAsync(smartMeter1);
         await SmartMeters.AddAsync(smartMeter2);
+        // Can't be inserted via "AddAsync".
         await Database.ExecuteSqlRawAsync(
             $@"INSERT INTO domain.""Measurement"" VALUES 
                                        (160, 1137778, 0, 0, 3837, 717727, 160, 1.03, 229.80, 0.42, 229.00, 0.17, 229.60,

@@ -1,7 +1,6 @@
 using SMAIAXBackend.Application.DTOs;
 using SMAIAXBackend.Application.Exceptions;
 using SMAIAXBackend.Application.Services.Interfaces;
-using SMAIAXBackend.Domain.Model.Entities;
 using SMAIAXBackend.Domain.Model.ValueObjects.Ids;
 using SMAIAXBackend.Domain.Repositories;
 
@@ -11,19 +10,22 @@ public class MeasurementListService(
     IMeasurementRepository measurementRepository,
     ISmartMeterRepository smartMeterRepository) : IMeasurementListService
 {
-    public async Task<List<MeasurementRawDto>> GetFilteredMeasurementsByTenantAndSmartMeterAsync(
-        Guid smartMeterId, DateTime? startAt = null,
-        DateTime? endAt = null)
+    public async Task<List<MeasurementRawDto>> GetMeasurementsBySmartMeterAsync(
+        Guid smartMeterId, DateTime startAt, DateTime endAt)
     {
-        SmartMeterId smId = new SmartMeterId(smartMeterId);
-        SmartMeter? smartMeter = await smartMeterRepository.GetSmartMeterByIdAsync(smId);
+        var smId = new SmartMeterId(smartMeterId);
+        var smartMeter = await smartMeterRepository.GetSmartMeterByIdAsync(smId);
         if (smartMeter == null)
         {
             throw new SmartMeterNotFoundException(smartMeterId);
         }
 
-        var measurements =
-            await measurementRepository.GetMeasurementsByTenantAndSmartMeterAsync(smId, startAt, endAt);
+        if (endAt < startAt)
+        {
+            throw new InvalidTimeRangeException("StartAt must be less than or equal to endAt.");
+        }
+
+        var measurements = await measurementRepository.GetMeasurementsBySmartMeterAsync(smId, startAt, endAt);
         return measurements.Select(MeasurementRawDto.FromMeasurement).ToList();
     }
 }

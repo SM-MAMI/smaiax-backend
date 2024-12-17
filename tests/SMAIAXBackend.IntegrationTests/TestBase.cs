@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 using SMAIAXBackend.Domain.Model.Entities;
 using SMAIAXBackend.Domain.Model.Enums;
@@ -16,6 +17,7 @@ public class TestBase
     protected readonly TenantDbContext _tenant1DbContext = IntegrationTestSetup.Tenant1DbContext;
     protected readonly TenantDbContext _tenant2DbContext = IntegrationTestSetup.Tenant2DbContext;
     protected readonly ISmartMeterRepository _smartMeterRepository = IntegrationTestSetup.SmartMeterRepository;
+    protected readonly IMeasurementRepository _measurementRepository = IntegrationTestSetup.MeasurementRepository;
     protected readonly IPolicyRepository _policyRepository = IntegrationTestSetup.PolicyRepository;
     protected readonly IPolicyRequestRepository _policyRequestRepository = IntegrationTestSetup.PolicyRequestRepository;
     protected readonly IUserRepository _userRepository = IntegrationTestSetup.UserRepository;
@@ -67,7 +69,8 @@ public class TestBase
 
         var johnDoeTenantId = new TenantId(Guid.Parse("f4c70232-6715-4c15-966f-bf4bcef46d39"));
         var johnDoeTenant = Tenant.Create(johnDoeTenantId, "tenant_1_role", "tenant_1_db");
-        var johnDoeDomainUser = User.Create(johnDoeUserId, new Name("John", "Doe"), johnDoeUserName, johnDoeEmail, johnDoeTenantId);
+        var johnDoeDomainUser = User.Create(johnDoeUserId, new Name("John", "Doe"), johnDoeUserName, johnDoeEmail,
+            johnDoeTenantId);
 
         var janeDoeUserId = new UserId(Guid.Parse("4d07065a-b964-44a9-9cdf-fbd49d755ea8"));
         const string janeDoeUserName = "janedoe";
@@ -86,7 +89,8 @@ public class TestBase
 
         var janeDoeTenantId = new TenantId(Guid.Parse("e4c70232-6715-4c15-966f-bf4bcef46d40"));
         var janeDoeTenant = Tenant.Create(janeDoeTenantId, "tenant_2_role", "tenant_2_db");
-        var janeDoeDomainUser = User.Create(janeDoeUserId, new Name("Jane", "Doe"), janeDoeUserName, janeDoeEmail, janeDoeTenantId);
+        var janeDoeDomainUser = User.Create(janeDoeUserId, new Name("Jane", "Doe"), janeDoeUserName, janeDoeEmail,
+            janeDoeTenantId);
 
         // Valid refresh token
         const string jwtId = "19f77b2e-e485-4031-8506-62f6d3b69e4d";
@@ -145,7 +149,8 @@ public class TestBase
         var smartMeter1 = SmartMeter.Create(new SmartMeterId(Guid.Parse("5e9db066-1b47-46cc-bbde-0b54c30167cd")),
             "Smart Meter 1", []);
         var smartMeter2 = SmartMeter.Create(smartMeter2Id, "Smart Meter 2", [smartMeter2Metadata]);
-        var policyRequest = PolicyRequest.Create(new PolicyRequestId(Guid.Parse("58af578c-9975-4633-8dfe-ff8b70b83661")),
+        var policyRequest = PolicyRequest.Create(
+            new PolicyRequestId(Guid.Parse("58af578c-9975-4633-8dfe-ff8b70b83661")),
             false, new PolicyFilter(MeasurementResolution.Hour, 1, 10, [],
                 LocationResolution.State, 500));
 
@@ -159,7 +164,7 @@ public class TestBase
         var policy1 = Policy.Create(new PolicyId(Guid.Parse("f4c70232-6715-4c15-966f-bf4bcef46d39")), "policy1",
             MeasurementResolution.Hour, LocationResolution.Country, 500, smartMeter3Id);
         var policy2 = Policy.Create(new PolicyId(Guid.Parse("a4c70232-6715-4c15-966f-bf4bcef46d40")), "policy2",
-                MeasurementResolution.Minute, LocationResolution.City, 1000, smartMeter3Id);
+            MeasurementResolution.Minute, LocationResolution.City, 1000, smartMeter3Id);
 
 
         await _applicationDbContext.Tenants.AddAsync(johnDoeTenant);
@@ -174,6 +179,11 @@ public class TestBase
         await _applicationDbContext.RefreshTokens.AddAsync(refreshToken4);
         await _tenant1DbContext.SmartMeters.AddAsync(smartMeter1);
         await _tenant1DbContext.SmartMeters.AddAsync(smartMeter2);
+        // can't be inserted via "AddAsync".
+        await _tenant1DbContext.Database.ExecuteSqlRawAsync(
+            $@"INSERT INTO domain.""Measurement"" VALUES 
+                                       (160, 1137778, 0, 0, 3837, 717727, 160, 1.03, 229.80, 0.42, 229.00, 0.17, 229.60,
+                                        '0000:01:49:41', '{DateTime.UtcNow:yyyy-MM-dd HH:mm:ss}', '{smartMeter1.Id}');");
         await _tenant1DbContext.PolicyRequests.AddAsync(policyRequest);
         await _tenant2DbContext.SmartMeters.AddAsync(smartMeter3);
         await _tenant2DbContext.Policies.AddAsync(policy1);

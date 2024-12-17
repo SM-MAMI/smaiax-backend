@@ -10,11 +10,9 @@ public static class GetMeasurementsEndpoint
 {
     public static async Task<Ok<List<MeasurementRawDto>>> Handle(IMeasurementListService measurementListService,
         [FromQuery] Guid smartMeterId,
-        [FromQuery] DateTime? startAt, [FromQuery] DateTime? endAt)
+        [FromQuery] DateTime startAt, [FromQuery] DateTime endAt)
     {
-        var measurements =
-            await measurementListService.GetFilteredMeasurementsByTenantAndSmartMeterAsync(
-                smartMeterId, startAt, endAt);
+        var measurements = await measurementListService.GetMeasurementsBySmartMeterAsync(smartMeterId, startAt, endAt);
 
         return TypedResults.Ok(measurements);
     }
