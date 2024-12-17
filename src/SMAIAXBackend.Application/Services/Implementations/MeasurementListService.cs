@@ -22,7 +22,7 @@ public class MeasurementListService(
 
         if (endAt < startAt)
         {
-            throw new InvalidTimeRangeException("StartAt must be less than or equal to endAt.");
+            throw new InvalidTimeRangeException();
         }
 
         var measurements = await measurementRepository.GetMeasurementsBySmartMeterAsync(smId, startAt, endAt);
