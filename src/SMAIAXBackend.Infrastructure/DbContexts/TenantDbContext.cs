@@ -39,6 +39,17 @@ public class TenantDbContext(DbContextOptions<TenantDbContext> options) : DbCont
         var smartMeter1 = SmartMeter.Create(smartMeter1Id, "Smart Meter 1", [metadata]);
         var smartMeter2 = SmartMeter.Create(new SmartMeterId(Guid.NewGuid()), "Smart Meter 2", []);
 
+        var policy = Policy.Create(new PolicyId(Guid.NewGuid()), "policy1", MeasurementResolution.Hour,
+            LocationResolution.None, 100, smartMeter1Id);
+        var policy2 = Policy.Create(new PolicyId(Guid.NewGuid()), "policy2", MeasurementResolution.Day,
+            LocationResolution.StreetName, 999, smartMeter1Id);
+        var policy3 = Policy.Create(new PolicyId(Guid.NewGuid()), "policy3", MeasurementResolution.Raw,
+            LocationResolution.Continent, 1999, smartMeter1Id);
+
+        await Policies.AddAsync(policy);
+        await Policies.AddAsync(policy2);
+        await Policies.AddAsync(policy3);
+
         await SmartMeters.AddAsync(smartMeter1);
         await SmartMeters.AddAsync(smartMeter2);
         await SaveChangesAsync();
