@@ -20,7 +20,24 @@ public class MeasurementRepositoryTests : TestBase
         // Then
         Assert.That(measurementsActual, Is.Not.Null);
         Assert.That(measurementsActual, Has.Count.EqualTo(1));
-        Assert.That(measurementsActual.First().SmartMeterId, Is.EqualTo(smartMeterId));
+        Assert.That(measurementsActual[0].SmartMeterId, Is.EqualTo(smartMeterId));
+    }
+
+    [Test]
+    public async Task GivenUnknownSmartMeterId_WhenGetMeasurements_ThenMeasurementsAreEmpty()
+    {
+        // Given
+        var smartMeterId = new SmartMeterId(Guid.Parse("6f064ac0-f14f-448e-969e-0f5b2884b631"));
+        var startAt = DateTime.UtcNow.AddDays(-1);
+        var endAt = DateTime.UtcNow;
+
+        // When
+        var measurementsActual =
+            await _measurementRepository.GetMeasurementsBySmartMeterAsync(smartMeterId, startAt, endAt);
+
+        // Then
+        Assert.That(measurementsActual, Is.Not.Null);
+        Assert.That(measurementsActual, Is.Empty);
     }
 
     [Test]
