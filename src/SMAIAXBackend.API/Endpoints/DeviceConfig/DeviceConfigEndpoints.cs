@@ -9,16 +9,16 @@ public static class  DeviceConfigEndpoints
     {
         const string contentType = "application/json";
         var group = app.MapGroup("/api/deviceConfig")
-            .WithTags("Policy")
+            .WithTags("DeviceConfig")
             .RequireAuthorization();
 
-        // group.MapPost("/", CreatePolicyEndpoint.Handle)
-        //     .WithName("createPolicy")
-        //     .Accepts<PolicyCreateDto>(contentType)
-        //     .Produces<Guid>(StatusCodes.Status200OK, contentType)
-        //     .ProducesProblem(StatusCodes.Status400BadRequest)
-        //     .ProducesProblem(StatusCodes.Status401Unauthorized)
-        //     .ProducesProblem(StatusCodes.Status500InternalServerError);
+        group.MapGet("/", GetDeviceConfigEndpoint.Handle)
+            .WithName("getDeviceConfig")
+            .Produces<List<PolicyDto>>(StatusCodes.Status200OK, contentType)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .ProducesProblem(StatusCodes.Status500InternalServerError);
 
         return app;
     }

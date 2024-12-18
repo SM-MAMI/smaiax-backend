@@ -9,11 +9,10 @@ namespace SMAIAXBackend.API.Endpoints.DeviceConfig;
 public static class GetDeviceConfigEndpoint
 {
     public static async Task<Ok<DeviceConfigDto>> Handle(
-        ISmartMeterListService smartMeterListService,
-        [FromRoute] Guid id)
+        IDeviceConfigListService deviceConfigListService,
+        [FromQuery] Guid id)
     {
-        var smartMeter = await smartMeterListService.GetSmartMeterByIdAsync(id);
-
-        return TypedResults.Ok(smartMeter);
+        var deviceConfig = await deviceConfigListService.GetDeviceConfigByDeviceIdAsync(id);
+        return TypedResults.Ok(deviceConfig);
     }
 }

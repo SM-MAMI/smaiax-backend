@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 using SMAIAXBackend.API.ApplicationConfigurations;
 using SMAIAXBackend.API.Endpoints.Authentication;
+using SMAIAXBackend.API.Endpoints.DeviceConfig;
 using SMAIAXBackend.API.Endpoints.Policy;
 using SMAIAXBackend.API.Endpoints.PolicyRequest;
 using SMAIAXBackend.API.Endpoints.SmartMeter;
@@ -97,6 +98,7 @@ app.UseExceptionHandler();
 app.MapAuthenticationEndpoints()
     .MapSmartMeterEndpoints()
     .MapPolicyEndpoints()
+    .MapDeviceConfigEndpoints()
     .MapPolicyRequestEndpoints();
 
 await app.RunAsync();

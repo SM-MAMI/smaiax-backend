@@ -97,7 +97,7 @@ public class VaultRepository : IVaultRepository
         await _vaultClient.V1.Secrets.KeyValue.V2.WriteSecretAsync(path, secrets, mountPoint: KeyValueSecretsMountPoint);
     }
 
-    public async Task<(string Username, string Password, string Topic)> GetMqttBrokerCredentialsAsync(SmartMeterId smartMeterId)
+    public async Task<(string? Username, string? Password, string? Topic)> GetMqttBrokerCredentialsAsync(SmartMeterId smartMeterId)
     {
         var path = $"mqtt/{smartMeterId.Id}";
         var secret = await _vaultClient.V1.Secrets.KeyValue.V2.ReadSecretAsync(path, mountPoint: KeyValueSecretsMountPoint);
@@ -105,6 +105,6 @@ public class VaultRepository : IVaultRepository
         secret.Data.Data.TryGetValue("username", out var username);
         secret.Data.Data.TryGetValue("password", out var password);
         
-        return (username.ToString(), password.ToString(), topic.ToString());
+        return (username?.ToString(), password?.ToString(), topic?.ToString());
     }
 }

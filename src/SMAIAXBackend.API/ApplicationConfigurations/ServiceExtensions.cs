@@ -20,5 +20,6 @@ public static class ServiceExtensions
         services.AddScoped<IPolicyRequestCreateService, PolicyRequestCreateService>();
         services.AddScoped<IPolicyMatchingService, PolicyMatchingService>();
         services.AddScoped<IPolicyListService, PolicyListService>();
+        services.AddScoped<IDeviceConfigListService, DeviceConfigListService>();
     }
 }
