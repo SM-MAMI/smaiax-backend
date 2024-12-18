@@ -1,4 +1,7 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+
+using Npgsql;
 
 using SMAIAXBackend.Domain.Model.Entities;
 using SMAIAXBackend.Domain.Model.Enums;
@@ -16,6 +19,7 @@ public class TestBase
     protected readonly TenantDbContext _tenant1DbContext = IntegrationTestSetup.Tenant1DbContext;
     protected readonly TenantDbContext _tenant2DbContext = IntegrationTestSetup.Tenant2DbContext;
     protected readonly ISmartMeterRepository _smartMeterRepository = IntegrationTestSetup.SmartMeterRepository;
+    protected readonly IMeasurementRepository _measurementRepository = IntegrationTestSetup.MeasurementRepository;
     protected readonly IPolicyRepository _policyRepository = IntegrationTestSetup.PolicyRepository;
     protected readonly IPolicyRequestRepository _policyRequestRepository = IntegrationTestSetup.PolicyRequestRepository;
     protected readonly IUserRepository _userRepository = IntegrationTestSetup.UserRepository;
@@ -67,7 +71,8 @@ public class TestBase
 
         var johnDoeTenantId = new TenantId(Guid.Parse("f4c70232-6715-4c15-966f-bf4bcef46d39"));
         var johnDoeTenant = Tenant.Create(johnDoeTenantId, "tenant_1_role", "tenant_1_db");
-        var johnDoeDomainUser = User.Create(johnDoeUserId, new Name("John", "Doe"), johnDoeUserName, johnDoeEmail, johnDoeTenantId);
+        var johnDoeDomainUser = User.Create(johnDoeUserId, new Name("John", "Doe"), johnDoeUserName, johnDoeEmail,
+            johnDoeTenantId);
 
         var janeDoeUserId = new UserId(Guid.Parse("4d07065a-b964-44a9-9cdf-fbd49d755ea8"));
         const string janeDoeUserName = "janedoe";
@@ -86,7 +91,8 @@ public class TestBase
 
         var janeDoeTenantId = new TenantId(Guid.Parse("e4c70232-6715-4c15-966f-bf4bcef46d40"));
         var janeDoeTenant = Tenant.Create(janeDoeTenantId, "tenant_2_role", "tenant_2_db");
-        var janeDoeDomainUser = User.Create(janeDoeUserId, new Name("Jane", "Doe"), janeDoeUserName, janeDoeEmail, janeDoeTenantId);
+        var janeDoeDomainUser = User.Create(janeDoeUserId, new Name("Jane", "Doe"), janeDoeUserName, janeDoeEmail,
+            janeDoeTenantId);
 
         // Valid refresh token
         const string jwtId = "19f77b2e-e485-4031-8506-62f6d3b69e4d";
@@ -145,7 +151,8 @@ public class TestBase
         var smartMeter1 = SmartMeter.Create(new SmartMeterId(Guid.Parse("5e9db066-1b47-46cc-bbde-0b54c30167cd")),
             "Smart Meter 1", []);
         var smartMeter2 = SmartMeter.Create(smartMeter2Id, "Smart Meter 2", [smartMeter2Metadata]);
-        var policyRequest = PolicyRequest.Create(new PolicyRequestId(Guid.Parse("58af578c-9975-4633-8dfe-ff8b70b83661")),
+        var policyRequest = PolicyRequest.Create(
+            new PolicyRequestId(Guid.Parse("58af578c-9975-4633-8dfe-ff8b70b83661")),
             false, new PolicyFilter(MeasurementResolution.Hour, 1, 10, [],
                 LocationResolution.State, 500));
 
@@ -159,7 +166,7 @@ public class TestBase
         var policy1 = Policy.Create(new PolicyId(Guid.Parse("f4c70232-6715-4c15-966f-bf4bcef46d39")), "policy1",
             MeasurementResolution.Hour, LocationResolution.Country, 500, smartMeter3Id);
         var policy2 = Policy.Create(new PolicyId(Guid.Parse("a4c70232-6715-4c15-966f-bf4bcef46d40")), "policy2",
-                MeasurementResolution.Minute, LocationResolution.City, 1000, smartMeter3Id);
+            MeasurementResolution.Minute, LocationResolution.City, 1000, smartMeter3Id);
 
 
         await _applicationDbContext.Tenants.AddAsync(johnDoeTenant);
@@ -182,5 +189,34 @@ public class TestBase
         await _applicationDbContext.SaveChangesAsync();
         await _tenant1DbContext.SaveChangesAsync();
         await _tenant2DbContext.SaveChangesAsync();
+
+        // can't be inserted via "AddAsync".
+        await _tenant1DbContext.Database.OpenConnectionAsync();
+        var sql = @"
+            INSERT INTO domain.""Measurement""(""positiveActivePower"", ""positiveActiveEnergyTotal"", ""negativeActivePower"", ""negativeActiveEnergyTotal"", ""reactiveEnergyQuadrant1Total"", ""reactiveEnergyQuadrant3Total"", ""totalPower"", ""currentPhase1"", ""voltagePhase1"", ""currentPhase2"", ""voltagePhase2"", ""currentPhase3"", ""voltagePhase3"", ""uptime"", ""timestamp"", ""smartMeterId"") 
+            VALUES (@positiveActivePower, @positiveActiveEnergyTotal, @negativeActivePower, @negativeActiveEnergyTotal, @reactiveEnergyQuadrant1Total, @reactiveEnergyQuadrant3Total, @totalPower, @currentPhase1, @voltagePhase1, @currentPhase2, @voltagePhase2, @currentPhase3, @voltagePhase3, @uptime, @timestamp, @smartMeterId);
+        ";
+        await using var insertCommand = _tenant1DbContext.Database.GetDbConnection().CreateCommand();
+        insertCommand.CommandText = sql;
+
+        insertCommand.Parameters.Add(new NpgsqlParameter("@positiveActivePower", 160));
+        insertCommand.Parameters.Add(new NpgsqlParameter("@positiveActiveEnergyTotal", 1137778));
+        insertCommand.Parameters.Add(new NpgsqlParameter("@negativeActivePower", 1));
+        insertCommand.Parameters.Add(new NpgsqlParameter("@negativeActiveEnergyTotal", 1));
+        insertCommand.Parameters.Add(new NpgsqlParameter("@reactiveEnergyQuadrant1Total", 3837));
+        insertCommand.Parameters.Add(new NpgsqlParameter("@reactiveEnergyQuadrant3Total", 717727));
+        insertCommand.Parameters.Add(new NpgsqlParameter("@totalPower", 160));
+        insertCommand.Parameters.Add(new NpgsqlParameter("@currentPhase1", 1.03));
+        insertCommand.Parameters.Add(new NpgsqlParameter("@voltagePhase1", 229.80));
+        insertCommand.Parameters.Add(new NpgsqlParameter("@currentPhase2", 0.42));
+        insertCommand.Parameters.Add(new NpgsqlParameter("@voltagePhase2", 229.00));
+        insertCommand.Parameters.Add(new NpgsqlParameter("@currentPhase3", 0.17));
+        insertCommand.Parameters.Add(new NpgsqlParameter("@voltagePhase3", 229.60));
+        insertCommand.Parameters.Add(new NpgsqlParameter("@uptime", "0000:01:49:41"));
+        insertCommand.Parameters.Add(new NpgsqlParameter("@timestamp", DateTime.UtcNow.AddDays(-1)));
+        insertCommand.Parameters.Add(new NpgsqlParameter("@smartMeterId", smartMeter1.Id.Id));
+
+        await insertCommand.ExecuteNonQueryAsync();
+        await _tenant1DbContext.Database.CloseConnectionAsync();
     }
 }

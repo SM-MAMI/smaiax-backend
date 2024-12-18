@@ -42,6 +42,7 @@ public class ExceptionHandlerMiddleware : IExceptionHandler
                 problemDetails.Status = StatusCodes.Status409Conflict;
                 problemDetails.Title = "Conflict";
                 break;
+            case InvalidTimeRangeException:
             case MetadataIdMismatchException:
             case SmartMeterIdMismatchException:
             case InsufficientLocationDataException:

@@ -1,8 +1,8 @@
-using System.Diagnostics.CodeAnalysis;
+﻿using SMAIAXBackend.Domain.Model.Entities;
 
-namespace SMAIAXBackend.Domain.Model.ValueObjects;
+namespace SMAIAXBackend.Application.DTOs;
 
-public class MeasurementData(
+public class MeasurementRawDto(
     double positiveActivePower,
     double positiveActiveEnergyTotal,
     double negativeActivePower,
@@ -17,7 +17,7 @@ public class MeasurementData(
     double currentPhase3,
     double voltagePhase3,
     string uptime,
-    DateTime timestamp) : ValueObject
+    DateTime timestamp)
 {
     public double PositiveActivePower { get; set; } = positiveActivePower;
     public double PositiveActiveEnergyTotal { get; set; } = positiveActiveEnergyTotal;
@@ -35,23 +35,13 @@ public class MeasurementData(
     public string Uptime { get; set; } = uptime;
     public DateTime Timestamp { get; set; } = timestamp;
 
-    [ExcludeFromCodeCoverage]
-    protected override IEnumerable<object> GetEqualityComponents()
+    public static MeasurementRawDto FromMeasurement(Measurement measurement)
     {
-        yield return PositiveActivePower;
-        yield return PositiveActiveEnergyTotal;
-        yield return NegativeActivePower;
-        yield return NegativeActiveEnergyTotal;
-        yield return ReactiveEnergyQuadrant1Total;
-        yield return ReactiveEnergyQuadrant3Total;
-        yield return TotalPower;
-        yield return CurrentPhase1;
-        yield return VoltagePhase1;
-        yield return CurrentPhase2;
-        yield return VoltagePhase2;
-        yield return CurrentPhase3;
-        yield return VoltagePhase3;
-        yield return Uptime;
-        yield return Timestamp;
+        return new MeasurementRawDto(measurement.PositiveActivePower, measurement.PositiveActiveEnergyTotal,
+            measurement.NegativeActivePower, measurement.NegativeActiveEnergyTotal,
+            measurement.ReactiveEnergyQuadrant1Total, measurement.ReactiveEnergyQuadrant3Total, measurement.TotalPower,
+            measurement.CurrentPhase1, measurement.VoltagePhase1,
+            measurement.CurrentPhase2, measurement.VoltagePhase2, measurement.CurrentPhase3, measurement.VoltagePhase3,
+            measurement.Uptime, measurement.Timestamp);
     }
 }

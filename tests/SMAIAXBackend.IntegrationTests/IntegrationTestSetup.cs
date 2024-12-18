@@ -27,6 +27,7 @@ internal static class IntegrationTestSetup
     public static TenantDbContext Tenant1DbContext { get; private set; } = null!;
     public static TenantDbContext Tenant2DbContext { get; private set; } = null!;
     public static ISmartMeterRepository SmartMeterRepository { get; private set; } = null!;
+    public static IMeasurementRepository MeasurementRepository { get; private set; } = null!;
     public static IPolicyRepository PolicyRepository { get; private set; } = null!;
     public static IPolicyRequestRepository PolicyRequestRepository { get; private set; } = null!;
     public static IUserRepository UserRepository { get; private set; } = null!;
@@ -51,7 +52,7 @@ internal static class IntegrationTestSetup
         const string superUserPassword = "password";
         const string databaseName = "smaiax-db";
         _postgresContainer = new PostgreSqlBuilder()
-            .WithImage("postgres:16-bullseye")
+            .WithImage("timescale/timescaledb:latest-pg16")
             .WithName(postgresContainerName)
             .WithUsername(superUserName)
             .WithPassword(superUserPassword)
@@ -115,6 +116,7 @@ internal static class IntegrationTestSetup
         // Repositories that are using the TenantDatabase need to be instantiated because
         // They are injected with a connection string that is created based on the http request
         SmartMeterRepository = new SmartMeterRepository(Tenant1DbContext);
+        MeasurementRepository = new MeasurementRepository(Tenant1DbContext);
         PolicyRepository = new PolicyRepository(Tenant1DbContext, tenantDbContextFactory, databaseConfigOptions);
         PolicyRequestRepository = new PolicyRequestRepository(Tenant1DbContext);
 

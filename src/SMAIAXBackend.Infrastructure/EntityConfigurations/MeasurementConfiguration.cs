@@ -12,41 +12,35 @@ public class MeasurementConfiguration : IEntityTypeConfiguration<Measurement>
     {
         builder.ToTable("Measurement", "domain");
 
-        builder.HasKey(m => m.Id);
-        builder.Property(m => m.Id)
-            .HasConversion(
-                v => v.Id,
-                v => new MeasurementId(v))
-            .IsRequired();
+        builder.HasNoKey();
 
         builder.Property(m => m.Timestamp)
             .IsRequired();
+        builder.HasIndex(m => m.Timestamp).IsDescending(true);
 
-        builder.OwnsOne(m => m.Data, data =>
-        {
-            data.Property(d => d.PositiveActivePower).HasColumnName("positiveActivePower").IsRequired();
-            data.Property(d => d.PositiveActiveEnergyTotal).HasColumnName("positiveActiveEnergyTotal").IsRequired();
-            data.Property(d => d.NegativeActivePower).HasColumnName("negativeActivePower").IsRequired();
-            data.Property(d => d.NegativeActiveEnergyTotal).HasColumnName("negativeActiveEnergyTotal").IsRequired();
-            data.Property(d => d.ReactiveEnergyQuadrant1Total).HasColumnName("reactiveEnergyQuadrant1Total")
-                .IsRequired();
-            data.Property(d => d.ReactiveEnergyQuadrant3Total).HasColumnName("reactiveEnergyQuadrant3Total")
-                .IsRequired();
-            data.Property(d => d.TotalPower).HasColumnName("totalPower").IsRequired();
-            data.Property(d => d.CurrentPhase1).HasColumnName("currentPhase1").IsRequired();
-            data.Property(d => d.VoltagePhase1).HasColumnName("voltagePhase1").IsRequired();
-            data.Property(d => d.CurrentPhase2).HasColumnName("currentPhase2").IsRequired();
-            data.Property(d => d.VoltagePhase2).HasColumnName("voltagePhase2").IsRequired();
-            data.Property(d => d.CurrentPhase3).HasColumnName("currentPhase3").IsRequired();
-            data.Property(d => d.VoltagePhase3).HasColumnName("voltagePhase3").IsRequired();
-            data.Property(d => d.Uptime).HasColumnName("uptime").IsRequired();
-            data.Property(d => d.Timestamp).HasColumnName("timestamp").IsRequired();
-        });
+        builder.Property(m => m.PositiveActivePower).HasColumnName("positiveActivePower").IsRequired();
+        builder.Property(m => m.PositiveActiveEnergyTotal).HasColumnName("positiveActiveEnergyTotal").IsRequired();
+        builder.Property(m => m.NegativeActivePower).HasColumnName("negativeActivePower").IsRequired();
+        builder.Property(m => m.NegativeActiveEnergyTotal).HasColumnName("negativeActiveEnergyTotal").IsRequired();
+        builder.Property(m => m.ReactiveEnergyQuadrant1Total).HasColumnName("reactiveEnergyQuadrant1Total")
+            .IsRequired();
+        builder.Property(m => m.ReactiveEnergyQuadrant3Total).HasColumnName("reactiveEnergyQuadrant3Total")
+            .IsRequired();
+        builder.Property(m => m.TotalPower).HasColumnName("totalPower").IsRequired();
+        builder.Property(m => m.CurrentPhase1).HasColumnName("currentPhase1").IsRequired();
+        builder.Property(m => m.VoltagePhase1).HasColumnName("voltagePhase1").IsRequired();
+        builder.Property(m => m.CurrentPhase2).HasColumnName("currentPhase2").IsRequired();
+        builder.Property(m => m.VoltagePhase2).HasColumnName("voltagePhase2").IsRequired();
+        builder.Property(m => m.CurrentPhase3).HasColumnName("currentPhase3").IsRequired();
+        builder.Property(m => m.VoltagePhase3).HasColumnName("voltagePhase3").IsRequired();
+        builder.Property(m => m.Uptime).HasColumnName("uptime").IsRequired();
+        builder.Property(m => m.Timestamp).HasColumnName("timestamp").IsRequired();
 
         builder.Property(m => m.SmartMeterId)
             .HasConversion(
                 v => v.Id,
                 v => new SmartMeterId(v))
             .IsRequired();
+        builder.HasIndex(m => m.SmartMeterId);
     }
 }
