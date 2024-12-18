@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 using SMAIAXBackend.Domain.Model.Entities;
 using SMAIAXBackend.Domain.Model.Enums;
 
@@ -10,10 +12,15 @@ public class PolicyDto(
     LocationResolution locationResolution,
     decimal price)
 {
+    [Required]
     public Guid Id { get; set; } = id;
+    [Required(AllowEmptyStrings=false)]    
     public string Name { get; set; } = name;
+    [Required]
     public MeasurementResolution MeasurementResolution { get; set; } = measurementResolution;
+    [Required]
     public LocationResolution LocationResolution { get; set; } = locationResolution;
+    [Required]
     public decimal Price { get; set; } = price;
 
     public static PolicyDto FromPolicy(Policy policy)
