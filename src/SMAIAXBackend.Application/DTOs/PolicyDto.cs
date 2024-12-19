@@ -14,7 +14,7 @@ public class PolicyDto(
 {
     [Required]
     public Guid Id { get; set; } = id;
-    [Required(AllowEmptyStrings=false)]    
+    [Required(AllowEmptyStrings = false)]
     public string Name { get; set; } = name;
     [Required]
     public MeasurementResolution MeasurementResolution { get; set; } = measurementResolution;
