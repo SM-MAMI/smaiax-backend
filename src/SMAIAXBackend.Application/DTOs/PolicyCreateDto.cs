@@ -10,7 +10,7 @@ public class PolicyCreateDto(string name,
     decimal price,
     Guid smartMeterId)
 {
-    [Required(AllowEmptyStrings=false)]
+    [Required(AllowEmptyStrings = false)]
     public string Name { get; set; } = name;
     [Required]
     public MeasurementResolution MeasurementResolution { get; set; } = measurementResolution;
