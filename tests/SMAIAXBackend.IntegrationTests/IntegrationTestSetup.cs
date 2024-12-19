@@ -29,7 +29,6 @@ internal static class IntegrationTestSetup
     public static ISmartMeterRepository SmartMeterRepository { get; private set; } = null!;
     public static IMeasurementRepository MeasurementRepository { get; private set; } = null!;
     public static IPolicyRepository PolicyRepository { get; private set; } = null!;
-    public static IPolicyRequestRepository PolicyRequestRepository { get; private set; } = null!;
     public static IUserRepository UserRepository { get; private set; } = null!;
     public static ITenantRepository TenantRepository { get; private set; } = null!;
     public static IVaultRepository VaultRepository { get; private set; } = null!;
@@ -118,7 +117,6 @@ internal static class IntegrationTestSetup
         SmartMeterRepository = new SmartMeterRepository(Tenant1DbContext);
         MeasurementRepository = new MeasurementRepository(Tenant1DbContext);
         PolicyRepository = new PolicyRepository(Tenant1DbContext, tenantDbContextFactory, databaseConfigOptions);
-        PolicyRequestRepository = new PolicyRequestRepository(Tenant1DbContext);
 
         var tokenRepository = _webAppFactory.Services.GetRequiredService<ITokenRepository>();
         AccessToken = await tokenRepository.GenerateAccessTokenAsync($"{Guid.NewGuid()}-{Guid.NewGuid()}",

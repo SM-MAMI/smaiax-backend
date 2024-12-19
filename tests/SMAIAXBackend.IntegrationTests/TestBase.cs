@@ -21,7 +21,6 @@ public class TestBase
     protected readonly ISmartMeterRepository _smartMeterRepository = IntegrationTestSetup.SmartMeterRepository;
     protected readonly IMeasurementRepository _measurementRepository = IntegrationTestSetup.MeasurementRepository;
     protected readonly IPolicyRepository _policyRepository = IntegrationTestSetup.PolicyRepository;
-    protected readonly IPolicyRequestRepository _policyRequestRepository = IntegrationTestSetup.PolicyRequestRepository;
     protected readonly IUserRepository _userRepository = IntegrationTestSetup.UserRepository;
     protected readonly string _accessToken = IntegrationTestSetup.AccessToken;
 
