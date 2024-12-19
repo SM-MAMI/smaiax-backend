@@ -12,7 +12,7 @@ using SMAIAXBackend.Infrastructure.DbContexts;
 namespace SMAIAXBackend.Infrastructure.Migrations.TenantDb
 {
     [DbContext(typeof(TenantDbContext))]
-    [Migration("20241218153107_RefactorMetadataNullableHouseholdsize")]
+    [Migration("20241219225620_RefactorMetadataNullableHouseholdsize")]
     partial class RefactorMetadataNullableHouseholdsize
     {
         /// <inheritdoc />
@@ -260,8 +260,7 @@ namespace SMAIAXBackend.Infrastructure.Migrations.TenantDb
                                 .HasConstraintName("fK_Metadata_Metadata_id");
                         });
 
-                    b.Navigation("Location")
-                        .IsRequired();
+                    b.Navigation("Location");
 
                     b.Navigation("SmartMeter");
                 });

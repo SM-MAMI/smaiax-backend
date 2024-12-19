@@ -257,8 +257,7 @@ namespace SMAIAXBackend.Infrastructure.Migrations.TenantDb
                                 .HasConstraintName("fK_Metadata_Metadata_id");
                         });
 
-                    b.Navigation("Location")
-                        .IsRequired();
+                    b.Navigation("Location");
 
                     b.Navigation("SmartMeter");
                 });

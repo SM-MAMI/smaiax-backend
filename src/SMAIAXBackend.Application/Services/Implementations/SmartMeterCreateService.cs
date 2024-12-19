@@ -26,10 +26,13 @@ public class SmartMeterCreateService(
         if (smartMeterCreateDto.Metadata != null)
         {
             var metadataId = smartMeterRepository.NextMetadataIdentity();
-            var location = new Location(smartMeterCreateDto.Metadata.Location.StreetName,
-                smartMeterCreateDto.Metadata.Location.City,
-                smartMeterCreateDto.Metadata.Location.State, smartMeterCreateDto.Metadata.Location.Country,
-                smartMeterCreateDto.Metadata.Location.Continent);
+            var locationDto = smartMeterCreateDto.Metadata.Location;
+            var location = locationDto != null
+                ? new Location(locationDto.StreetName,
+                    locationDto.City,
+                    locationDto.State, locationDto.Country,
+                    locationDto.Continent)
+                : null;
             var metadata = Metadata.Create(metadataId, smartMeterCreateDto.Metadata.ValidFrom, location,
                 smartMeterCreateDto.Metadata.HouseholdSize, smartMeterId);
 
@@ -64,8 +67,11 @@ public class SmartMeterCreateService(
         }
 
         var metadataId = smartMeterRepository.NextMetadataIdentity();
-        var location = new Location(metadataCreateDto.Location.StreetName, metadataCreateDto.Location.City,
-            metadataCreateDto.Location.State, metadataCreateDto.Location.Country, metadataCreateDto.Location.Continent);
+        var locationDto = metadataCreateDto.Location;
+        var location = locationDto != null
+            ? new Location(locationDto.StreetName, locationDto.City,
+                locationDto.State, locationDto.Country, locationDto.Continent)
+            : null;
         var metadata = Metadata.Create(metadataId, metadataCreateDto.ValidFrom, location,
             metadataCreateDto.HouseholdSize, smartMeter.Id);
 

@@ -4,20 +4,19 @@ using SMAIAXBackend.Domain.Model.Entities;
 
 namespace SMAIAXBackend.Application.DTOs;
 
-public class MetadataDto(Guid id, DateTime validFrom, LocationDto location, int? householdSize)
+public class MetadataDto(Guid id, DateTime validFrom, LocationDto? location, int? householdSize)
 {
-    [Required]
-    public Guid Id { get; set; } = id;
+    [Required] public Guid Id { get; set; } = id;
 
-    [Required]
-    public DateTime ValidFrom { get; set; } = validFrom;
+    [Required] public DateTime ValidFrom { get; set; } = validFrom;
 
-    public LocationDto Location { get; set; } = location;
+    public LocationDto? Location { get; set; } = location;
 
     public int? HouseholdSize { get; set; } = householdSize;
 
     public static MetadataDto FromMetadata(Metadata metadata)
     {
-        return new MetadataDto(metadata.Id.Id, metadata.ValidFrom, LocationDto.FromLocation(metadata.Location), metadata.HouseholdSize);
+        var location = metadata.Location != null ? LocationDto.FromLocation(metadata.Location) : null;
+        return new MetadataDto(metadata.Id.Id, metadata.ValidFrom, location, metadata.HouseholdSize);
     }
 }
