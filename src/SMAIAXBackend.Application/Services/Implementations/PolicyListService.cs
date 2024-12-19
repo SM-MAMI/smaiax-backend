@@ -1,8 +1,10 @@
 ﻿using SMAIAXBackend.Application.DTOs;
 using SMAIAXBackend.Application.Services.Interfaces;
+using SMAIAXBackend.Domain.Model.Entities;
 using SMAIAXBackend.Domain.Model.Enums;
 using SMAIAXBackend.Domain.Model.ValueObjects.Ids;
 using SMAIAXBackend.Domain.Repositories;
+using SMAIAXBackend.Domain.Specifications;
 
 namespace SMAIAXBackend.Application.Services.Implementations;
 
@@ -26,37 +28,32 @@ public class PolicyListService(
     public async Task<List<PolicyDto>> GetFilteredPoliciesAsync(decimal? maxPrice,
         MeasurementResolution? measurementResolution)
     {
-        // TODO: Use Specification pattern to filter policies
-        var matchingPolices = new List<PolicyDto>();
+        var matchingPolicies = new List<PolicyDto>();
+        ISpecification<Policy> specification = new BaseSpecification<Policy>();
+
+        if (maxPrice.HasValue)
+        {
+            var priceSpecification = new PriceSpecification(maxPrice.Value);
+            specification = new AndSpecification<Policy>(specification, priceSpecification);
+        }
+
+        if (measurementResolution.HasValue)
+        {
+            var measurementResolutionSpecification =
+                new MeasurementResolutionSpecification(measurementResolution.Value);
+            specification = new AndSpecification<Policy>(specification, measurementResolutionSpecification);
+        }
 
         var currentTenant = await tenantContextService.GetCurrentTenantAsync();
         var tenants = await tenantRepository.GetAllAsync();
 
-        foreach (var tenant in tenants)
+        foreach (var tenant in tenants.Where(t => !t.Equals(currentTenant)))
         {
-            if (currentTenant.Equals(tenant))
-            {
-                continue;
-            }
-            
             var policies = await policyRepository.GetPoliciesByTenantAsync(tenant);
-            
-            foreach (var policy in policies)
-            {
-                if (maxPrice.HasValue && policy.Price > maxPrice)
-                {
-                    continue;
-                }
-
-                if (measurementResolution.HasValue && policy.MeasurementResolution != measurementResolution)
-                {
-                    continue;
-                }
-
-                matchingPolices.Add(PolicyDto.FromPolicy(policy));
-            }
+            var filteredPolicies = policies.Where(policy => specification.IsSatisfiedBy(policy)).ToList();
+            matchingPolicies.AddRange(filteredPolicies.Select(PolicyDto.FromPolicy));
         }
 
-        return matchingPolices;
+        return matchingPolicies;
     }
 }

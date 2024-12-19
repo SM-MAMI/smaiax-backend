@@ -13,8 +13,6 @@ public static class ServiceExtensions
         services.AddScoped<IAuthenticationService, AuthenticationService>();
         services.AddScoped<IMeasurementListService, MeasurementListService>();
         services.AddScoped<IPolicyCreateService, PolicyCreateService>();
-        services.AddScoped<IPolicyRequestCreateService, PolicyRequestCreateService>();
-        services.AddScoped<IPolicyMatchingService, PolicyMatchingService>();
         services.AddScoped<IPolicyListService, PolicyListService>();
         services.AddScoped<ITenantContextService, TenantContextService>();
         services.AddScoped<ISmartMeterCreateService, SmartMeterCreateService>();

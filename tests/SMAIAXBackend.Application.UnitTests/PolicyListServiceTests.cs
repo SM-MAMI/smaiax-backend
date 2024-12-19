@@ -110,4 +110,66 @@ public class PolicyListServiceTests
         Assert.That(policiesActual, Is.Not.Null);
         Assert.That(policiesActual, Has.Count.EqualTo(0));
     }
+
+    [Test]
+    public async Task GivenExistingPolicies_WhenGetFilteredPolicies_ThenReturnFilteredPolicies()
+    {
+        // Given
+        const int maxPrice = 100;
+        const MeasurementResolution measurementResolution = MeasurementResolution.Hour;
+        var currentTenant = Tenant.Create(new TenantId(Guid.NewGuid()), "tenant1", "tenant1");
+        List<Tenant> tenants =
+        [
+            Tenant.Create(new TenantId(Guid.NewGuid()), "tenant2", "tenant2"),
+            Tenant.Create(new TenantId(Guid.NewGuid()), "tenant3", "tenant3")
+        ];
+
+        var policyId1 = new PolicyId(Guid.NewGuid());
+        var policyId2 = new PolicyId(Guid.NewGuid());
+
+        var policiesExpected = new List<Policy>
+        {
+            Policy.Create(policyId1, "policy1", MeasurementResolution.Hour, LocationResolution.None, 100,
+                new SmartMeterId(Guid.NewGuid())),
+            Policy.Create(policyId2, "policy2", MeasurementResolution.Hour, LocationResolution.None, 100,
+                new SmartMeterId(Guid.NewGuid()))
+        };
+
+        _tenantContextServiceMock.Setup(service => service.GetCurrentTenantAsync()).ReturnsAsync(currentTenant);
+        _tenantRepositoryMock.Setup(repo => repo.GetAllAsync()).ReturnsAsync(tenants);
+        _policyRepositoryMock.Setup(repo => repo.GetPoliciesByTenantAsync(tenants[0])).ReturnsAsync(policiesExpected);
+        _policyRepositoryMock.Setup(repo => repo.GetPoliciesByTenantAsync(tenants[1])).ReturnsAsync([]);
+
+        // When
+        var policiesActual = await _policyListService.GetFilteredPoliciesAsync(maxPrice, measurementResolution);
+
+        // Then
+        Assert.That(policiesActual, Is.Not.Null);
+        Assert.That(policiesActual, Has.Count.EqualTo(policiesExpected.Count));
+    }
+
+    [Test]
+    public async Task GivenNoPolicies_WhenGetFilteredPolicies_ThenReturnEmptyList()
+    {
+        // Given
+        const int maxPrice = 100;
+        const MeasurementResolution measurementResolution = MeasurementResolution.Hour;
+        var currentTenant = Tenant.Create(new TenantId(Guid.NewGuid()), "tenant1", "tenant1");
+        List<Tenant> tenants =
+        [
+            Tenant.Create(new TenantId(Guid.NewGuid()), "tenant2", "tenant2"),
+            Tenant.Create(new TenantId(Guid.NewGuid()), "tenant3", "tenant3")
+        ];
+
+        _tenantContextServiceMock.Setup(service => service.GetCurrentTenantAsync()).ReturnsAsync(currentTenant);
+        _tenantRepositoryMock.Setup(repo => repo.GetAllAsync()).ReturnsAsync(tenants);
+        _policyRepositoryMock.Setup(repo => repo.GetPoliciesByTenantAsync(It.IsAny<Tenant>())).ReturnsAsync([]);
+
+        // When
+        var policiesActual = await _policyListService.GetFilteredPoliciesAsync(maxPrice, measurementResolution);
+
+        // Then
+        Assert.That(policiesActual, Is.Not.Null);
+        Assert.That(policiesActual, Has.Count.EqualTo(0));
+    }
 }
