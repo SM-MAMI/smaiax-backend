@@ -26,15 +26,14 @@ public class MetadataConfiguration : IEntityTypeConfiguration<Metadata>
 
         builder.OwnsOne(m => m.Location, location =>
         {
-            location.Property(l => l.StreetName).HasColumnName("streetName");
-            location.Property(l => l.City).HasColumnName("city");
-            location.Property(l => l.State).HasColumnName("state");
-            location.Property(l => l.Country).HasColumnName("country");
-            location.Property(l => l.Continent).HasColumnName("continent").HasConversion<string>();
+            location.Property(l => l.StreetName).HasColumnName("streetName").HasMaxLength(200);
+            location.Property(l => l.City).HasColumnName("city").HasMaxLength(200);
+            location.Property(l => l.State).HasColumnName("state").HasMaxLength(200);
+            location.Property(l => l.Country).HasColumnName("country").HasMaxLength(200);
+            location.Property(l => l.Continent).HasColumnName("continent").HasConversion<string>().HasMaxLength(200);
         });
 
-        builder.Property(m => m.HouseholdSize)
-            .IsRequired();
+        builder.Property(m => m.HouseholdSize);
 
         builder.HasOne(md => md.SmartMeter)
             .WithMany(sm => sm.Metadata)

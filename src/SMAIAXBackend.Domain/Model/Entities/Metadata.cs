@@ -10,7 +10,7 @@ public sealed class Metadata : IEquatable<Metadata>
     public MetadataId Id { get; } = null!;
     public DateTime ValidFrom { get; }
     public Location Location { get; } = null!;
-    public int HouseholdSize { get; }
+    public int? HouseholdSize { get; }
     public SmartMeterId SmartMeterId { get; }
     public SmartMeter SmartMeter { get; } = null!;
 
@@ -18,7 +18,7 @@ public sealed class Metadata : IEquatable<Metadata>
         MetadataId metadataId,
         DateTime validFrom,
         Location location,
-        int householdSize,
+        int? householdSize,
         SmartMeterId smartMeterId)
     {
         return new Metadata(metadataId, validFrom, location, householdSize, smartMeterId);
@@ -34,7 +34,7 @@ public sealed class Metadata : IEquatable<Metadata>
         MetadataId metadataId,
         DateTime validFrom,
         Location location,
-        int householdSize,
+        int? householdSize,
         SmartMeterId smartMeterId)
     {
         Id = metadataId;
