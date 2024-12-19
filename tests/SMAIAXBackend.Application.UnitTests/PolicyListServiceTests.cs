@@ -1,8 +1,7 @@
-using Microsoft.Extensions.Logging;
-
 using Moq;
 
 using SMAIAXBackend.Application.Services.Implementations;
+using SMAIAXBackend.Application.Services.Interfaces;
 using SMAIAXBackend.Domain.Model.Entities;
 using SMAIAXBackend.Domain.Model.Enums;
 using SMAIAXBackend.Domain.Model.ValueObjects.Ids;
@@ -14,15 +13,18 @@ namespace SMAIAXBackend.Application.UnitTests;
 public class PolicyListServiceTests
 {
     private Mock<IPolicyRepository> _policyRepositoryMock;
-    private Mock<ILogger<PolicyListService>> _loggerMock;
+    private Mock<ITenantRepository> _tenantRepositoryMock;
+    private Mock<ITenantContextService> _tenantContextServiceMock;
     private PolicyListService _policyListService;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
         _policyRepositoryMock = new Mock<IPolicyRepository>();
-        _loggerMock = new Mock<ILogger<PolicyListService>>();
-        _policyListService = new PolicyListService(_policyRepositoryMock.Object, _loggerMock.Object);
+        _tenantRepositoryMock = new Mock<ITenantRepository>();
+        _tenantContextServiceMock = new Mock<ITenantContextService>();
+        _policyListService = new PolicyListService(_policyRepositoryMock.Object, _tenantRepositoryMock.Object,
+            _tenantContextServiceMock.Object);
     }
 
     [Test]
@@ -77,7 +79,7 @@ public class PolicyListServiceTests
         {
             Policy.Create(policyId1, "policy1", MeasurementResolution.Hour, LocationResolution.None, 100,
                 smartMeterId),
-            Policy.Create(policyId2,  "policy2", MeasurementResolution.Hour, LocationResolution.None, 100,
+            Policy.Create(policyId2, "policy2", MeasurementResolution.Hour, LocationResolution.None, 100,
                 smartMeterId)
         };
 
